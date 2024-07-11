@@ -23,6 +23,9 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "joi": "^17.13.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
+    "sequelize": "^6.37.3",
+    "typeorm": "^0.3.20"
   }
 }

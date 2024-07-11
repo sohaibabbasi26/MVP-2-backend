@@ -9,6 +9,19 @@ async function serverCheck(req,res) {
     }
 }
 
+async function signup(req,res){
+    try{
+        const data = req?.body;
+        console.log("data:",data);
+        res.send(data);
+    }
+    catch(err){
+        console.log("ERROR:",err);
+        return;
+    }
+}
+
 module.exports = {
-    serverCheck
+    serverCheck,
+    signup
 }
