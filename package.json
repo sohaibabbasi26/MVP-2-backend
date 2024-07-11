@@ -1,0 +1,28 @@
+{
+  "name": "mvp-2-backend",
+  "version": "1.0.0",
+  "description": "Its a MVP-2 backend service comprised of recruitinn v2 API's and MVP-2 service",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sohaibabbasi26/MVP-2-backend.git"
+  },
+  "keywords": [
+    "MVP2"
+  ],
+  "author": "Sohaib Abbasi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sohaibabbasi26/MVP-2-backend/issues"
+  },
+  "homepage": "https://github.com/sohaibabbasi26/MVP-2-backend#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
