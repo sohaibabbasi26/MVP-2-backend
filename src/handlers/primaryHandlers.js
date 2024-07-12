@@ -1,3 +1,4 @@
+const services = require('../services/primaryServices');
 
 async function serverCheck(req,res) {
     try{
@@ -13,7 +14,8 @@ async function signup(req,res){
     try{
         const data = req?.body;
         console.log("data:",data);
-        res.send(data);
+        const result = await services.signup(data) ;
+        res.send(result);
     }
     catch(err){
         console.log("ERROR:",err);
