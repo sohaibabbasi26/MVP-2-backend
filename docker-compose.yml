@@ -5,13 +5,13 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
     ports:
-      - "7778:5432"
+      - "5432:5432"
     networks:
       - dev-net
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: MVP2_Backend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
      
   adminer:
       image: adminer
