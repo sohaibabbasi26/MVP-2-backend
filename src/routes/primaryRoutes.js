@@ -12,6 +12,12 @@ const routes = [
         url:'/signup',
         handler: primaryHandlers.signup,
         preHandler: authValidation.validateRegister
+    },
+    {
+        method:'POST',
+        url:'/login',
+        handler:primaryHandlers.login,
+        preHandler:authValidation.validateLogin
     }
 ];
 

@@ -1,30 +1,132 @@
 const { sequelize } = require('../../configurations/sequelizePgSQL');
 const Customer = require('../models/customer');
-const {checkCustomerInDb} = require('../utilities/checkCustomerExists');
+const Client = require('../models/client');
+const Admin = require('../models/admin');
+const { checkCustomerInDb } = require('../utilities/checkCustomerExists');
+const { checkClientInDb } = require('../utilities/checkClientInDb');
 const { encryptPasword } = require('../utilities/encryptPassword');
+const { jwtSignature } = require('../utilities/jwtSign');
+const { comparePassword } = require('../utilities/passwordCompare');
 
-async function signup(data) {
+async function customerSignup(data) {
     try {
-        console.log('data in service:', data);
-        checkCustomerInDb(data?.customer_id);
-        if (checkIfCustomerExists) {
+        const { name, email, password, contact_no, method } = data;
+        const isCustomerInDb = await checkCustomerInDb(email, method);
+        if (isCustomerInDb === true) {
             return `User with these credentials already exists`;
         } else {
             try {
-                const hashedPassword = encryptPasword(data?.password);
-                const result = await Customer.create(data);
-                console.log("Created User:", result);
+                const hashedPassword = await encryptPasword(password);
+                const newData = {
+                    name,
+                    email,
+                    password: hashedPassword,
+                    contact_no,
+                }
+                const result = await Customer.create(newData);
+                jwtSignature(result?.dataValues);
                 return "User has been created successfully."
             } catch (err) {
-                console.log("ERROR WHILE CREATING CUSTOMER:",err,'\n error source :  error source: src -> services -> primaryServices')
+                console.log("ERROR WHILE CREATING CUSTOMER:", err, '\n error source :  error source: src -> services -> primaryServices -> signup');
+                return 'ERROR WHILE CREATING CUSTOMER:', err;
             }
         }
     } catch (err) {
-        console.log('some error occured while signing up:', err, '\n error source: src -> services -> primaryServices');
+        console.log('some error occured while signing up:', err, '\n error source: src -> services -> primaryServices -> signup');
         return "Some error occured while signing up";
     }
 }
 
+
+async function clientSignup(data) {
+    try {
+        const { name, client_location, email, password, contact_no, method } = data;
+        const isClientInDb = await checkClientInDb(email, method);
+        if (isClientInDb === true) {
+            return `Client with these credentials already exists`;
+        } else {
+            try {
+                const hashedPassword = await encryptPasword(password);
+                const newData = {
+                    name,
+                    client_location,
+                    email,
+                    password: hashedPassword,
+                    contact_no,
+                }
+                const result = await Client.create(newData);
+                jwtSignature(result?.dataValues);
+                return "CLIENT has been created successfully."
+            } catch (err) {
+                console.log("ERROR WHILE CREATING CLIENT:", err, '\n error source :  error source: src -> services -> primaryServices -> signup');
+                return 'ERROR WHILE CREATING CLIENT:', err;
+            }
+        }
+    } catch (err) {
+        console.log('some error occured while signing up:', err, '\n error source: src -> services -> primaryServices -> signup');
+        return "Some error occured while signing up";
+    }
+}
+
+async function customerLogin(data) {
+    try {
+        const { email, password, method } = data;
+        const fetchedCustomer = await checkCustomerInDb(email, method);
+        if (fetchedCustomer) {
+            try {
+                const compareAndCheck = await comparePassword(password, fetchedCustomer?.password);
+                if (!compareAndCheck) {
+                    return "Invalid password";
+                } else {
+                    const token = await jwtSignature(fetchedCustomer.dataValues); // Pass customer_id and email
+                    return token;
+                }
+            }
+            catch (err) {
+                console.log("ERR:", err, "\n Error source: src -> services -> primaryServices -> login");
+                return "ERROR WHILE LOGGING IN:", err
+            }
+        }
+        else {
+            return "Customer not found";
+        }
+    } catch (err) {
+        console.log("SOME ERROR OCCURED:", err, "\n Error source: src -> services -> primaryServices -> login ");
+        return "SOME ERROR OCCURED:", err
+    }
+}
+
+async function clientLogin(data) {
+    try {
+        const { email, password, method } = data;
+        const fetchedClient = await checkClientInDb(email, method);
+        if (fetchedClient) {
+            try {
+                const compareAndCheck = await comparePassword(password, fetchedClient?.password);
+                if (!compareAndCheck) {
+                    return "Invalid password";
+                } else {
+                    const token = await jwtSignature(fetchedClient?.dataValues);
+                    return token;
+                }
+            }
+            catch (err) {
+                console.log("ERR:", err, "\n Error source: src -> services -> primaryServices -> login");
+                return "ERROR WHILE LOGGING IN:", err
+            }
+        }
+        else {
+            return "Customer not found";
+        }
+    } catch (err) {
+        console.log("SOME ERROR OCCURED:", err, "\n Error source: src -> services -> primaryServices -> login ");
+        return "SOME ERROR OCCURED:", err
+    }
+}
+
 module.exports = {
-    signup
+    customerSignup,
+    clientSignup,
+    customerLogin,
+    clientLogin
 } 

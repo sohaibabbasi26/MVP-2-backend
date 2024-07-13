@@ -1,22 +1,31 @@
 const Customer = require('../models/customer');
+const { Op } = require('sequelize');
 
 
-const checkCustomerInDb = async (customerId) => {
-    try{
-        const checkIfCustomerExists = await Customer.findOne({
+const checkCustomerInDb = async (email, method) => {
+    try {
+        const customer = await Customer.findOne({
             where: {
-                customer_id: customerId
+                email:email
             }
-        })
-    
-        if (checkIfCustomerExists){
-            return true;
-        } else {
-            return false
+        });
+        if(method === 'signup'){
+            if(customer){
+                return true;
+            } else{
+                return false;
+            }
+        } else if(method === 'login'){
+            if(customer){
+                return customer;
+            } else{
+                return "Couldn't find any customer";
+            }
         }
-    } catch(e){
-        console.log("ERROR WHILE CHECKING:", e, "\n error source : src -> utilities -> checkCustomerExists")
+    } catch (error) {
+        console.error("ERROR WHILE CHECKING:", error);
+        throw error; 
     }
-}
+};
 
 module.exports = { checkCustomerInDb }

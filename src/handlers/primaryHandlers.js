@@ -14,8 +14,34 @@ async function signup(req,res){
     try{
         const data = req?.body;
         console.log("data:",data);
-        const result = await services.signup(data) ;
-        res.send(result);
+        if(data?.user_role === 'customer'){
+            const result = await services.customerSignup(data) ;
+            res.send(result);
+        }
+        else if(data?.user_role === 'client'){
+            const result = await services.clientSignup(data) ;
+            res.send(result);
+        }
+    }
+    catch(err){
+        console.log("ERROR:",err);
+        return;
+    }
+}
+
+async function login(req,res){
+    try{
+        const data = req?.body;
+        console.log("data:",data);
+
+        if(data?.user_role === 'customer'){
+            const result = await services.customerLogin(data);
+            res.send(result);
+        }
+        else if(data?.user_role === 'client'){
+            const result = await services.clientLogin(data) ;
+            res.send(result);
+        }
     }
     catch(err){
         console.log("ERROR:",err);
@@ -25,5 +51,6 @@ async function signup(req,res){
 
 module.exports = {
     serverCheck,
-    signup
+    signup,
+    login
 }
