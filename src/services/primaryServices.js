@@ -7,6 +7,7 @@ const { checkClientInDb } = require('../utilities/checkClientInDb');
 const { encryptPasword } = require('../utilities/encryptPassword');
 const { jwtSignature } = require('../utilities/jwtSign');
 const { comparePassword } = require('../utilities/passwordCompare');
+const { checkAdminInDb } = require('../utilities/checkAdminInDb');
 
 async function customerSignup(data) {
     try {
@@ -68,6 +69,37 @@ async function clientSignup(data) {
     }
 }
 
+async function adminSignup(data) {
+    try{
+        const {email,password,method} = data;
+        const isAdminInDb = await checkAdminInDb(email, method);
+        if (isAdminInDb === true) {
+            return `Admin with these credentials already exists`;
+        } else {
+            try {
+                const hashedPassword = await encryptPasword(password);
+                const newData = {
+                    // name,
+                    // client_location,
+                    email,
+                    password: hashedPassword,
+                    // contact_no,
+                }
+                const result = await Admin.create(newData);
+                jwtSignature(result?.dataValues);
+                return "Admin has been created successfully."
+            } catch (err) {
+                console.log("ERROR WHILE CREATING ADMIN:", err, '\n error source :  error source: src -> services -> primaryServices -> signup');
+                return 'ERROR WHILE CREATING ADMIN:', err;
+            }
+        }
+    } catch (e){
+        console.log("SOME ERROR OCCURED:", e, "\n Error source: src -> services -> primaryServices -> login ");
+        return "SOME ERROR OCCURED:", e
+    }
+}
+
+
 async function customerLogin(data) {
     try {
         const { email, password, method } = data;
@@ -124,9 +156,40 @@ async function clientLogin(data) {
     }
 }
 
+async function adminLogin(data) {
+    try {
+        const { email, password, method } = data;
+        const fetchedAdmin = await checkAdminInDb(email, method);
+        if (fetchedAdmin) {
+            try {
+                const compareAndCheck = await comparePassword(password, fetchedAdmin?.password);
+                if (!compareAndCheck) {
+                    return "Invalid password";
+                } else {
+                    const token = await jwtSignature(fetchedAdmin?.dataValues);
+                    return token;
+                }
+            }
+            catch (err) {
+                console.log("ERR:", err, "\n Error source: src -> services -> primaryServices -> login");
+                return "ERROR WHILE LOGGING IN:", err
+            }
+        }
+        else {
+            return "Admin not found";
+        }
+    } catch (err) {
+        console.log("SOME ERROR OCCURED:", err, "\n Error source: src -> services -> primaryServices -> login ");
+        return "SOME ERROR OCCURED:", err
+    }
+}
+
+
 module.exports = {
     customerSignup,
     clientSignup,
     customerLogin,
-    clientLogin
+    clientLogin,
+    adminSignup,
+    adminLogin
 } 

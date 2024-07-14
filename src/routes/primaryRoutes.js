@@ -18,7 +18,7 @@ const routes = [
         url:'/login',
         handler:primaryHandlers.login,
         preHandler:authValidation.validateLogin
-    }
+    },
 ];
 
 module.exports = {routes};

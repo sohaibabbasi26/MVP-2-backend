@@ -22,6 +22,10 @@ async function signup(req,res){
             const result = await services.clientSignup(data) ;
             res.send(result);
         }
+        else if(data?.user_role === 'admin'){
+            const result = await services.adminSignup(data) ;
+            res.send(result);
+        }
     }
     catch(err){
         console.log("ERROR:",err);
@@ -40,6 +44,10 @@ async function login(req,res){
         }
         else if(data?.user_role === 'client'){
             const result = await services.clientLogin(data) ;
+            res.send(result);
+        }
+        else if(data?.user_role === 'admin'){
+            const result = await services.adminLogin(data) ;
             res.send(result);
         }
     }

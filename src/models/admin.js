@@ -17,19 +17,6 @@ const Admin = sequelize.define('admins', {
         type: DataTypes.STRING,
         allowNull: false
     }
-}, {
-    hooks: {
-        beforeCreate: async (admin, options) => {
-            if (admin.password) {
-                admin.password = await encryptPassword(admin.password);
-            }
-        },
-        beforeUpdate: async (admin, options) => {
-            if (admin.changed('password')) {
-                admin.password = await encryptPassword(admin.password);
-            }
-        }
-    }
 });
 
 module.exports = Admin;
