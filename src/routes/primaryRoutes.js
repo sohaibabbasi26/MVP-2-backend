@@ -26,7 +26,7 @@ const routes = [
         url:'/password-reset',
         handler: resetPasswordHandler,
         preHandler: validatePasswordReset
-    }
+    },
 ];
 
 module.exports = {routes};
