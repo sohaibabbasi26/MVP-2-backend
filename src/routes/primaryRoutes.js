@@ -19,6 +19,23 @@ const routes = [
         handler:primaryHandlers.login,
         preHandler:authValidation.validateLogin
     },
+    {
+        method:'POST',
+        url:'/gen-random-questions',
+        handler: primaryHandlers.getRandomQuestions,
+        preHandler:authValidation.validateRandomQuestionGen
+    },
+    {
+        method:'POST',
+        url:'/create-positions',
+        handler: primaryHandlers.createPositions,
+        preHandler:authValidation.validateJobPost
+    },
+    {
+        method:'POST',
+        url:'/send-email',
+        handler: primaryHandlers.sendMail,
+    }
 ];
 
 module.exports = {routes};

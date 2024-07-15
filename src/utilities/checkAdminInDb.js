@@ -22,6 +22,11 @@ const checkAdminInDb = async (email, method) => {
                 return "Couldn't find any customer";
             }
         }
+        if(admin){
+            return true;
+        } else{
+            return 'No such admin is available.';
+        }
     } catch (error) {
         console.error("ERROR WHILE CHECKING:", error);
         throw error; 
