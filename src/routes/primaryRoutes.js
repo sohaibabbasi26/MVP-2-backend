@@ -1,5 +1,7 @@
+const { resetPasswordHandler } = require('../handlers/passwordResetHandler');
 const primaryHandlers = require('../handlers/primaryHandlers');
 const authValidation = require('../pre-handlers/authValidation');
+const { validatePasswordReset } = require('../pre-handlers/passwordResetValidation');
 
 const routes = [
     {
@@ -19,6 +21,12 @@ const routes = [
         handler:primaryHandlers.login,
         preHandler:authValidation.validateLogin
     },
+    {
+        method:'POST',
+        url:'/password-reset',
+        handler: resetPasswordHandler,
+        preHandler: validatePasswordReset
+    }
 ];
 
 module.exports = {routes};
