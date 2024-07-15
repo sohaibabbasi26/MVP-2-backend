@@ -5,7 +5,7 @@ const getCustomerViaExpertise = async (expertise) => {
   const customer = await Customer.findAll({
     where: {
       expertise: {
-        [Op.contains]: JSON.parse(expertise),
+        [Op.contains]: expertise,
       },
     },
   });

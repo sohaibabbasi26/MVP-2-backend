@@ -15,7 +15,7 @@ async function customers(req, res) {
 }
 
 const getCustomerWithExpertise = async (req, res) => {
-  const { expertise } = req.query;
+  const { expertise } = req.body;
   console.log("expertise: ", expertise);
 
   if (expertise) {

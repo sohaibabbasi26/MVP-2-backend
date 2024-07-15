@@ -3,6 +3,7 @@ const clientHandlers = require("../handlers/clientHandler");
 const customerHandlers = require("../handlers/customerHandler");
 const authValidation = require("../pre-handlers/authValidation");
 const { getCustomerWithExpertise } = require("../handlers/customerHandler");
+const { clientinterview } = require("../handlers/client-interview-Handler");
 const routes = [
   {
     method: "GET",
@@ -32,9 +33,14 @@ const routes = [
     handler: clientHandlers.clients,
   },
   {
-    method: "GET",
+    method: "POST",
     url: "/get-customer-with-expertise",
     handler: getCustomerWithExpertise,
+  },
+  {
+    method: "POST",
+    url: "/scheduling-interview",
+    handler: clientinterview,
   },
 ];
 
