@@ -5,8 +5,13 @@ const {
 } = require("../services/customerservice");
 const Op = require("@sequelize/core");
 async function customers(req, res) {
-  const data = await getallcustomers();
-  res.send(data);
+  try {
+    const data = await getallcustomers();
+    res.send(data);
+  } catch (error) {
+    console.log(`Error while getting customers data ${error}`);
+    return;
+  }
 }
 
 const getCustomerWithExpertise = async (req, res) => {

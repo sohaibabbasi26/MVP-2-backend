@@ -1,9 +1,13 @@
-const Client = require("../models/client");
 const { getallclients } = require("../services/clientservice");
 //Client Api
 async function clients(req, res) {
-  const data = await getallclients();
-  res.send(data);
+  try {
+    const data = await getallclients();
+    res.send(data);
+  } catch (error) {
+    console.log(`Error while getting clients data ${error}`);
+    return;
+  }
 }
 module.exports = {
   clients,

@@ -5,7 +5,7 @@ async function getallclients(req, res) {
     const result = await Client.findAll();
     return result;
   } catch (error) {
-    console.log(`Error while retrieving data ${error}`);
+    console.log(`Error while retrieving client data ${error}`);
     return;
   }
 }
