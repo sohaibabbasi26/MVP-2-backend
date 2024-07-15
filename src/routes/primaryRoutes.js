@@ -1,3 +1,5 @@
+const { getClientById } = require('../handlers/clientHandler');
+const { getCustomerById } = require('../handlers/customerHandler');
 const { resetPasswordHandler } = require('../handlers/passwordResetHandler');
 const primaryHandlers = require('../handlers/primaryHandlers');
 const authValidation = require('../pre-handlers/authValidation');
@@ -27,6 +29,16 @@ const routes = [
         handler: resetPasswordHandler,
         preHandler: validatePasswordReset
     },
+    {
+        method:'GET',
+        url:'/client',
+        handler: getClientById
+    },
+    {
+        method:'GET',
+        url:'/customer',
+        handler: getCustomerById
+    }
 ];
 
 module.exports = {routes};
