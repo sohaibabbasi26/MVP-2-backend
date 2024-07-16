@@ -4,6 +4,7 @@ const customerHandlers = require("../handlers/customerHandler");
 const authValidation = require("../pre-handlers/authValidation");
 const { getCustomerWithExpertise } = require("../handlers/customerHandler");
 const { admininterview } = require("../handlers/admin-interview-Handler");
+const { adminassignedhandler } = require("../handlers/adminassignedhandler");
 const routes = [
   {
     method: "GET",
@@ -58,6 +59,11 @@ const routes = [
     method: "POST",
     url: "/send-email",
     handler: primaryHandlers.sendMail,
+  },
+  {
+    method: "POST",
+    url: "/assigned_customer",
+    handler: adminassignedhandler,
   },
 ];
 
