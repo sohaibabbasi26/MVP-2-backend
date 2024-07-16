@@ -3,7 +3,7 @@ const clientHandlers = require("../handlers/clientHandler");
 const customerHandlers = require("../handlers/customerHandler");
 const authValidation = require("../pre-handlers/authValidation");
 const { getCustomerWithExpertise } = require("../handlers/customerHandler");
-const { clientinterview } = require("../handlers/client-interview-Handler");
+const { admininterview } = require("../handlers/admin-interview-Handler");
 const routes = [
   {
     method: "GET",
@@ -40,7 +40,24 @@ const routes = [
   {
     method: "POST",
     url: "/scheduling-interview",
-    handler: clientinterview,
+    handler: admininterview,
+  },
+  {
+    method: "POST",
+    url: "/gen-random-questions",
+    handler: primaryHandlers.getRandomQuestions,
+    preHandler: authValidation.validateRandomQuestionGen,
+  },
+  {
+    method: "POST",
+    url: "/create-positions",
+    handler: primaryHandlers.createPositions,
+    preHandler: authValidation.validateJobPost,
+  },
+  {
+    method: "POST",
+    url: "/send-email",
+    handler: primaryHandlers.sendMail,
   },
 ];
 

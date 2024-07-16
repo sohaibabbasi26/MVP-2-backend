@@ -22,6 +22,13 @@ const checkCustomerInDb = async (email, method) => {
                 return "Couldn't find any customer";
             }
         }
+
+        if(customer){
+            return true;
+        } else{
+            return 'No such customer is available.';
+        }
+
     } catch (error) {
         console.error("ERROR WHILE CHECKING:", error);
         throw error; 
