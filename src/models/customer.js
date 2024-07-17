@@ -42,6 +42,10 @@ const Customer = sequelize.define('customers', {
     contact_no: {
         type: DataTypes.STRING,
     },
+    is_approved:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 });
 
 module.exports = Customer

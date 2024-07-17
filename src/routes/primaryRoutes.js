@@ -1,3 +1,4 @@
+const { approveCustomerHandler } = require('../handlers/adminHandler');
 const { getClientById } = require('../handlers/clientHandler');
 const { getCustomerById } = require('../handlers/customerHandler');
 const { resetPasswordHandler } = require('../handlers/passwordResetHandler');
@@ -38,6 +39,11 @@ const routes = [
         method:'GET',
         url:'/customer',
         handler: getCustomerById
+    },
+    {
+        method:'POST',
+        url: '/admin/approve-customer',
+        handler: approveCustomerHandler
     }
 ];
 
