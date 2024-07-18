@@ -1,4 +1,4 @@
-const { getClientByIdService } = require("../services/clientService");
+const { getClientByIdService, createClientRequestService } = require("../services/clientService");
 
 const getClientById = async (req, res) => {
   try {
@@ -17,6 +17,24 @@ const getClientById = async (req, res) => {
   }
 };
 
+
+const createClientRequestHandler=(req,res)=>{
+  try{
+    createClientRequestService(req.body)
+    .then((result)=>{
+      res.status(result.status).send({
+        message: result.message
+      })
+    })
+  }catch(err){
+    console.log("error in root_project -> src -> handlers -> clientHandler.js");
+    res.status(500).send({
+      message: err
+    })
+  }
+}
+
 module.exports = {
   getClientById,
+  createClientRequestHandler
 };

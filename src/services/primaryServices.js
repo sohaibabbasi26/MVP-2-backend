@@ -2,12 +2,18 @@ const { sequelize } = require('../../configurations/sequelizePgSQL');
 const Customer = require('../models/customer');
 const Client = require('../models/client');
 const Admin = require('../models/admin');
+const Questions = require('../models/questions');
 const { checkCustomerInDb } = require('../utilities/checkCustomerExists');
 const { checkClientInDb } = require('../utilities/checkClientInDb');
 const { encryptPasword } = require('../utilities/encryptPassword');
 const { jwtSignature } = require('../utilities/jwtSign');
 const { comparePassword } = require('../utilities/passwordCompare');
 const { checkAdminInDb } = require('../utilities/checkAdminInDb');
+const { getCompletion } = require('../utilities/OpenAIgateways');
+const { convertTextToQuestionArray } = require('../utilities/convTextToQuesArray');
+const { createPrompt } = require('../utilities/promptHelper');
+const JobPostings = require('../models/jobPostings');
+const transporter = require('../../configurations/gmailConfig');
 
 async function customerSignup(data) {
     try {
@@ -70,8 +76,8 @@ async function clientSignup(data) {
 }
 
 async function adminSignup(data) {
-    try{
-        const {email,password,method} = data;
+    try {
+        const { email, password, method } = data;
         const isAdminInDb = await checkAdminInDb(email, method);
         if (isAdminInDb === true) {
             return `Admin with these credentials already exists`;
@@ -79,11 +85,8 @@ async function adminSignup(data) {
             try {
                 const hashedPassword = await encryptPasword(password);
                 const newData = {
-                    // name,
-                    // client_location,
                     email,
                     password: hashedPassword,
-                    // contact_no,
                 }
                 const result = await Admin.create(newData);
                 jwtSignature(result?.dataValues);
@@ -93,7 +96,7 @@ async function adminSignup(data) {
                 return 'ERROR WHILE CREATING ADMIN:', err;
             }
         }
-    } catch (e){
+    } catch (e) {
         console.log("SOME ERROR OCCURED:", e, "\n Error source: src -> services -> primaryServices -> login ");
         return "SOME ERROR OCCURED:", e
     }
@@ -184,6 +187,102 @@ async function adminLogin(data) {
     }
 }
 
+async function getRandomQuestionsService(data) {
+    const { expertise, difficulty, limit, position_id } = data;
+    const prompt = createPrompt(expertise, difficulty, limit);
+    try {
+        const completion = await getCompletion(prompt);
+        console.log("completion: ", completion.choices[0].message);
+        const data = completion.choices[0].message.content;
+        const finalData = convertTextToQuestionArray(data);
+
+        const reqBody = {
+            expertise,
+            position_id,
+            question: finalData,
+        };
+        console.log("request body:", reqBody);
+        try {
+            const submitQuestions = await Questions.create({
+                question: finalData,
+                position_id: position_id,
+            });
+            console.log("\nQUESTIONS SAVED IN DB:", submitQuestions);
+            return { status: 200, message: submitQuestions };
+        } catch (err) {
+            console.log("ERROR WHILE SUBMITTING TO DB:", err, '\n ');
+            return {
+                status: 500,
+                message: "Failed to update questions in the db table.",
+            };
+        }
+    } catch (err) {
+        console.error("OpenAI Error:", err.message,'\nError source: src -> services -> primaryServices -> getRandomQuestionsService');
+        throw new Error("Failed to generate question");
+    }
+}
+
+async function sendMailService(mailOptions) {
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error("Error sending email:", error);
+            return error;
+        } else {
+            console.log("Email sent:", info.response);
+            return;
+        }
+    });
+}
+
+async function createPositionsService(data) {
+
+    const {
+        position,
+        client_id,
+        expertise,
+        job_type,
+        description,
+        status,
+        applied_customers_count,
+        location,
+        is_test_required,
+    } = data;
+
+    try {
+        const check = await Client.findOne({
+            where: {
+                client_id: client_id,
+            },
+        });
+
+        if (check) {
+            const requestBody = {
+                position,
+                client_id,
+                expertise,
+                job_type,
+                description,
+                status,
+                applied_customers_count,
+                location,
+                is_test_required,
+            };
+            console.log("request body: ", requestBody);
+            try {
+                const result = await JobPostings.create(requestBody);
+                return { statusCode: 200, data: result?.dataValues };
+            } catch(e){
+                console.log("Failed to create a job posting",e,'\nError source: src -> services -> primaryServices -> createPositionsService');
+                return "Failed to create a job posting",e;
+            }
+        } else {
+            return { statusCode: 404, message: "Unauthorized access to make a job posting." };
+        }
+    } catch (error) {
+        console.log(error);
+        return "Failed to create a job posting";
+    }
+}
 
 module.exports = {
     customerSignup,
@@ -191,5 +290,8 @@ module.exports = {
     customerLogin,
     clientLogin,
     adminSignup,
-    adminLogin
+    adminLogin,
+    getRandomQuestionsService,
+    createPositionsService,
+    sendMailService
 } 
