@@ -2,18 +2,32 @@ const primaryHandlers = require("../handlers/primaryHandlers");
 const clientHandlers = require("../handlers/clientHandler");
 const customerHandlers = require("../handlers/customerHandler");
 const authValidation = require("../pre-handlers/authValidation");
-const { getCustomerWithExpertise } = require("../handlers/customerHandler");
-const { admininterview } = require("../handlers/admin-interview-Handler");
-const { adminassignedhandler } = require("../handlers/adminassignedhandler");
-const {
-  validateClientProfileUpdate,
-} = require("../pre-handlers/clientValidation");
-const { validateExpertise } = require("../pre-handlers/customerValidation");
+const customerHandler = require("../handlers/customerHandler");
+const adminHandler = require("../handlers/adminHandler");
+const clientValidation = require("../pre-handlers/clientValidation");
+const customerValidation = require("../pre-handlers/customerValidation");
+const adminValidation = require("../pre-handlers/adminValidation");
+
 const routes = [
   {
     method: "GET",
     url: "/",
     handler: primaryHandlers.serverCheck,
+  },
+  {
+    method: "GET",
+    url: "/customers",
+    handler: customerHandlers.customers,
+  },
+  {
+    method: "GET",
+    url: "/clients",
+    handler: clientHandlers.clients,
+  },
+  {
+    method: "GET",
+    url: "/assigned_customer/:client_id",
+    handler: clientHandlers.getcustomerwithclientid,
   },
   {
     method: "POST",
@@ -28,25 +42,16 @@ const routes = [
     preHandler: authValidation.validateLogin,
   },
   {
-    method: "GET",
-    url: "/customers",
-    handler: customerHandlers.customers,
-  },
-  {
-    method: "GET",
-    url: "/clients",
-    handler: clientHandlers.clients,
-  },
-  {
     method: "POST",
     url: "/get-customer-with-expertise",
-    handler: getCustomerWithExpertise,
-    prehander: validateExpertise,
+    handler: customerHandler.getCustomerWithExpertise,
+    prehander: customerValidation.validateExpertise,
   },
   {
     method: "POST",
     url: "/scheduling-interview",
-    handler: admininterview,
+    handler: adminHandler.admininterview,
+    prehandler: adminValidation.validate_registerSchema,
   },
   {
     method: "POST",
@@ -68,18 +73,14 @@ const routes = [
   {
     method: "POST",
     url: "/assigned_customer",
-    handler: adminassignedhandler,
-  },
-  {
-    method: "GET",
-    url: "/assigned_customer/:client_id",
-    handler: clientHandlers.getcustomerwithclientid,
+    handler: adminHandler.adminassignedhandler,
+    prehander: adminValidation.validate_adminassignedSchema,
   },
   {
     method: "PUT",
     url: "/client-profile-update/:client_id",
     handler: clientHandlers.client_updateprofile,
-    preHandler: validateClientProfileUpdate,
+    preHandler: clientValidation.validateClientProfileUpdate,
   },
 ];
 
