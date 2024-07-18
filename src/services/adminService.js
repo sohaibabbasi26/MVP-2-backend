@@ -32,13 +32,20 @@ const approveCustomerService = async (customer_id) => {
 
 
 const fetchClientRequestService= async()=>{
+  
   try{
-    const client_request= await Client_Requests.findAll();
+    const clientsWithRequests = await Client.findAll({
+      include: {
+        model: Client_Requests,
+        required: true
+      }
+    });
 
-  if(client_request){
+
+  if(clientsWithRequests){
     return{
       status: 200,
-      message: client_request
+      message: clientsWithRequests
     }
   }else{
     return{

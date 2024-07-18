@@ -26,4 +26,7 @@ const Client_Requests= sequelize.define('client_requests',{
     }
 });
 
+Client.hasMany(Client_Requests, { foreignKey: 'client_id' });
+Client_Requests.belongsTo(Client, { foreignKey: 'client_id' });
+
 module.exports= {Client_Requests};
