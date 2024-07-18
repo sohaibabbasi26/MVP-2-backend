@@ -1,4 +1,4 @@
-const { approveCustomerService } = require("../services/adminService");
+const { approveCustomerService, fetchClientRequestService } = require("../services/adminService");
 
 const approveCustomerHandler= async(req,res)=>{
     const {customer_id}= req.body;
@@ -20,6 +20,19 @@ const approveCustomerHandler= async(req,res)=>{
     }
 }
 
+const fetchClientRequestHandler= (req,res)=>{
+    fetchClientRequestService()
+    .then((result)=>{
+        res.status(result.status)
+        .send(result.message);
+    })
+    .catch((err)=>{
+        res.status(500)
+        .send(err);
+    })
+}
+
 module.exports={
-    approveCustomerHandler
+    approveCustomerHandler,
+    fetchClientRequestHandler
 }

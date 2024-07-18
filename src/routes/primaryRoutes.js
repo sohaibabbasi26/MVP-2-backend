@@ -1,4 +1,4 @@
-const { approveCustomerHandler } = require('../handlers/adminHandler');
+const { approveCustomerHandler, fetchClientRequestHandler } = require('../handlers/adminHandler');
 const { getClientById, clientRequestExpertiseHandler, createClientRequestHandler } = require('../handlers/clientHandler');
 const { getCustomerById } = require('../handlers/customerHandler');
 const { resetPasswordHandler } = require('../handlers/passwordResetHandler');
@@ -68,6 +68,12 @@ const routes = [
         url:'/client/create-request',
         handler: createClientRequestHandler,
         preHandler: validateClientRequest
+    },
+    {
+        method:'GET',
+        url:'/admin/fetch-client-requests',
+        handler: fetchClientRequestHandler,
+        
     }
 ];
 
