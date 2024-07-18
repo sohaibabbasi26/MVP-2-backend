@@ -5,6 +5,10 @@ const authValidation = require("../pre-handlers/authValidation");
 const { getCustomerWithExpertise } = require("../handlers/customerHandler");
 const { admininterview } = require("../handlers/admin-interview-Handler");
 const { adminassignedhandler } = require("../handlers/adminassignedhandler");
+const {
+  validateClientProfileUpdate,
+} = require("../pre-handlers/clientValidation");
+const { validateExpertise } = require("../pre-handlers/customerValidation");
 const routes = [
   {
     method: "GET",
@@ -37,6 +41,7 @@ const routes = [
     method: "POST",
     url: "/get-customer-with-expertise",
     handler: getCustomerWithExpertise,
+    prehander: validateExpertise,
   },
   {
     method: "POST",
@@ -64,6 +69,17 @@ const routes = [
     method: "POST",
     url: "/assigned_customer",
     handler: adminassignedhandler,
+  },
+  {
+    method: "GET",
+    url: "/assigned_customer/:client_id",
+    handler: clientHandlers.getcustomerwithclientid,
+  },
+  {
+    method: "PUT",
+    url: "/client-profile-update/:client_id",
+    handler: clientHandlers.client_updateprofile,
+    preHandler: validateClientProfileUpdate,
   },
 ];
 

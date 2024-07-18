@@ -22,7 +22,9 @@ async function getallcustomers() {
     const result = await Customer.findAll();
     return result;
   } catch (error) {
-    console.log(`Error while retrieving customers ${error}`);
+    console.log(
+      `Error while retrieving customers =>src->services->customerservice ${error} `
+    );
     return;
   }
 }
