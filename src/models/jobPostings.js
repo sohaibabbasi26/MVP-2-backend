@@ -42,6 +42,11 @@ const JobPostings = sequelize.define("job_postings", {
   is_test_required: {
     type: DataTypes.BOOLEAN,
   },
+  assigned_customers: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: null,
+  },
 });
 
 module.exports = JobPostings;
