@@ -16,6 +16,7 @@ const AdminInterview = sequelize.define("admin_interviews", {
       model: Customer,
       key: "customer_id",
     },
+    onDelete: "CASCADE",
   },
   interview_date: {
     type: DataTypes.DATEONLY,

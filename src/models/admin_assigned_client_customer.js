@@ -17,6 +17,7 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
       model: Customer,
       key: "customer_id",
     },
+    onDelete: "CASCADE",
   },
   client_id: {
     type: DataTypes.UUID,
@@ -25,6 +26,7 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
       model: Client,
       key: "client_id",
     },
+    onDelete: "CASCADE",
   },
   job_posting_id: {
     type: DataTypes.UUID,
@@ -33,6 +35,22 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
       model: JobPostings,
       key: "job_posting_id",
     },
+    onDelete: "CASCADE",
+  },
+  //extra work
+  client_response: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "PENDING",
+  },
+  is_enable: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    allowNull: false,
+  },
+  comments: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 

@@ -7,8 +7,24 @@ const adminHandler = require("../handlers/adminHandler");
 const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
+const {
+  approveCustomerHandler,
+  fetchClientRequestHandler,
+} = require("../handlers/adminHandler");
+const {
+  getClientById,
+  clientRequestExpertiseHandler,
+  createClientRequestHandler,
+} = require("../handlers/clientHandler");
+const { getCustomerById } = require("../handlers/customerHandler");
+const { resetPasswordHandler } = require("../handlers/passwordResetHandler");
+const { validateClientRequest } = require("../pre-handlers/clientValidation");
+const {
+  validatePasswordReset,
+} = require("../pre-handlers/passwordResetValidation");
 
 const routes = [
+  
   {
     method: "GET",
     url: "/",
@@ -81,6 +97,28 @@ const routes = [
     url: "/client-profile-update/:client_id",
     handler: clientHandlers.client_updateprofile,
     preHandler: clientValidation.validateClientProfileUpdate,
+  },
+  {
+    method: "POST",
+    url: "/password-reset",
+    handler: resetPasswordHandler,
+    preHandler: validatePasswordReset,
+  },
+  {
+    method: "POST",
+    url: "/admin/approve-customer",
+    handler: approveCustomerHandler,
+  },
+  {
+    method: "POST",
+    url: "/client/create-request",
+    handler: createClientRequestHandler,
+    preHandler: validateClientRequest,
+  },
+  {
+    method: "GET",
+    url: "/admin/fetch-client-requests",
+    handler: fetchClientRequestHandler,
   },
 ];
 

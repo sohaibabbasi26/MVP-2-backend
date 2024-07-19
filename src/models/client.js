@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../configurations/sequelizePgSQL");
+const Customer = require("./customer");
 
 const Client = sequelize.define("clients", {
   client_location: {
@@ -39,6 +40,11 @@ const Client = sequelize.define("clients", {
   status: {
     type: DataTypes.ENUM("Active", "In-Active"),
     defaultValue: "Active",
+  },
+  assigned_customers: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: null,
   },
 });
 
