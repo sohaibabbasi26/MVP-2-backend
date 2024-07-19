@@ -37,7 +37,7 @@ const fetchClientRequestService= async()=>{
     const clientsWithRequests = await Client.findAll({
       include: {
         model: Client_Requests,
-        required: true
+        required: true //inner join
       }
     });
 

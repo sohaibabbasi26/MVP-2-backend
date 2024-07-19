@@ -22,7 +22,7 @@ const Client_Requests= sequelize.define('client_requests',{
         type: DataTypes.JSONB,
     },
     experience:{
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('beginner','expert','intermediate'),
     }
 });
 

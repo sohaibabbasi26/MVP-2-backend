@@ -10,8 +10,8 @@ const passwordResetValidationSchema= Joi.object({
 const validatePasswordReset= (request, response, next)=>{
     const {error}= passwordResetValidationSchema.validate(request.body);
     if(error){
-        response.status(403).send({
-            message:error
+        response.status(400).send({     
+            message: error["message"]
         })
     }else{
         next();
