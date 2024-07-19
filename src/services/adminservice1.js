@@ -95,59 +95,55 @@ const approveCustomerService = async (customer_id) => {
 
     if (is_approved > 0) {
       return {
-        is_approved:true,
-        message: "customer has been approved"
+        is_approved: true,
+        message: "customer has been approved",
       };
     } else {
-        return {
-            is_approved:true,
-            message: "customer not been approved"
-          };
+      return {
+        is_approved: true,
+        message: "customer not been approved",
+      };
     }
   } catch (error) {
-    console.log('error at root project -> services -> adminService.js');
+    console.log("error at root project -> services -> adminService.js");
     console.log(error);
   }
 };
 
-
-const fetchClientRequestService= async()=>{
-  
-  try{
+const fetchClientRequestService = async () => {
+  try {
     const clientsWithRequests = await Client.findAll({
       include: {
         model: Client_Requests,
-        required: true //inner join
-      }
+        required: true, //inner join
+      },
     });
 
-
-  if(clientsWithRequests){
-    return{
-      status: 200,
-      message: clientsWithRequests
+    if (clientsWithRequests) {
+      return {
+        status: 200,
+        message: clientsWithRequests,
+      };
+    } else {
+      return {
+        status: 404,
+        message: "no client requests yet",
+      };
     }
-  }else{
-    return{
-      status: 404,
-      message: "no client requests yet"
-    }
-  }
-  }catch(err){
-    console.log('error at root project -> services -> adminService.js');
+  } catch (err) {
+    console.log("error at root project -> services -> adminService.js");
     console.log(err);
-    return{
+    return {
       status: 500,
-      message: err
-    }
+      message: err,
+    };
   }
-  
-}
+};
 
-module.exports={
-    approveCustomerService,
-    fetchClientRequestService,
-    admin_interview_scheduling_service,
-    assigningCustomerservice,
-    getcustomerwithid
-}
+module.exports = {
+  approveCustomerService,
+  fetchClientRequestService,
+  admin_interview_scheduling_service,
+  assigningCustomerservice,
+  getcustomerwithid,
+};
