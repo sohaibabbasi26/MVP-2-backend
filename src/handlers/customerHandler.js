@@ -1,8 +1,9 @@
 const {
   getCustomerViaExpertise,
   getallcustomers,
+  getCustomerByIdService
 } = require("../services/customerservice");
-const Op = require("@sequelize/core");
+
 //getting all the customers
 async function customers(req, res) {
   try {
@@ -24,8 +25,28 @@ const getCustomerWithExpertise = async (req, res) => {
   } else {
     res.status(403).send({
       message: "invalid expertise",
+    })
+  }
+}
+
+const getCustomerById = async (req, res) => {
+  try {
+    const { customer_id } = req.query;
+    const customer = await getCustomerByIdService(customer_id);
+
+    if (customer) {
+        res.status(200).send({
+            customer:customer
+        })
+    }
+  } catch (error) {
+    res.status(500).send({
+      error,
     });
   }
 };
 
-module.exports = { customers, getCustomerWithExpertise };
+module.exports = {
+  getCustomerById,
+  customers, getCustomerWithExpertise
+};

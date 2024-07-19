@@ -52,6 +52,10 @@ const Customer = sequelize.define("customers", {
     allowNull: true,
     defaultValue: null,
   },
+    is_approved:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 });
 
 module.exports = Customer;
