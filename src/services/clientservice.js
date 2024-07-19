@@ -1,5 +1,4 @@
 const Client = require("../models/client");
-const Adminassigned = require("../models/admin_assigned_client_customer");
 
 //Client Api
 async function getallclients(req, res) {
@@ -11,21 +10,6 @@ async function getallclients(req, res) {
       `Error while retrieving client data => src->services->clientservice${error}->getallclients`
     );
     return;
-  }
-}
-
-async function getcustomerwithid(client_id) {
-  try {
-    const result = await Adminassigned.findOne({
-      where: { client_id },
-    });
-    return result;
-  } catch (error) {
-    console.log(
-      `Error while fetching Customer=> src->services->clientservice->getcustomerwithid`,
-      error
-    );
-    throw error; // Ensure the error is propagated
   }
 }
 
@@ -47,6 +31,5 @@ async function updateclient_service(body, client_id) {
 
 module.exports = {
   getallclients,
-  getcustomerwithid,
   updateclient_service,
 };

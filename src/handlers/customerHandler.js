@@ -1,9 +1,9 @@
-const Customer = require("../models/customer");
 const {
   getCustomerViaExpertise,
   getallcustomers,
 } = require("../services/customerservice");
 const Op = require("@sequelize/core");
+//getting all the customers
 async function customers(req, res) {
   try {
     const data = await getallcustomers();
@@ -13,7 +13,7 @@ async function customers(req, res) {
     return;
   }
 }
-
+//getting all the customers with their expertise
 const getCustomerWithExpertise = async (req, res) => {
   const { expertise } = req.body;
   console.log("expertise: ", expertise);

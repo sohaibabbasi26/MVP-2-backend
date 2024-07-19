@@ -27,7 +27,7 @@ const routes = [
   {
     method: "GET",
     url: "/assigned_customer/:client_id",
-    handler: clientHandlers.getcustomerwithclientid,
+    handler: adminHandler.getcustomerwithclientid,
   },
   {
     method: "POST",
@@ -50,8 +50,8 @@ const routes = [
   {
     method: "POST",
     url: "/scheduling-interview",
-    handler: adminHandler.admininterview,
-    prehandler: adminValidation.validate_registerSchema,
+    handler: adminHandler.scheduleinterviewhandler,
+    prehandler: adminValidation.validate_InterviewScheduleSchema,
   },
   {
     method: "POST",
@@ -73,8 +73,8 @@ const routes = [
   {
     method: "POST",
     url: "/assigned_customer",
-    handler: adminHandler.adminassignedhandler,
-    prehander: adminValidation.validate_adminassignedSchema,
+    handler: adminHandler.assigningCustomerHandler,
+    prehander: adminValidation.validate_assigningCustomerSchema,
   },
   {
     method: "PUT",

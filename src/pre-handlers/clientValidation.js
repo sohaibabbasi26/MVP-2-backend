@@ -4,7 +4,7 @@ const client_profile_update_schema = Joi.object({
   name: Joi.string().min(2).max(50),
   email: Joi.string().email(),
   contact_no: Joi.string().min(11).max(50),
-  status: Joi.string().valid("Active", "Not Active"),
+  status: Joi.string().valid("Active", "In-Active"),
   client_location: Joi.string(),
 });
 
