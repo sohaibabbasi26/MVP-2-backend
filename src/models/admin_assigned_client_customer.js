@@ -3,7 +3,7 @@ const { sequelize } = require("../../configurations/sequelizePgSQL");
 const Customer = require("./customer");
 const Client = require("./client");
 const JobPostings = require("./jobPostings");
-const Adminassigned = sequelize.define("clients_customer_assigned", {
+const Adminassigned = sequelize.define("admin_assigned_customer", {
   admin_assigned_id: {
     type: DataTypes.UUID,
     allowNull: false,
