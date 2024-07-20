@@ -1,27 +1,15 @@
 const primaryHandlers = require("../handlers/primaryHandlers");
 const clientHandlers = require("../handlers/clientHandler");
 const customerHandlers = require("../handlers/customerHandler");
+const resetPasswordHandler= require('../handlers/passwordResetHandler');
 const authValidation = require("../pre-handlers/authValidation");
 const customerHandler = require("../handlers/customerHandler");
 const adminHandler = require("../handlers/adminHandler");
 const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
-const {
-  approveCustomerHandler,
-  fetchClientRequestHandler,
-} = require("../handlers/adminHandler");
-const {
-  getClientById,
-  clientRequestExpertiseHandler,
-  createClientRequestHandler,
-} = require("../handlers/clientHandler");
-const { getCustomerById } = require("../handlers/customerHandler");
-const { resetPasswordHandler } = require("../handlers/passwordResetHandler");
-const { validateClientRequest } = require("../pre-handlers/clientValidation");
-const {
-  validatePasswordReset,
-} = require("../pre-handlers/passwordResetValidation");
+const resetPasswordValidation= require('../pre-handlers/passwordResetValidation');
+
 
 const routes = [
   
@@ -101,24 +89,24 @@ const routes = [
   {
     method: "POST",
     url: "/password-reset",
-    handler: resetPasswordHandler,
-    preHandler: validatePasswordReset,
+    handler: resetPasswordHandler.resetPasswordHandler,
+    preHandler: resetPasswordValidation.validatePasswordReset,
   },
   {
     method: "POST",
     url: "/admin/approve-customer",
-    handler: approveCustomerHandler,
+    handler: adminHandler.approveCustomerHandler,
   },
   {
     method: "POST",
     url: "/client/create-request",
-    handler: createClientRequestHandler,
-    preHandler: validateClientRequest,
+    handler: clientHandlers.createClientRequestHandler,
+    preHandler: clientValidation.validateClientRequest,
   },
   {
     method: "GET",
     url: "/admin/fetch-client-requests",
-    handler: fetchClientRequestHandler,
+    handler: adminHandler.fetchClientRequestHandler,
   },
 ];
 
