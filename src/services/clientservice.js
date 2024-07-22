@@ -1,4 +1,5 @@
 const Adminassigned = require("../models/admin_assigned_client_customer");
+const { Op } = require("sequelize");
 const Client = require("../models/client");
 const { Client_Requests } = require("../models/client_requests");
 const Customer = require("../models/customer");
@@ -77,32 +78,67 @@ const createClientRequestService = async (body) => {
   }
 };
 
-const declineCustomerService=async(client_id,customer_id)=>{
-
-  const client= await Client.findByPk(client_id);
-  const ass_cust= client.assigned_customers;
-
-  //pehle customer id ko remove kro assigned customers se
-  for(let i=0; i<ass_cust.length; i++){
-
-    if(ass_cust[i]['customer_id']===customer_id){
-      ass_cust.splice(i,1);
-      break;
+const declineCustomerService = async (
+  client_id,
+  customer_id,
+  job_posting_id
+) => {
+  try {
+    const client = await Client.findByPk(client_id);
+    if (!client) {
+      return {
+        status: 404,
+        message: "Client not found",
+      };
     }
+
+    const assigned_customers = client.assigned_customers || [];
+
+    // Remove the customer id from assigned customers
+    const updated_customers = assigned_customers.filter(
+      (cust) => cust.customer_id !== customer_id
+    );
+
+    // Update the assigned customers array
+    await client.update({
+      assigned_customers:
+        updated_customers.length > 0 ? updated_customers : null,
+    });
+
+    const customer = await Customer.findByPk(customer_id);
+    const assigned_clients = customer.assigned_clients || [];
+
+    const updated_clients = assigned_clients.filter(
+      (cli) => cli.client_id !== client_id
+    );
+
+    customer.update({ job_status: "Un-Assigned", assigned_clients:
+      updated_clients.length > 0 ? updated_clients : null});
+
+    await Adminassigned.update(
+      {
+        client_response: "Decline",
+      },
+      {
+        where: {
+          job_posting_id: job_posting_id,
+          customer_id:customer_id,
+          client_id:client_id
+        },
+      }
+    )
+
+    return {
+      status: 200,
+      message: "customer has been deleted",
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: error.message,
+    };
   }
-
-  
-
-  //phir assigned customer jo array update hua ha usko dubara daalo
-  await client.update({ assigned_customers: ass_cust });
-
-  return {
-    status: 200,
-    message: client
-  }
-}
-
-
+};
 
 //client accept service
 const clientAcceptService = async (body) => {
@@ -160,7 +196,11 @@ const clientAcceptService = async (body) => {
       );
 
       console.log("Update successful");
-      return { message: "Customer is Assigned to Given Client", body };
+      return {
+        status: 200,
+        message: "Customer is Assigned to Given Client",
+        body,
+      };
     } else {
       console.log("Customer not found");
       return;
@@ -225,7 +265,11 @@ const clientPendingService = async (body) => {
       );
 
       console.log("Update successful");
-      return { message: "Client has added customer in Pending", body };
+      return {
+        status: 200,
+        message: "Client has added customer in Pending",
+        body,
+      };
     } else {
       console.log("Customer not found");
       return;
@@ -241,5 +285,5 @@ module.exports = {
   updateclient_service,
   clientAcceptService,
   clientPendingService,
-  declineCustomerService
+  declineCustomerService,
 };

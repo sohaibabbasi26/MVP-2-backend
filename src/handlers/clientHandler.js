@@ -5,7 +5,7 @@ const {
   createClientRequestService,
   clientAcceptService,
   clientPendingService,
-  declineCustomerService
+  declineCustomerService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -61,58 +61,84 @@ const createClientRequestHandler = (req, res) => {
         message: result.message,
       });
     });
-  } catch (err) {
+  }  catch  (err)  {
     console.log("error in root_project -> src -> handlers -> clientHandler.js");
     res.status(500).send({
       message: err,
     });
   }
-}
-
-
-const ClientAcceptHandler = async (req, res) => {
-  try {
-    const body = req.body;
-    const result = await clientAcceptService(body);
-    res.send(result);
-  } catch (error) {
-    console.log(`Error in clientAcceptHandler`);
-  }
 };
 
-const ClientPendingHandler = async (req, res) => {
-  try {
-    const body = req.body;
-    const result = await clientPendingService(body);
-    res.send(result);
-  } catch (error) {
-    console.log(`Error in clientAcceptHandler`);
-  }
-};
 
-const declineCustomer=(req,res)=>{
-  try{
-    const {customer_id,client_id}= req.body;
-    declineCustomerService(client_id,customer_id)
-    .then(result=>{
-      res.status(result.status)
-      .send({
-        message: result.message
-      });
-    })
-  }catch(err){
+// const ClientAcceptHandler = async (req, res) => {
+//   try {
+//     const body = req.body;
+//     const result = await clientAcceptService(body);
+//     res.send(result);
+//   } catch (error) {
+//     console.log(`Error in clientAcceptHandler`);
+//   }
+// };
+
+// const ClientPendingHandler = async (req, res) => {
+//   try {
+//     const body = req.body;
+//     const result = await clientPendingService(body);
+//     res.send(result);
+//   } catch (error) {
+//     console.log(`Error in clientAcceptHandler`);
+//   }
+// };
+
+const clientResponseHandler = (req, res) => {
+  try {
+    const { customer_id, client_id, job_posting_id, response_status } =
+      req.body;
+
+    switch (response_status) {
+      case "decline":
+        declineCustomerService(client_id, customer_id, job_posting_id).then(
+          (result) => {
+            res.status(result.status).send({
+              message: result.message,
+            });
+          }
+        );
+        break;
+      case "accept":
+        clientAcceptService(req.body).then((result)=>{
+          res.status(result.status).send({
+            message: result.message,
+            body: result.body
+          })
+        });
+        break;
+      case "pending":
+        clientPendingService(req.body).then((result)=>{
+          res.status(result.status).send({
+            message: result.message,
+            body: result.body
+          })
+        });
+        break;
+      default:
+        res.status(400).send({
+          message: "invalid response status",
+        });
+    }
+  } catch (err) {
     res.status(500).send({
-      message: err
+      message: err,
     });
   }
-}
+};
 
 module.exports = {
   clients,
   client_updateprofile,
   getClientById,
-  ClientAcceptHandler,
-  ClientPendingHandler,
-  declineCustomer,
+  // ClientAcceptHandler,
+  // ClientPendingHandler,
+  clientResponseHandler,
   createClientRequestHandler
 };
