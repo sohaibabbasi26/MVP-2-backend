@@ -39,13 +39,8 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
   },
   //extra work
   client_response: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: "PENDING",
-  },
-  is_enable: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    type: DataTypes.ENUM("Accept", "Pending", "Decline"),
+    defaultValue: "Pending",
     allowNull: false,
   },
   comments: {
