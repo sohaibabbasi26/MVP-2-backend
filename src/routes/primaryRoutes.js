@@ -108,6 +108,11 @@ const routes = [
     url: "/admin/fetch-client-requests",
     handler: adminHandler.fetchClientRequestHandler,
   },
+  {
+    method:'POST',
+    url:'/client/decline-customer',
+    handler: clientHandlers.declineCustomer
+  }
 ];
 
 module.exports = { routes };

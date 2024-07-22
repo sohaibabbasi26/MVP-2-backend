@@ -1,7 +1,8 @@
 const {
   getallclients,
   updateclient_service,
-  getClientByIdService, createClientRequestService
+  getClientByIdService, createClientRequestService,
+  declineCustomerService
 } = require("../services/clientservice");
 
 
@@ -71,9 +72,27 @@ const createClientRequestHandler=(req,res)=>{
   }
 }
 
+const declineCustomer=(req,res)=>{
+  try{
+    const {customer_id,client_id}= req.body;
+    declineCustomerService(client_id,customer_id)
+    .then(result=>{
+      res.status(result.status)
+      .send({
+        message: result.message
+      });
+    })
+  }catch(err){
+    res.status(500).send({
+      message: err
+    });
+  }
+}
+
 module.exports = {
   clients,
   client_updateprofile,
   getClientById,
-  createClientRequestHandler
+  createClientRequestHandler,
+  declineCustomer
 };

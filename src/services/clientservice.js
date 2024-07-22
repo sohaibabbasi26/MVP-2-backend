@@ -76,9 +76,35 @@ const createClientRequestService = async (body) => {
   }
 };
 
+const declineCustomerService=async(client_id,customer_id)=>{
+
+  const client= await Client.findByPk(client_id);
+  const ass_cust= client.assigned_customers;
+
+  //pehle customer id ko remove kro assigned customers se
+  for(let i=0; i<ass_cust.length; i++){
+
+    if(ass_cust[i]['customer_id']===customer_id){
+      ass_cust.splice(i,1);
+      break;
+    }
+  }
+
+  
+
+  //phir assigned customer jo array update hua ha usko dubara daalo
+  await client.update({ assigned_customers: ass_cust });
+
+  return {
+    status: 200,
+    message: client
+  }
+}
+
 module.exports = {
   getClientByIdService,
   createClientRequestService,
   getallclients,
   updateclient_service,
+  declineCustomerService
 };
