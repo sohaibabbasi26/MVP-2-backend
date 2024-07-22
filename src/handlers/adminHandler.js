@@ -2,17 +2,23 @@ const {
   assigningCustomerservice,
   getcustomerwithid,
   admin_interview_scheduling_service,
-  approveCustomerService, fetchClientRequestService
+  approveCustomerService,
+  fetchClientRequestService,
 } = require("../services/adminService");
+const { updateclient_service } = require("../services/clientservice");
 
 //Client and customer assigned
-
-
 
 async function assigningCustomerHandler(req, res) {
   try {
     const data = req.body;
     const result = await assigningCustomerservice(data);
+    // const body = {
+    //   assigned_customers: result.assigned_customers.concat([
+    //     { customer_id: data.customer_id },
+    //   ]),
+    // };
+    // await updateclient_service(body, data.client_id);
     res.send(result);
   } catch (error) {
     console.error("Error in adminassignedhandler:", error.message);
@@ -61,43 +67,40 @@ async function getcustomerwithclientid(req, res) {
   }
 }
 
+const approveCustomerHandler = async (req, res) => {
+  const { customer_id } = req.body;
 
-const approveCustomerHandler= async(req,res)=>{
-    const {customer_id}= req.body;
-
-    if(customer_id){
-        const customerApproveService= await approveCustomerService(customer_id);
-        let statusCode= 200;
-        if(!customerApproveService.is_approved){
-            statusCode=404;
-        }
-        res.status(statusCode).send({
-            is_approved:customerApproveService.is_approved,
-            message:"customer approved"
-        })
-    }else{
-        res.status(403).rend({
-            message:"invalid customer id"
-        })
+  if (customer_id) {
+    const customerApproveService = await approveCustomerService(customer_id);
+    let statusCode = 200;
+    if (!customerApproveService.is_approved) {
+      statusCode = 404;
     }
-}
+    res.status(statusCode).send({
+      is_approved: customerApproveService.is_approved,
+      message: "customer approved",
+    });
+  } else {
+    res.status(403).rend({
+      message: "invalid customer id",
+    });
+  }
+};
 
-const fetchClientRequestHandler= (req,res)=>{
-    fetchClientRequestService()
-    .then((result)=>{
-        res.status(result.status)
-        .send(result.message);
+const fetchClientRequestHandler = (req, res) => {
+  fetchClientRequestService()
+    .then((result) => {
+      res.status(result.status).send(result.message);
     })
-    .catch((err)=>{
-        res.status(500)
-        .send(err);
-    })
-}
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+};
 
-module.exports={
-    approveCustomerHandler,
-    fetchClientRequestHandler,
-    getcustomerwithclientid,
-    assigningCustomerHandler,
-    scheduleinterviewhandler,
-}
+module.exports = {
+  approveCustomerHandler,
+  fetchClientRequestHandler,
+  getcustomerwithclientid,
+  assigningCustomerHandler,
+  scheduleinterviewhandler,
+};

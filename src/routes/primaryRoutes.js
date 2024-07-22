@@ -24,7 +24,6 @@ const {
 } = require("../pre-handlers/passwordResetValidation");
 
 const routes = [
-  
   {
     method: "GET",
     url: "/",
@@ -119,6 +118,18 @@ const routes = [
     method: "GET",
     url: "/admin/fetch-client-requests",
     handler: fetchClientRequestHandler,
+  },
+  {
+    method: "PUT",
+    url: "/client/accept_customer",
+    handler: clientHandlers.ClientAcceptHandler,
+    // preHandler: clientValidation.validate_clientAcceptschema,
+  },
+  {
+    method: "PUT",
+    url: "/client/pending_customer",
+    handler: clientHandlers.ClientPendingHandler,
+    // preHandler: clientValidation.validate_clientAcceptschema,
   },
 ];
 
