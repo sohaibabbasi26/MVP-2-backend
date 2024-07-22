@@ -1,10 +1,12 @@
 const {
   getallclients,
   updateclient_service,
-  getClientByIdService, createClientRequestService,
+  getClientByIdService,
+  createClientRequestService,
+  clientAcceptService,
+  clientPendingService,
   declineCustomerService
 } = require("../services/clientservice");
-
 
 //Client Api
 async function clients(req, res) {
@@ -37,16 +39,13 @@ async function client_updateprofile(req, res) {
   }
 }
 
-
 const getClientById = async (req, res) => {
   try {
     const { client_id } = req.query;
     const client = await getClientByIdService(client_id);
 
     if (client) {
-        res.status(200).send(
-            client
-        )
+      res.status(200).send(client);
     }
   } catch (error) {
     res.status(500).send({
@@ -55,22 +54,41 @@ const getClientById = async (req, res) => {
   }
 };
 
-
-const createClientRequestHandler=(req,res)=>{
-  try{
-    createClientRequestService(req.body)
-    .then((result)=>{
+const createClientRequestHandler = (req, res) => {
+  try {
+    createClientRequestService(req.body).then((result) => {
       res.status(result.status).send({
-        message: result.message
-      })
-    })
-  }catch(err){
+        message: result.message,
+      });
+    });
+  } catch (err) {
     console.log("error in root_project -> src -> handlers -> clientHandler.js");
     res.status(500).send({
-      message: err
-    })
+      message: err,
+    });
   }
 }
+
+
+const ClientAcceptHandler = async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await clientAcceptService(body);
+    res.send(result);
+  } catch (error) {
+    console.log(`Error in clientAcceptHandler`);
+  }
+};
+
+const ClientPendingHandler = async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await clientPendingService(body);
+    res.send(result);
+  } catch (error) {
+    console.log(`Error in clientAcceptHandler`);
+  }
+};
 
 const declineCustomer=(req,res)=>{
   try{
@@ -93,6 +111,8 @@ module.exports = {
   clients,
   client_updateprofile,
   getClientById,
-  createClientRequestHandler,
-  declineCustomer
+  ClientAcceptHandler,
+  ClientPendingHandler,
+  declineCustomer,
+  createClientRequestHandler
 };
