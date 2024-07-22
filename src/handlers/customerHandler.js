@@ -1,7 +1,7 @@
 const {
   getCustomerViaExpertise,
   getallcustomers,
-  getCustomerByIdService
+  getCustomerByIdService,
 } = require("../services/customerservice");
 
 //getting all the customers
@@ -25,9 +25,9 @@ const getCustomerWithExpertise = async (req, res) => {
   } else {
     res.status(403).send({
       message: "invalid expertise",
-    })
+    });
   }
-}
+};
 
 const getCustomerById = async (req, res) => {
   try {
@@ -35,9 +35,9 @@ const getCustomerById = async (req, res) => {
     const customer = await getCustomerByIdService(customer_id);
 
     if (customer) {
-        res.status(200).send({
-            customer:customer
-        })
+      res.status(200).send({
+        customer: customer,
+      });
     }
   } catch (error) {
     res.status(500).send({
@@ -48,5 +48,6 @@ const getCustomerById = async (req, res) => {
 
 module.exports = {
   getCustomerById,
-  customers, getCustomerWithExpertise
+  customers,
+  getCustomerWithExpertise,
 };
