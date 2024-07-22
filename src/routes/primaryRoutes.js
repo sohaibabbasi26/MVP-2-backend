@@ -110,8 +110,9 @@ const routes = [
   },
   {
     method:'POST',
-    url:'/client/decline-customer',
-    handler: clientHandlers.declineCustomer
+    url:'/client/client-response',
+    preHandler: clientValidation.validateClientResponse,
+    handler: clientHandlers.clientResponseHandler
   }
 ];
 

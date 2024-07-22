@@ -1,10 +1,10 @@
 const {
   getallclients,
   updateclient_service,
-  getClientByIdService, createClientRequestService,
-  declineCustomerService
+  getClientByIdService,
+  createClientRequestService,
+  declineCustomerService,
 } = require("../services/clientservice");
-
 
 //Client Api
 async function clients(req, res) {
@@ -37,16 +37,13 @@ async function client_updateprofile(req, res) {
   }
 }
 
-
 const getClientById = async (req, res) => {
   try {
     const { client_id } = req.query;
     const client = await getClientByIdService(client_id);
 
     if (client) {
-        res.status(200).send(
-            client
-        )
+      res.status(200).send(client);
     }
   } catch (error) {
     res.status(500).send({
@@ -55,44 +52,52 @@ const getClientById = async (req, res) => {
   }
 };
 
-
-const createClientRequestHandler=(req,res)=>{
-  try{
-    createClientRequestService(req.body)
-    .then((result)=>{
+const createClientRequestHandler = (req, res) => {
+  try {
+    createClientRequestService(req.body).then((result) => {
       res.status(result.status).send({
-        message: result.message
-      })
-    })
-  }catch(err){
+        message: result.message,
+      });
+    });
+  } catch (err) {
     console.log("error in root_project -> src -> handlers -> clientHandler.js");
     res.status(500).send({
-      message: err
-    })
-  }
-}
-
-const declineCustomer=(req,res)=>{
-  try{
-    const {customer_id,client_id}= req.body;
-    declineCustomerService(client_id,customer_id)
-    .then(result=>{
-      res.status(result.status)
-      .send({
-        message: result.message
-      });
-    })
-  }catch(err){
-    res.status(500).send({
-      message: err
+      message: err,
     });
   }
-}
+};
+
+const clientResponseHandler = (req, res) => {
+  try {
+    const { customer_id, client_id, job_posting_id, response_status } =
+      req.body;
+
+    switch (response_status) {
+      case "decline":
+        declineCustomerService(client_id, customer_id, job_posting_id).then(
+          (result) => {
+            res.status(result.status).send({
+              message: result.message,
+            });
+          }
+        );
+        break;
+      default:
+        res.status(400).send({
+          message: "invalid response status",
+        });
+    }
+  } catch (err) {
+    res.status(500).send({
+      message: err,
+    });
+  }
+};
 
 module.exports = {
   clients,
   client_updateprofile,
   getClientById,
   createClientRequestHandler,
-  declineCustomer
+  clientResponseHandler,
 };
