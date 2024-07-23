@@ -83,28 +83,9 @@ const validateClientResponse = (req, res, next) => {
     next();
   }
 };
-const clientScheduleschema = Joi.object({
-  customer_id: Joi.string().min(2).max(50).required(),
-  customer_email: Joi.string().email().required(),
-  interview_time: Joi.string().required(),
-  interview_date: Joi.date().required(),
-  admin_email: Joi.string().email().required(),
-});
-
-const validate_clientInterviewSchema = (req, res, next) => {
-  const { error } = clientScheduleschema.validate(req.body);
-  if (error) {
-    res.status(400).send({
-      message: error.details[0].message,
-    });
-  } else {
-    next();
-  }
-};
 
 module.exports = {
   validateClientRequest,
   validateClientProfileUpdate,
   validateClientResponse,
-  validate_clientInterviewSchema,
 };

@@ -84,7 +84,7 @@ Co-VenTech`,
       return { message: "Table not created" };
     }
   } catch (error) {
-    console.log(`Error while inserting data ${error}`);
+    return { message: `Error while inserting data ${error}` };
   }
 };
 const getClientByIdService = async (id) => {

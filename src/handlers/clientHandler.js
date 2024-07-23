@@ -72,13 +72,43 @@ const createClientRequestHandler = (req, res) => {
 
 //client interview api
 async function clientinterviewhandler(req, res) {
+  const data = req.body;
+  if (!data.customer_id) {
+    return res.status(400).send({
+      message: "customer_id must not be empty",
+    });
+  }
+
+  if (!data.customer_email) {
+    return res.status(400).send({
+      message: "customer_email must not be empty",
+    });
+  }
+
+  if (!data.interview_time) {
+    return res.status(400).send({
+      message: "interview_time must not be empty",
+    });
+  }
+  if (!data.interview_date) {
+    return res.status(400).send({
+      message: "interview_date must not be empty",
+    });
+  }
+  if (!data.admin_email) {
+    return res.status(400).send({
+      message: "admin_email must not be empty",
+    });
+  }
+
   try {
-    const data = req.body;
     const result = await client_interview_service(data);
     res.send(result);
   } catch (error) {
-    console.log(`Error while posting ${error}`);
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({
+      message: "An error occurred while scheduling the interview.",
+      error: error.message,
+    });
   }
 }
 
