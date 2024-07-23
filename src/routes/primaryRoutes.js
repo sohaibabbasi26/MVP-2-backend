@@ -112,6 +112,11 @@ const routes = [
     preHandler: clientValidation.validateClientResponse, //accept Pending Reject
     handler: clientHandlers.clientResponseHandler,
   },
+  {
+    method: "POST",
+    url: "/client/client_interview",
+    handler: clientHandlers.clientinterviewhandler,
+  },
 ];
 
 module.exports = { routes };

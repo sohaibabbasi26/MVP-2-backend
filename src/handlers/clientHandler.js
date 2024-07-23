@@ -6,6 +6,7 @@ const {
   clientAcceptService,
   clientPendingService,
   declineCustomerService,
+  client_interview_service,
 } = require("../services/clientservice");
 
 //Client Api
@@ -69,6 +70,18 @@ const createClientRequestHandler = (req, res) => {
   }
 };
 
+//client interview api
+async function clientinterviewhandler(req, res) {
+  try {
+    const data = req.body;
+    const result = await client_interview_service(data);
+    res.send(result);
+  } catch (error) {
+    console.log(`Error while posting ${error}`);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+}
+
 const clientResponseHandler = (req, res) => {
   try {
     const { customer_id, client_id, job_posting_id, response_status } =
@@ -118,4 +131,5 @@ module.exports = {
   getClientById,
   clientResponseHandler,
   createClientRequestHandler,
+  clientinterviewhandler,
 };

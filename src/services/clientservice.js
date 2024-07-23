@@ -3,7 +3,8 @@ const { Op } = require("sequelize");
 const Client = require("../models/client");
 const { Client_Requests } = require("../models/client_requests");
 const Customer = require("../models/customer");
-
+const ClientInterview = require("../models/client_interview_scheduling");
+const { sendMail } = require("../handlers/primaryHandlers");
 //Client Api
 async function getallclients(req, res) {
   try {
@@ -33,6 +34,59 @@ async function updateclient_service(body, client_id) {
   return body;
 }
 
+const client_interview_service = async (body) => {
+  try {
+    const schedule = await ClientInterview.create(body);
+    if (schedule) {
+      const emailData = {
+        to: body.customer_email,
+        subject: "Interview Scheduled",
+        text: `Dear Customer,
+                      
+Your interview has been scheduled for ${body.interview_date} at ${body.interview_time}.
+              
+Thank you,
+Co-VenTech`,
+        user_role: "customer",
+      };
+
+      const adminEmailData = {
+        to: body.admin_email,
+        subject: "Interview Scheduled",
+        text: `Dear Admin,
+                      
+An interview has been scheduled for ${body.interview_date} at ${body.interview_time}.
+              
+Thank you,
+Co-VenTech`,
+
+        user_role: "admin",
+      };
+
+      // Send the email
+      await sendMail(
+        { body: emailData },
+        {
+          send: (result) => console.log(result),
+          status: (code) => ({ send: (message) => console.log(message) }),
+        }
+      );
+      await sendMail(
+        { body: adminEmailData },
+        {
+          send: (result) => console.log(result),
+          status: (code) => ({ send: (message) => console.log(message) }),
+        }
+      );
+
+      return { message: "Successfully Scheduled an Interview" };
+    } else {
+      return { message: "Table not created" };
+    }
+  } catch (error) {
+    console.log(`Error while inserting data ${error}`);
+  }
+};
 const getClientByIdService = async (id) => {
   const client = await Client.findOne({
     attributes: [
@@ -112,8 +166,10 @@ const declineCustomerService = async (
       (cli) => cli.client_id !== client_id
     );
 
-    customer.update({ job_status: "Un-Assigned", assigned_clients:
-      updated_clients.length > 0 ? updated_clients : null});
+    customer.update({
+      job_status: "Un-Assigned",
+      assigned_clients: updated_clients.length > 0 ? updated_clients : null,
+    });
 
     await Adminassigned.update(
       {
@@ -122,11 +178,11 @@ const declineCustomerService = async (
       {
         where: {
           job_posting_id: job_posting_id,
-          customer_id:customer_id,
-          client_id:client_id
+          customer_id: customer_id,
+          client_id: client_id,
         },
       }
-    )
+    );
 
     return {
       status: 200,
@@ -284,6 +340,7 @@ module.exports = {
   getallclients,
   updateclient_service,
   clientAcceptService,
+  client_interview_service,
   clientPendingService,
   declineCustomerService,
 };

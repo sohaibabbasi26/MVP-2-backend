@@ -28,7 +28,7 @@ const validate_InterviewScheduleSchema = (req, res, next) => {
   const { error } = interviewScheduleschema.validate(req.body);
   if (error) {
     res.status(400).send({
-      message: error,
+      message: error.details[0].message,
     });
   } else {
     next();
