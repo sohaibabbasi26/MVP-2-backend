@@ -61,34 +61,13 @@ const createClientRequestHandler = (req, res) => {
         message: result.message,
       });
     });
-  }  catch  (err)  {
+  } catch (err) {
     console.log("error in root_project -> src -> handlers -> clientHandler.js");
     res.status(500).send({
       message: err,
     });
   }
 };
-
-
-// const ClientAcceptHandler = async (req, res) => {
-//   try {
-//     const body = req.body;
-//     const result = await clientAcceptService(body);
-//     res.send(result);
-//   } catch (error) {
-//     console.log(`Error in clientAcceptHandler`);
-//   }
-// };
-
-// const ClientPendingHandler = async (req, res) => {
-//   try {
-//     const body = req.body;
-//     const result = await clientPendingService(body);
-//     res.send(result);
-//   } catch (error) {
-//     console.log(`Error in clientAcceptHandler`);
-//   }
-// };
 
 const clientResponseHandler = (req, res) => {
   try {
@@ -106,19 +85,19 @@ const clientResponseHandler = (req, res) => {
         );
         break;
       case "accept":
-        clientAcceptService(req.body).then((result)=>{
+        clientAcceptService(req.body).then((result) => {
           res.status(result.status).send({
             message: result.message,
-            body: result.body
-          })
+            body: result.body,
+          });
         });
         break;
       case "pending":
-        clientPendingService(req.body).then((result)=>{
+        clientPendingService(req.body).then((result) => {
           res.status(result.status).send({
             message: result.message,
-            body: result.body
-          })
+            body: result.body,
+          });
         });
         break;
       default:
@@ -137,8 +116,6 @@ module.exports = {
   clients,
   client_updateprofile,
   getClientById,
-  // ClientAcceptHandler,
-  // ClientPendingHandler,
   clientResponseHandler,
-  createClientRequestHandler
+  createClientRequestHandler,
 };

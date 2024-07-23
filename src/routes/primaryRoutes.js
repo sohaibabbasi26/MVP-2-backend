@@ -1,15 +1,14 @@
 const primaryHandlers = require("../handlers/primaryHandlers");
 const clientHandlers = require("../handlers/clientHandler");
 const customerHandlers = require("../handlers/customerHandler");
-const resetPasswordHandler= require('../handlers/passwordResetHandler');
+const resetPasswordHandler = require("../handlers/passwordResetHandler");
 const authValidation = require("../pre-handlers/authValidation");
 const customerHandler = require("../handlers/customerHandler");
 const adminHandler = require("../handlers/adminHandler");
 const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
-const resetPasswordValidation= require('../pre-handlers/passwordResetValidation');
-
+const resetPasswordValidation = require("../pre-handlers/passwordResetValidation");
 
 const routes = [
   {
@@ -107,24 +106,12 @@ const routes = [
     url: "/admin/fetch-client-requests",
     handler: adminHandler.fetchClientRequestHandler,
   },
-  // {
-  //   method: "PUT",
-  //   url: "/client/accept_customer",
-  //   handler: clientHandlers.ClientAcceptHandler,
-  //   // preHandler: clientValidation.validate_clientAcceptschema,
-  // },
-  // {
-  //   method: "PUT",
-  //   url: "/client/pending_customer",
-  //   handler: clientHandlers.ClientPendingHandler,
-  //   // preHandler: clientValidation.validate_clientAcceptschema,
-  // },
   {
-    method:'POST',
-    url:'/client/client-response',
-    preHandler: clientValidation.validateClientResponse,
-    handler: clientHandlers.clientResponseHandler
-  }
+    method: "POST",
+    url: "/client/client-response",
+    preHandler: clientValidation.validateClientResponse, //accept Pending Reject
+    handler: clientHandlers.clientResponseHandler,
+  },
 ];
 
 module.exports = { routes };
