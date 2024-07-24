@@ -3,17 +3,26 @@ const Customer = require('../models/customer');
 const Client = require('../models/client');
 const Admin = require('../models/admin');
 const Questions = require('../models/questions');
+const JobPostings = require('../models/jobPostings');
+const Test = require('../models/test');
+const CodingResults = require('../models/codingResults');
+const Results = require('../models/results');
+// const Assessment = require('')
+const Assessments = require('../models/assessments');
 const { checkCustomerInDb } = require('../utilities/checkCustomerExists');
 const { checkClientInDb } = require('../utilities/checkClientInDb');
 const { encryptPasword } = require('../utilities/encryptPassword');
 const { jwtSignature } = require('../utilities/jwtSign');
 const { comparePassword } = require('../utilities/passwordCompare');
 const { checkAdminInDb } = require('../utilities/checkAdminInDb');
-const { getCompletion } = require('../utilities/OpenAIgateways');
+const { getCompletion, getCodingVerifiedCompletion } = require('../utilities/OpenAIgateways');
 const { convertTextToQuestionArray } = require('../utilities/convTextToQuesArray');
-const { createPrompt } = require('../utilities/promptHelper');
-const JobPostings = require('../models/jobPostings');
+const { createPrompt, CodingAssignmentPrompt, CodingExcersiceVerificationPrompt } = require('../utilities/promptHelper');
+const { processJob } = require('../utilities/cronJob');
+const { refineApiResponseForCoding } = require('../utilities/refinedCodingResults')
+const { generateCodeQues } = require('../utilities/generateCodeQues');
 const transporter = require('../../configurations/gmailConfig');
+const { SimpleQueue } = require('../utilities/TemporaryQueue');
 
 async function customerSignup(data) {
     try {
@@ -188,7 +197,7 @@ async function adminLogin(data) {
 }
 
 async function getRandomQuestionsService(data) {
-    const { expertise, difficulty, limit, position_id } = data;
+    const { expertise, difficulty, limit, job_posting_id } = data;
     const prompt = createPrompt(expertise, difficulty, limit);
     try {
         const completion = await getCompletion(prompt);
@@ -198,14 +207,14 @@ async function getRandomQuestionsService(data) {
 
         const reqBody = {
             expertise,
-            position_id,
+            job_posting_id,
             question: finalData,
         };
         console.log("request body:", reqBody);
         try {
             const submitQuestions = await Questions.create({
                 question: finalData,
-                position_id: position_id,
+                job_posting_id: job_posting_id,
             });
             console.log("\nQUESTIONS SAVED IN DB:", submitQuestions);
             return { status: 200, message: submitQuestions };
@@ -217,7 +226,7 @@ async function getRandomQuestionsService(data) {
             };
         }
     } catch (err) {
-        console.error("OpenAI Error:", err.message,'\nError source: src -> services -> primaryServices -> getRandomQuestionsService');
+        console.error("OpenAI Error:", err.message, '\nError source: src -> services -> primaryServices -> getRandomQuestionsService');
         throw new Error("Failed to generate question");
     }
 }
@@ -271,9 +280,9 @@ async function createPositionsService(data) {
             try {
                 const result = await JobPostings.create(requestBody);
                 return { statusCode: 200, data: result?.dataValues };
-            } catch(e){
-                console.log("Failed to create a job posting",e,'\nError source: src -> services -> primaryServices -> createPositionsService');
-                return "Failed to create a job posting",e;
+            } catch (e) {
+                console.log("Failed to create a job posting", e, '\nError source: src -> services -> primaryServices -> createPositionsService');
+                return "Failed to create a job posting", e;
             }
         } else {
             return { statusCode: 404, message: "Unauthorized access to make a job posting." };
@@ -284,6 +293,250 @@ async function createPositionsService(data) {
     }
 }
 
+async function takeTest({ question_answer, customer_id, job_posting_id }) {
+    ''
+    const resultQueue = new SimpleQueue();
+    try {
+        const checkTwo = await Customer.findOne({
+            where: { customer_id },
+        });
+
+        if (checkTwo) {
+            let test;
+            try {
+                test = await Test.create({
+                    question_answer,
+                    customer_id,
+                });
+                console.log("Test:", test.dataValues.test_id);
+
+                let job;
+                job = {
+                    question_answer: question_answer,
+                    customer_id: customer_id,
+                    testId: test.dataValues.test_id,
+                };
+                resultQueue.enqueue(job);
+
+                processJob(job, job_posting_id, resultQueue);
+
+                return {
+                    message: "Test is being processed",
+                    jobId: test.dataValues.test_id,
+                };
+            } catch (err) {
+                console.error("Error creating test in DB:", err);
+                return {
+                    statusCode: 500,
+                    message: "Failed to create test.",
+                };
+            }
+        } else {
+            console.log("A customer with and id:", customer_id, " is not found in the DB.");
+            return "A customer with and id:", customer_id, " is not found in the DB."
+        }
+    } catch (err) {
+        console.error("Error in takeTest:", err);
+        return {
+            statusCode: 500,
+            message: "An error occurred during the test process.",
+        };
+    }
+}
+
+async function getCodingQuestionService({ job_posting_id, customer_id }) {
+    try {
+        const prompt = await CodingAssignmentPrompt();
+        console.log("Prompt for coding assignment:", prompt);
+        if (prompt) {
+            try {
+                const JsonifiedData = await generateCodeQues(prompt);
+                const reqBody = {
+                    assesment: JsonifiedData,
+                    job_posting_id: job_posting_id,
+                };
+
+                try {
+                    const setAssessment = await Assessments.create(
+                        reqBody
+                    );
+                    console.log("assessment:", setAssessment);
+                    console.log("assessment created:", setAssessment?.dataValues);
+                    return JsonifiedData;
+                } catch (err) {
+                    console.log("Error while creating assessment:", err, "\nError source: src -> services -> primaryServices -> getCodingQuestion");
+                    return "Error while creating assessment:", err, "\nError source: src -> services -> primaryServices -> getCodingQuestion";
+                }
+            } catch (err) {
+                console.log("Some server side error occured:", err, "\nError source: src -> services -> primaryServices -> getCodingQuestion");
+                return "Some server side error occured:", err, "\nError source: src -> services -> primaryServices -> getCodingQuestion";
+            }
+        }
+    } catch (err) {
+        console.log("ERROR:", err);
+        return;
+    }
+}
+
+async function getCodingVerifiedService({ code, exercise, constraints, output, customer_id }) {
+    try {
+        const prompt = await CodingExcersiceVerificationPrompt(
+            code,
+            exercise,
+            constraints,
+            output
+        );
+        const completion = await getCodingVerifiedCompletion(prompt);
+        const data = completion.choices[0].message.content
+            .replace(/```/g, "")
+            .trim();
+
+        console.log(" data:", data);
+
+        let JsonifiedData;
+        try {
+            JsonifiedData = await refineApiResponseForCoding(data);
+        } catch (parseError) {
+            console.error(
+                "Error parsing JSON:",
+                parseError,
+                "Raw data:",
+                data
+            );
+            return { error: parseError.message, rawData: data };
+        }
+
+        const dataEntry = await CodingResults.create({
+            result: JsonifiedData,
+            customer_id: customer_id,
+        });
+        console.log("Data entered in the DB table:", dataEntry);
+        return dataEntry;
+    }
+    catch (err) {
+        console.log('ERROR while verifying the provided code:', err, '\nError source: src -> services -> primaryServices.js -> getCodingVerified');
+        return 'ERROR while verifying the provided code:', err;
+    }
+}
+
+async function getCustomerResultService({ customer_id }) {
+    try {
+        const check = await Customer.findOne({
+            where: {
+                customer_id: customer_id
+            }
+        });
+
+        if (!check) {
+            console.log("No customer found with id:", customer_id);
+            return {
+                message: 'No such customer available.'
+            }
+        } else {
+            try {
+                const result = await Results.findOne({
+                    where: {
+                        customer_id: customer_id
+                    }
+                });
+                console.log('the fetched results are:', result?.dataValues);
+                return {
+                    message: result?.dataValues
+                }
+            } catch (err) {
+                console.log("Error while finding the client's result:", err, '\nError source: src -> services -> primaryServices.js -> getCustomerResultService');
+                return {
+                    message: "Error while finding the client:", err
+                };
+            }
+        }
+    } catch (err) {
+        console.log("Error while finding the requested client's info:", err, '\nError source: src -> services -> primaryServices.js -> getCustomerResultService');
+        return "Error while finding the requested client's info:", err;
+    }
+}
+
+async function setHourlyRateService({ customer_id, hourly_rate }) {
+    try {
+        const check = await Customer.findOne({
+            where: {
+                customer_id: customer_id
+            }
+        });
+        console.log("found customer:", check?.dataValues);
+
+        if (!check) {
+            console.log("No customer found with id:", customer_id);
+            return {
+                message: 'No such customer available.'
+            }
+        } else {
+            try {
+                const result = await Customer.update({
+                    hourly_rate: hourly_rate
+                },
+                {
+                    where: {
+                        customer_id: customer_id
+                    }
+                });    
+                console.log("the customer table is updated", result);
+                return {
+                    message: 'Hourly-rate has been successfully set.',
+                    response: result
+                };
+            } catch (err) {
+                console.log("Error while finding the client:", err, '\nError source: src -> services -> primaryServices.js -> getCustomerResultService');
+                return {
+                    message: "Error while finding the client:", err
+                };
+            }
+        }
+
+    } catch (err) {
+        console.log("Error while finding the requested client's info:", err, '\nError source: src -> services -> primaryServices.js -> getCustomerResultService');
+        return "Error while finding the requested client's info:", err;
+    }
+}
+
+async function setExpertiseService({ expertise, customer_id }) {
+    const customer = await Customer.findOne({
+        where: {
+            customer_id: customer_id,
+        },
+    });
+
+    try {
+        if (!customer) {
+            return "no such customer was found in the db";
+        } else {
+            const result = await Customer.update(
+                {
+                    expertise: expertise,
+                },
+                {
+                    where: {
+                        customer_id: customer_id,
+                    },
+                }
+            );
+
+            if (result[0] > 0) {
+                ``;
+                return `New expertise updated for customer ID: ${customer_id}`;
+            } else {
+                throw new Error(
+                    "No update performed. It is possible the customer ID did not match."
+                );
+            }
+        }
+    } catch (err) {
+        console.log("ERROR occured during updating the expertise of a customer:", err);
+        return "ERROR occured during updating the expertise of a customer:", err
+    }
+}
+
+
 module.exports = {
     customerSignup,
     clientSignup,
@@ -293,5 +546,11 @@ module.exports = {
     adminLogin,
     getRandomQuestionsService,
     createPositionsService,
-    sendMailService
+    setExpertiseService,
+    sendMailService,
+    takeTest,
+    getCodingQuestionService,
+    getCodingVerifiedService,
+    getCustomerResultService,
+    setHourlyRateService,
 } 

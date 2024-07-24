@@ -42,6 +42,12 @@ const Customer = sequelize.define('customers', {
     contact_no: {
         type: DataTypes.STRING,
     },
+    hourly_rate : {
+        type: DataTypes.INTEGER
+    },
+    exxperience: {
+        type: DataTypes.ENUM("beginner","intermediate","expert")
+    }
 });
 
 module.exports = Customer
