@@ -19,9 +19,6 @@ const Customer = sequelize.define('customers', {
             isEmail: true
         }
     },
-    over_all_exp: {
-        type: DataTypes.STRING,
-    },
     applied_through: {
         type: DataTypes.STRING,
     },
@@ -45,8 +42,9 @@ const Customer = sequelize.define('customers', {
     hourly_rate : {
         type: DataTypes.INTEGER
     },
-    exxperience: {
-        type: DataTypes.ENUM("beginner","intermediate","expert")
+    experience: {
+        type: DataTypes.ENUM("beginner","intermediate","expert"),
+        defaultValue: "beginner"
     }
 });
 

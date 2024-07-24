@@ -161,7 +161,7 @@ async function getCodingVerified(request, reply) {
         reply.status(200).send(result);
     }
     catch (err) {
-        console.log("ERROR while handling the route:", err, "\nError source: src -> handlers -> primaryHandlers.js -> getCodingQuestion");
+        console.log("ERROR while handling the route:", err, "\nError source: src -> handlers -> primaryHandlers.js -> getCodingVerified");
         return "ERROR while handling the route:", err;
     }
 }
@@ -183,7 +183,7 @@ async function setHourlyRate(request, reply) {
         const result = await services.setHourlyRateService({ customer_id , hourly_rate});
         reply.status(200).send(result);
     } catch (err) {
-        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> getCustomerResult");
+        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> setHourlyRate");
         return "Some error occured while handling the route", err;
     }
 }
@@ -194,7 +194,29 @@ async function setExpertise(request,reply){
         const result = await services.setExpertiseService({ customer_id , expertise});
         reply.status(200).send(result);
     } catch (err){
-        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> getCustomerResult");
+        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> setExpertise");
+        return "Some error occured while handling the route", err;
+    }
+}
+
+async function setExperience(request,reply){
+    try{
+        const { customer_id, experience } = request?.body;
+        const result = await services.setExperienceService({ customer_id , experience });
+        reply.status(200).send(result);
+    } catch (err){
+        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> setExperience");
+        return "Some error occured while handling the route", err;
+    }
+}
+
+async function profileInfoUpdate(request,reply){
+    try{
+        const { customer_id, prop, value } = request?.body;
+        const result = await services.profileInfoUpdateService({ customer_id , prop, value });
+        reply.status(200).send(result);
+    } catch (err){
+        console.log('Some error occured while handling the route', err, "\nError source: src -> handlers -> primaryHandlers.js -> profileInfoUpdate");
         return "Some error occured while handling the route", err;
     }
 }
@@ -211,5 +233,7 @@ module.exports = {
     getCodingVerified,
     getCustomerResult,
     setHourlyRate,
-    setExpertise
+    setExpertise,
+    setExperience,
+    profileInfoUpdate
 }

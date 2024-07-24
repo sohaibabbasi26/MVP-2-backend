@@ -60,15 +60,25 @@ const routes = [
         handler: primaryHandlers.getCustomerResult,
     },
     {
-        method: 'POST',
+        method: 'PUT',
         url: '/set-hourly-rate',
         handler: primaryHandlers.setHourlyRate,
     },
     {
-        method: 'POST',
+        method: 'PUT',
         url: '/set-expertise',
         handler: primaryHandlers.setExpertise,
     },
+    {
+        method: 'PUT',
+        url: '/set-experience',
+        handler: primaryHandlers.setExperience,
+    },
+    {
+        method: 'PUT',
+        url: '/profile-info-update',
+        handler: primaryHandlers.profileInfoUpdate
+    }
 ];
 
 module.exports = {routes};

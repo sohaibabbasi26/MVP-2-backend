@@ -531,11 +531,91 @@ async function setExpertiseService({ expertise, customer_id }) {
             }
         }
     } catch (err) {
-        console.log("ERROR occured during updating the expertise of a customer:", err);
+        console.log("ERROR occured during updating the expertise of a customer:", err,"\nError source: src -> services -> primaryServices.js -> setExpertiseService");
         return "ERROR occured during updating the expertise of a customer:", err
     }
 }
 
+async function setExperienceService({ experience, customer_id }) {
+    const customer = await Customer.findOne({
+        where: {
+            customer_id: customer_id,
+        },
+    });
+
+    try {
+        if (!customer) {
+            return "no such customer was found in the db";
+        } else {
+            const result = await Customer.update(
+                {
+                    experience: experience,
+                },
+                {
+                    where: {
+                        customer_id: customer_id,
+                    },
+                }
+            );
+
+            if (result[0] > 0) {
+                ``;
+                return `New experience updated for customer ID: ${customer_id}`;
+            } else {
+                throw new Error(
+                    "No update performed. It is possible the customer ID did not match."
+                );
+            }
+        }
+    } catch (err) {
+        console.log("ERROR occured during updating the experience of a customer:", err,"\nError source: src -> services -> primaryServices.js -> setExperienceService");
+        return "ERROR occured during updating the experience of a customer:", err;
+    }
+}
+
+async function profileInfoUpdateService({ prop, customer_id, value }) {
+    const customer = await Customer.findOne({
+        where: {
+            customer_id: customer_id,
+        },
+    });
+
+    try {
+        if (!customer) {
+            return "no such customer was found in the db";
+        } else {
+
+            const updateObject = {};
+            updateObject[prop] = value;
+
+            console.log("update property object",updateObject);
+
+            const result = await Customer.update(
+                updateObject
+                ,
+                {
+                    where: {
+                        customer_id: customer_id,
+                    },
+                }
+            );
+
+            console.log("Result:",result);
+
+            if (result[0] > 0) {
+                ``;
+                return `New ${prop} updated for customer ID: ${customer_id}`;
+            } else {
+                throw new Error(
+                    "No update performed. It is possible the customer ID did not match."
+                );
+            }
+        }
+    } catch (err) {
+        console.log("ERROR occured during updating the experience of a customer:", err,"\nError source: src -> services -> primaryServices.js -> setExperienceService");
+        return "ERROR occured during updating the experience of a customer:", err;
+    }
+}
 
 module.exports = {
     customerSignup,
@@ -553,4 +633,6 @@ module.exports = {
     getCodingVerifiedService,
     getCustomerResultService,
     setHourlyRateService,
+    setExperienceService,
+    profileInfoUpdateService
 } 
