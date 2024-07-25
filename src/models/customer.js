@@ -42,12 +42,19 @@ const Customer = sequelize.define("customers", {
   contact_no: {
     type: DataTypes.STRING,
   },
-  hourly_rate: {
-    type: DataTypes.INTEGER,
+  job_status: {
+    type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
+    defaultValue: "Un-Assigned",
+    allowNull: false,
   },
-  experience: {
-    type: DataTypes.ENUM("beginner", "intermediate", "expert"),
-    defaultValue: "beginner",
+  assigned_clients: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: null,
+  },
+  is_approved: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
 });
 
