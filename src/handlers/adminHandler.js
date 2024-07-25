@@ -13,12 +13,6 @@ async function assigningCustomerHandler(req, res) {
   try {
     const data = req.body;
     const result = await assigningCustomerservice(data);
-    // const body = {
-    //   assigned_customers: result.assigned_customers.concat([
-    //     { customer_id: data.customer_id },
-    //   ]),
-    // };
-    // await updateclient_service(body, data.client_id);
     res.send(result);
   } catch (error) {
     console.error("Error in adminassignedhandler:", error.message);
