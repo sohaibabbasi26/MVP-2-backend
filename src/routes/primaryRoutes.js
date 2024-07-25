@@ -28,7 +28,7 @@ const routes = [
   },
   {
     method: "GET",
-    url: "/assigned_customer/:client_id",
+    url: "/assigned-customer/:client_id",
     handler: adminHandler.getcustomerwithclientid,
   },
   {
@@ -74,7 +74,7 @@ const routes = [
   },
   {
     method: "POST",
-    url: "/assigned_customer",
+    url: "/assigned-customer",
     handler: adminHandler.assigningCustomerHandler,
     prehander: adminValidation.validate_assigningCustomerSchema,
   },
@@ -114,8 +114,51 @@ const routes = [
   },
   {
     method: "POST",
-    url: "/client/client_interview",
+    url: "/client/client-interview",
     handler: clientHandlers.clientinterviewhandler,
+  },
+  {
+    method: "POST",
+    url: "/take-test",
+    handler: primaryHandlers.takeTest,
+    preHandler: authValidation.validateTakeTestBody,
+  },
+  {
+    method: "POST",
+    url: "/gen-coding-ques",
+    handler: primaryHandlers.getCodingQuestion,
+    preHandler: authValidation.validateCodingGenBody,
+  },
+  {
+    method: "POST",
+    url: "/get-coding-verified",
+    handler: primaryHandlers.getCodingVerified,
+    preHandler: authValidation.validateCodingVerified,
+  },
+  {
+    method: "GET",
+    url: "/get-customer-result",
+    handler: primaryHandlers.getCustomerResult,
+  },
+  {
+    method: "PUT",
+    url: "/set-hourly-rate",
+    handler: primaryHandlers.setHourlyRate,
+  },
+  {
+    method: "PUT",
+    url: "/set-expertise",
+    handler: primaryHandlers.setExpertise,
+  },
+  {
+    method: "PUT",
+    url: "/set-experience",
+    handler: primaryHandlers.setExperience,
+  },
+  {
+    method: "PUT",
+    url: "/profile-info-update",
+    handler: primaryHandlers.profileInfoUpdate,
   },
 ];
 

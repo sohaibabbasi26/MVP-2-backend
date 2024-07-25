@@ -9,5 +9,5 @@ function convertTextToQuestionArray(text) {
 }
 
 module.exports = {
-    convertTextToQuestionArray
+    convertTextToQuestionArray  
 }

@@ -3,7 +3,6 @@ const fastify = require('fastify')({
 });
 const { routes } = require('../src/routes/primaryRoutes')
 require('dotenv').config()
-// const {connectDb} = require('../src/utilities/dbConnection');
 const { syncModels } = require("../src/utilities/syncModels");
 const {generateJwtSecret} = require('../src/utilities/jwtSecretGenerator');
 

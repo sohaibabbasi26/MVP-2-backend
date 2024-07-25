@@ -31,7 +31,10 @@ const Customer = sequelize.define("customers", {
   expertise: {
     type: DataTypes.JSONB,
   },
-
+  client_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
   position: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -39,19 +42,12 @@ const Customer = sequelize.define("customers", {
   contact_no: {
     type: DataTypes.STRING,
   },
-  job_status: {
-    type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
-    defaultValue: "Un-Assigned",
-    allowNull: false,
+  hourly_rate: {
+    type: DataTypes.INTEGER,
   },
-  assigned_clients: {
-    type: DataTypes.JSONB,
-    allowNull: true,
-    defaultValue: null,
-  },
-  is_approved: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+  experience: {
+    type: DataTypes.ENUM("beginner", "intermediate", "expert"),
+    defaultValue: "beginner",
   },
 });
 

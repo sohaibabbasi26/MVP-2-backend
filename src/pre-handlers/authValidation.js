@@ -34,6 +34,17 @@ const genRandQuesSchema = Joi.object({
     expertise: Joi.array().required(),
 })
 
+const genCodingquestionSchema = Joi.object({
+    job_posting_id: Joi.string().min(8).max(50).required(),
+    customer_id: Joi.string().min(8).max(50),
+});
+
+const takeTestSchema = Joi.object({
+    question_answer: Joi.array().required(),
+    customer_id: Joi.string().min(8).max(50),
+    job_posting_id: Joi.string().min(8).max(50)
+})
+
 const validateRegister = (request, reply, done) => {
     try {
         const { error } = registerSchema.validate(request.body);
@@ -45,6 +56,32 @@ const validateRegister = (request, reply, done) => {
         console.log("ERR:",e)
     }
 };
+
+
+
+const validateTakeTestBody = (request,reply,done) => {
+    try {
+        const { error } = takeTestSchema.validate(request.body);
+        if (error) {
+            return reply.status(400).send(error.details[0].message);
+        }
+        done();
+    } catch(e){
+        console.log("ERR:",e)
+    }
+}
+
+const validateCodingGenBody = (request,reply,done) => {
+    try {
+        const { error } = genCodingquestionSchema.validate(request.body);
+        if (error) {
+            return reply.status(400).send(error.details[0].message);
+        }
+        done();
+    } catch(e){
+        console.log("ERR:",e)
+    }
+}
 
 const validateJobPost = (request, reply, done) => {
     try {
@@ -86,5 +123,7 @@ module.exports = {
     validateRegister,
     validateLogin,
     validateRandomQuestionGen,
-    validateJobPost
+    validateJobPost,
+    validateTakeTestBody,
+    validateCodingGenBody
 }
