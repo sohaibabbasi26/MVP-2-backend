@@ -30,11 +30,24 @@ async function assigningCustomerHandler(req, res) {
 async function scheduleinterviewhandler(req, res) {
   try {
     const data = req.body;
-    if (!data.customer_id || !data.customer_email || !data.interview_time) {
-      // Ensure email is provided
+    if (!data.customer_id) {
       return res.status(400).send({
-        message:
-          "Customer_Id, Customer_Email, Interview_time  must not be empty",
+        message: "customer_id must not be empty",
+      });
+    }
+    if (!data.customer_email) {
+      return res.status(400).send({
+        message: "customer_email must not be empty",
+      });
+    }
+    if (!data.interview_time) {
+      return res.status(400).send({
+        message: "interview_time must not be empty",
+      });
+    }
+    if (!data.interview_date) {
+      return res.status(400).send({
+        message: "interview_date must not be empty",
       });
     } else {
       const result = await admin_interview_scheduling_service(data);

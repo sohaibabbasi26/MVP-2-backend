@@ -16,7 +16,7 @@ async function admin_interview_scheduling_service(body) {
         subject: "Interview Scheduled",
         text: `Dear Candidate,
                       
-                    Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
+Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
               
         Thank you,
         Co-VenTech`,
