@@ -5,6 +5,7 @@ const { Client_Requests } = require("../models/client_requests");
 const Customer = require("../models/customer");
 const ClientInterview = require("../models/client_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
+const JobPostings = require("../models/jobPostings");
 //Client Api
 async function getallclients(req, res) {
   try {
@@ -171,6 +172,17 @@ const declineCustomerService = async (
       assigned_clients: updated_clients.length > 0 ? updated_clients : null,
     });
 
+    await JobPostings.update(
+      {
+        job_status: "Un-Assigned",
+      },
+      {
+        where: {
+          job_posting_id: job_posting_id,
+        },
+      }
+    );
+
     await Adminassigned.update(
       {
         client_response: "Decline",
@@ -201,7 +213,7 @@ const clientAcceptService = async (body) => {
   try {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
-    console.log(body.job_posting_id);
+    const job_id = body.job_posting_id;
     //Updating Customer_Table
     const customer = await Customer.findOne({
       where: {
@@ -250,7 +262,16 @@ const clientAcceptService = async (body) => {
           },
         }
       );
-
+      await JobPostings.update(
+        {
+          job_status: "On-Job",
+        },
+        {
+          where: {
+            job_posting_id: job_id,
+          },
+        }
+      );
       console.log("Update successful");
       return {
         status: 200,
@@ -271,6 +292,8 @@ const clientPendingService = async (body) => {
   try {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
+    const job_id = body.job_posting_id;
+
     //Updating Customer_Table
     const customer = await Customer.findOne({
       where: {
@@ -316,6 +339,16 @@ const clientPendingService = async (body) => {
         {
           where: {
             client_id: client_id,
+          },
+        }
+      );
+      await JobPostings.update(
+        {
+          job_status: "Assigned",
+        },
+        {
+          where: {
+            job_posting_id: job_id,
           },
         }
       );

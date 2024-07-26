@@ -42,16 +42,10 @@ const JobPostings = sequelize.define("job_postings", {
   is_test_required: {
     type: DataTypes.BOOLEAN,
   },
-  // assigned_customers: {
-  //   type: DataTypes.JSONB,
-  //   allowNull: true,
-  //   defaultValue: null,
-  // },
   //ADDED job_status because we dont wanna use multiple joins to get status
   job_status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: "NOT_ASSIGNED",
+    type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
+    defaultValue: "Un-Assigned",
   },
 });
 

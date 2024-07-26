@@ -5,6 +5,7 @@ const Customer = require("../models/customer");
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
+const { Sequelize } = require("sequelize");
 
 //Interview scheduling
 async function admin_interview_scheduling_service(body) {
@@ -70,12 +71,17 @@ async function assigningCustomerservice(body) {
 async function getcustomerwithid(client_id) {
   try {
     const result = await Adminassigned.findOne({
-      where: { client_id },
+      where: {
+        client_id,
+        client_response: {
+          [Sequelize.Op.or]: ["Accept", "Pending"],
+        },
+      },
     });
     return result;
   } catch (error) {
     console.log(
-      `Error while fetching Customer=> src->services->adminservice->getcustomerwithid`,
+      `Error while fetching Customer=> src->services->adminservice->getCustomerWithId`,
       error
     );
     throw error;
