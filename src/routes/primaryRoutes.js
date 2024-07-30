@@ -160,6 +160,11 @@ const routes = [
     url: "/profile-info-update",
     handler: primaryHandlers.profileInfoUpdate,
   },
+  {
+    method: "GET",
+    url: "/client/job-posting/:client_id",
+    handler: clientHandlers.getJobviaclientIdHandler,
+  },
 ];
 
 module.exports = { routes };

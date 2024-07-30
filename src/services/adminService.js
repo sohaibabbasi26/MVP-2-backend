@@ -59,6 +59,46 @@ async function assigningCustomerservice(body) {
         message: `Customer is already assigned to this client for the given job posting.`,
       };
     }
+    const customer = await Customer.findOne({
+      where: {
+        customer_id: body.customer_id,
+      },
+    });
+    const client = await Client.findOne({
+      where: {
+        client_id: body.client_id,
+      },
+    });
+    if (customer && client) {
+      let position = customer.position || [];
+      let assignedClients = customer.assigned_clients || [];
+      let assignedCustomers = client.assigned_customers || [];
+      assignedClients.push({ client_id: body.client_id });
+      assignedCustomers.push({ customer_id: body.customer_id });
+      position.push({ job_posting_id: body.job_posting_id });
+      await Customer.update(
+        {
+          job_status: "Assigned",
+          position: position,
+          assigned_clients: assignedClients,
+        },
+        {
+          where: {
+            customer_id: body.customer_id,
+          },
+        }
+      );
+      await Client.update(
+        {
+          assigned_customers: assignedCustomers,
+        },
+        {
+          where: {
+            client_id: body.client_id,
+          },
+        }
+      );
+    }
     const data = await Adminassigned.create(body);
     return { data, message: `Customer is assigned to Client` };
   } catch (e) {

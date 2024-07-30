@@ -6,6 +6,21 @@ const Customer = require("../models/customer");
 const ClientInterview = require("../models/client_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const JobPostings = require("../models/jobPostings");
+
+//job posting via client_Id
+//get job posting via client-Id
+async function getJobviaclientIdService(client_id) {
+  try {
+    const result = await JobPostings.findOne({
+      where: {
+        client_id,
+      },
+    });
+    return { result, message: "Successfully retrieved data" };
+  } catch (error) {
+    console.log(`Error is at src->clientservice->getjobviaclientId`);
+  }
+}
 //Client Api
 async function getallclients(req, res) {
   try {
@@ -321,27 +336,6 @@ const clientPendingService = async (body) => {
           },
         }
       );
-      await Customer.update(
-        {
-          job_status: "Assigned",
-          assigned_clients: assignedClients,
-        },
-        {
-          where: {
-            customer_id: customer_id,
-          },
-        }
-      );
-      await Client.update(
-        {
-          assigned_customers: assignedCustomers,
-        },
-        {
-          where: {
-            client_id: client_id,
-          },
-        }
-      );
       await JobPostings.update(
         {
           job_status: "Assigned",
@@ -376,4 +370,5 @@ module.exports = {
   client_interview_service,
   clientPendingService,
   declineCustomerService,
+  getJobviaclientIdService,
 };

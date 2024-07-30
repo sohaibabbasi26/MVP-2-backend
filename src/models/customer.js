@@ -31,16 +31,11 @@ const Customer = sequelize.define("customers", {
   expertise: {
     type: DataTypes.JSONB,
   },
-  client_id: {
-    type: DataTypes.UUID,
-    allowNull: true,
-  },
-  position: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   contact_no: {
     type: DataTypes.STRING,
+  },
+  position: {
+    type: DataTypes.JSONB,
   },
   job_status: {
     type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),

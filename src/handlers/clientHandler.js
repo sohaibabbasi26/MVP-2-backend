@@ -7,6 +7,7 @@ const {
   clientPendingService,
   declineCustomerService,
   client_interview_service,
+  getJobviaclientIdService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -19,7 +20,16 @@ async function clients(req, res) {
     return;
   }
 }
-
+//job posting via clientid
+async function getJobviaclientIdHandler(req, res) {
+  try {
+    const client_id = req.params.client_id;
+    const result = await getJobviaclientIdService(client_id);
+    res.send(result);
+  } catch (error) {
+    console.log(`Error fetching Job ${error}`);
+  }
+}
 //Client update_profile
 async function client_updateprofile(req, res) {
   const body = req.body;
@@ -27,6 +37,9 @@ async function client_updateprofile(req, res) {
 
   if (body.password) {
     delete body.password;
+  }
+  if (body.email) {
+    delete body.email;
   }
 
   try {
@@ -162,4 +175,5 @@ module.exports = {
   clientResponseHandler,
   createClientRequestHandler,
   clientinterviewhandler,
+  getJobviaclientIdHandler,
 };
