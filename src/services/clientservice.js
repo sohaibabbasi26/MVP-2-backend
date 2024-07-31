@@ -365,10 +365,6 @@ const clientPendingService = async (body) => {
       },
     });
     if (customer && client) {
-      // let assignedClients = customer.assigned_clients || [];
-      let assignedCustomers = client.assigned_customers || [];
-      // assignedClients.push({ client_id: body.client_id });
-      assignedCustomers.push({ customer_id: body.customer_id });
       await Adminassigned.update(
         {
           client_response: "Pending",
