@@ -16,7 +16,7 @@ async function getJobviaclientIdService(client_id) {
         client_id,
       },
     });
-    return { result, message: "Successfully retrieved data" };
+    return { result, message: "Successfully retrieved Jobs" };
   } catch (error) {
     console.log(`Error is at src->clientservice->getjobviaclientId`);
   }
@@ -52,52 +52,61 @@ async function updateclient_service(body, client_id) {
 
 const client_interview_service = async (body) => {
   try {
-    const schedule = await ClientInterview.create(body);
-    if (schedule) {
-      const emailData = {
-        to: body.customer_email,
-        subject: "Interview Scheduled",
-        text: `Dear Customer,
+    const data = await Customer.findOne({
+      where: {
+        customer_id: body.customer_id,
+      },
+    });
+    if (data) {
+      const schedule = await ClientInterview.create(body);
+      if (schedule) {
+        const emailData = {
+          to: body.customer_email,
+          subject: "Interview Scheduled",
+          text: `Dear Customer,
                       
 Your interview has been scheduled for ${body.interview_date} at ${body.interview_time}.
               
 Thank you,
 Co-VenTech`,
-        user_role: "customer",
-      };
+          user_role: "customer",
+        };
 
-      const adminEmailData = {
-        to: body.admin_email,
-        subject: "Interview Scheduled",
-        text: `Dear Admin,
+        const adminEmailData = {
+          to: body.admin_email,
+          subject: "Interview Scheduled",
+          text: `Dear Admin,
                       
 An interview has been scheduled for ${body.interview_date} at ${body.interview_time}.
               
 Thank you,
 Co-VenTech`,
 
-        user_role: "admin",
-      };
+          user_role: "admin",
+        };
 
-      // Send the email
-      await sendMail(
-        { body: emailData },
-        {
-          send: (result) => console.log(result),
-          status: (code) => ({ send: (message) => console.log(message) }),
-        }
-      );
-      await sendMail(
-        { body: adminEmailData },
-        {
-          send: (result) => console.log(result),
-          status: (code) => ({ send: (message) => console.log(message) }),
-        }
-      );
+        // Send the email
+        await sendMail(
+          { body: emailData },
+          {
+            send: (result) => console.log(result),
+            status: (code) => ({ send: (message) => console.log(message) }),
+          }
+        );
+        await sendMail(
+          { body: adminEmailData },
+          {
+            send: (result) => console.log(result),
+            status: (code) => ({ send: (message) => console.log(message) }),
+          }
+        );
 
-      return { message: "Successfully Scheduled an Interview" };
+        return { message: "Successfully Scheduled an Interview" };
+      } else {
+        return { message: "Table not created" };
+      }
     } else {
-      return { message: "Table not created" };
+      return { message: "Customer Not existed in the database" };
     }
   } catch (error) {
     return { message: `Error while inserting data ${error}` };
@@ -229,37 +238,52 @@ const clientAcceptService = async (body) => {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
     const job_id = body.job_posting_id;
-    //Updating Customer_Table
+
+    // Fetch the customer and client records
     const customer = await Customer.findOne({
       where: {
         customer_id: customer_id,
       },
     });
-    //Updating client_Table
+
     const client = await Client.findOne({
       where: {
         client_id: client_id,
       },
     });
+
     if (customer && client) {
-      let assignedClients = customer.assigned_clients || [];
-      let assignedCustomers = client.assigned_customers || [];
-      assignedClients.push({ client_id: body.client_id });
-      assignedCustomers.push({ customer_id: body.customer_id });
+      // Fetch the job posting record
+      const jobPosting = await JobPostings.findOne({
+        where: {
+          job_posting_id: job_id,
+        },
+      });
+
+      if (!jobPosting) {
+        console.log("Job posting not found");
+        return {
+          status: 404,
+          message: "Job posting not found",
+        };
+      }
+
+      // Update Adminassigned table
       await Adminassigned.update(
         {
           client_response: "Accept",
         },
         {
           where: {
-            job_posting_id: body.job_posting_id,
+            job_posting_id: job_id,
           },
         }
       );
+
+      // Update Customer table
       await Customer.update(
         {
           job_status: "On-Job",
-          assigned_clients: assignedClients,
         },
         {
           where: {
@@ -267,16 +291,27 @@ const clientAcceptService = async (body) => {
           },
         }
       );
-      await Client.update(
-        {
-          assigned_customers: assignedCustomers,
-        },
-        {
-          where: {
-            client_id: client_id,
-          },
-        }
+
+      // Update Client table with assigned customer if not already assigned
+      const assignedCustomers = client.assigned_customers || [];
+      const customerExists = assignedCustomers.some(
+        (assignedCustomer) => assignedCustomer.customer_id === customer_id
       );
+      if (!customerExists) {
+        assignedCustomers.push({ customer_id: customer_id });
+        await Client.update(
+          {
+            assigned_customers: assignedCustomers,
+          },
+          {
+            where: {
+              client_id: client_id,
+            },
+          }
+        );
+      }
+
+      // Update JobPostings table
       await JobPostings.update(
         {
           job_status: "On-Job",
@@ -287,6 +322,7 @@ const clientAcceptService = async (body) => {
           },
         }
       );
+
       console.log("Update successful");
       return {
         status: 200,
@@ -294,11 +330,18 @@ const clientAcceptService = async (body) => {
         body,
       };
     } else {
-      console.log("Customer not found");
-      return;
+      console.log("Customer or client not found");
+      return {
+        status: 404,
+        message: "Customer or client not found",
+      };
     }
   } catch (error) {
-    console.error("Error in clientAccept Service:", error.message);
+    console.error("Error in clientAcceptService:", error.message);
+    return {
+      status: 500,
+      message: "Internal server error",
+    };
   }
 };
 
@@ -322,9 +365,9 @@ const clientPendingService = async (body) => {
       },
     });
     if (customer && client) {
-      let assignedClients = customer.assigned_clients || [];
+      // let assignedClients = customer.assigned_clients || [];
       let assignedCustomers = client.assigned_customers || [];
-      assignedClients.push({ client_id: body.client_id });
+      // assignedClients.push({ client_id: body.client_id });
       assignedCustomers.push({ customer_id: body.customer_id });
       await Adminassigned.update(
         {
@@ -343,6 +386,16 @@ const clientPendingService = async (body) => {
         {
           where: {
             job_posting_id: job_id,
+          },
+        }
+      );
+      await Customer.update(
+        {
+          job_status: "Assigned",
+        },
+        {
+          where: {
+            customer_id: customer_id,
           },
         }
       );

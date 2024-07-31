@@ -6,37 +6,47 @@ const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const { Sequelize } = require("sequelize");
+const JobPostings = require("../models/jobPostings");
 
 //Interview scheduling
 async function admin_interview_scheduling_service(body) {
   try {
-    const schedule = await AdminInterview.create(body);
-    if (schedule) {
-      const emailData = {
-        to: body.customer_email,
-        subject: "Interview Scheduled",
-        text: `Dear Candidate,
+    const data = await Customer.findOne({
+      where: {
+        customer_id: body.customer_id,
+      },
+    });
+    if (data) {
+      const schedule = await AdminInterview.create(body);
+      if (schedule) {
+        const emailData = {
+          to: body.customer_email,
+          subject: "Interview Scheduled",
+          text: `Dear Candidate,
                       
 Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
               
-        Thank you,
-        Co-VenTech`,
+Thank you,
+Co-VenTech`,
 
-        user_role: `customer`,
-      };
+          user_role: `customer`,
+        };
 
-      // Send the email
-      await sendMail(
-        { body: emailData },
-        {
-          send: (result) => console.log(result),
-          status: (code) => ({ send: (message) => console.log(message) }),
-        }
-      );
+        // Send the email
+        await sendMail(
+          { body: emailData },
+          {
+            send: (result) => console.log(result),
+            status: (code) => ({ send: (message) => console.log(message) }),
+          }
+        );
 
-      return { message: "Successfully Scheduled an Interview" };
+        return { message: "Successfully Scheduled an Interview" };
+      } else {
+        return { message: "Table not created" };
+      }
     } else {
-      return { message: "Table not created" };
+      return { message: "customer not existed in database" };
     }
   } catch (error) {
     console.log(`Error while inserting data ${error}`);
@@ -64,18 +74,60 @@ async function assigningCustomerservice(body) {
         customer_id: body.customer_id,
       },
     });
+
     const client = await Client.findOne({
       where: {
         client_id: body.client_id,
       },
     });
-    if (customer && client) {
+
+    const jobPosting = await JobPostings.findOne({
+      where: {
+        job_posting_id: body.job_posting_id,
+      },
+    });
+
+    if (customer && client && jobPosting) {
       let position = customer.position || [];
       let assignedClients = customer.assigned_clients || [];
       let assignedCustomers = client.assigned_customers || [];
-      assignedClients.push({ client_id: body.client_id });
-      assignedCustomers.push({ customer_id: body.customer_id });
-      position.push({ job_posting_id: body.job_posting_id });
+
+      // Check if the client_id already exists in assignedClients
+      const clientExists = assignedClients.some(
+        (assignedClient) => assignedClient.client_id === body.client_id
+      );
+      if (!clientExists) {
+        assignedClients.push({ client_id: body.client_id });
+      }
+
+      // Check if the customer_id already exists in assignedCustomers
+      const customerExists = assignedCustomers.some(
+        (assignedCustomer) => assignedCustomer.customer_id === body.customer_id
+      );
+      if (!customerExists) {
+        assignedCustomers.push({ customer_id: body.customer_id });
+      }
+
+      // Check if the job_posting_id already exists in position
+      const jobPostingExists = position.some(
+        (pos) => pos.job_posting_id === body.job_posting_id
+      );
+      if (!jobPostingExists) {
+        position.push({ job_posting_id: body.job_posting_id });
+      }
+
+      await JobPostings.update(
+        {
+          job_status: "Assigned",
+          assigned_customer: assignedCustomers,
+        },
+        {
+          where: {
+            job_posting_id: body.job_posting_id,
+          },
+        }
+      );
+
       await Customer.update(
         {
           job_status: "Assigned",
@@ -88,6 +140,7 @@ async function assigningCustomerservice(body) {
           },
         }
       );
+
       await Client.update(
         {
           assigned_customers: assignedCustomers,
@@ -99,6 +152,7 @@ async function assigningCustomerservice(body) {
         }
       );
     }
+
     const data = await Adminassigned.create(body);
     return { data, message: `Customer is assigned to Client` };
   } catch (e) {

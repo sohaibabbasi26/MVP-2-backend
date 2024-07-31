@@ -47,6 +47,9 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
     defaultValue: "Un-Assigned",
   },
+  assigned_customer: {
+    type: DataTypes.JSONB,
+  },
 });
 
 module.exports = JobPostings;
