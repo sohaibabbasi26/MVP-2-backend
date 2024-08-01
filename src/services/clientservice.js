@@ -185,27 +185,37 @@ const declineCustomerService = async (
     });
 
     const customer = await Customer.findByPk(customer_id);
+    const job_postings = await JobPostings.findByPk(job_posting_id);
+
     const assigned_clients = customer.assigned_clients || [];
+    const position = customer.position || [];
+    const job_assigned_customers = job_postings.assigned_customer;
 
     const updated_clients = assigned_clients.filter(
       (cli) => cli.client_id !== client_id
     );
 
+    const updated_job_assigned_customers = job_assigned_customers.filter(
+      (cus) => cus.customer_id !== customer_id
+    );
+
+    const updated_position = position.filter(
+      (cus) => cus.job_posting_id !== job_posting_id
+    );
+
     customer.update({
       job_status: "Un-Assigned",
       assigned_clients: updated_clients.length > 0 ? updated_clients : null,
+      position: updated_position.length > 0 ? updated_position : null,
     });
 
-    await JobPostings.update(
-      {
-        job_status: "Un-Assigned",
-      },
-      {
-        where: {
-          job_posting_id: job_posting_id,
-        },
-      }
-    );
+    job_postings.update({
+      job_status: "Un-Assigned",
+      assigned_customer:
+        updated_job_assigned_customers.length > 0
+          ? updated_job_assigned_customers
+          : null,
+    });
 
     await Adminassigned.update(
       {
