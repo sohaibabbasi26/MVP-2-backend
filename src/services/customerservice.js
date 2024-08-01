@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const Customer = require("../models/customer");
-
+//get customer by expertise
 const getCustomerViaExpertise = async (expertise) => {
   try {
     const customer = await Customer.findAll({
@@ -22,6 +22,32 @@ const getCustomerViaExpertise = async (expertise) => {
     );
   }
 };
+async function customerUpdateExpertise(body) {
+  try {
+    const customer_id = body.customer_id;
+    const expertise = body.expertise;
+    const customer = await Customer.findOne({
+      where: {
+        customer_id,
+      },
+    });
+    if (customer) {
+      await Customer.update(
+        {
+          expertise: expertise,
+        },
+        {
+          where: {
+            customer_id: customer_id,
+          },
+        }
+      );
+    }
+    return body;
+  } catch (error) {
+    console.log(`Error while updating Expertise ${error}`);
+  }
+}
 //customers Api
 async function getallcustomers() {
   try {
@@ -67,4 +93,5 @@ module.exports = {
   getCustomerByIdService,
   getCustomerViaExpertise,
   getallcustomers,
+  customerUpdateExpertise,
 };

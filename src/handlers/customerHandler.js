@@ -1,5 +1,6 @@
 const {
   getCustomerViaExpertise,
+  customerUpdateExpertise,
   getallcustomers,
   getCustomerByIdService,
 } = require("../services/customerservice");
@@ -28,7 +29,18 @@ const getCustomerWithExpertise = async (req, res) => {
     });
   }
 };
-
+//update expertise of customer
+const updateExpertise = async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await customerUpdateExpertise(body);
+    res
+      .status(200)
+      .send({ result, message: "Expertise is updated at your profile" });
+  } catch (error) {
+    console.log(`Error while updating Expertise ${error}`);
+  }
+};
 const getCustomerById = async (req, res) => {
   try {
     const { customer_id } = req.query;
@@ -50,4 +62,5 @@ module.exports = {
   getCustomerById,
   customers,
   getCustomerWithExpertise,
+  updateExpertise,
 };

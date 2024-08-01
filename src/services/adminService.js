@@ -87,6 +87,12 @@ async function assigningCustomerservice(body) {
       },
     });
 
+    if (!customer.is_approved) {
+      return {
+        message: `Customer is not approved.`,
+      };
+    }
+
     if (customer && client && jobPosting) {
       let position = customer.position || [];
       let assignedClients = customer.assigned_clients || [];

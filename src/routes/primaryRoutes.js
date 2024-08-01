@@ -161,6 +161,11 @@ const routes = [
     handler: primaryHandlers.profileInfoUpdate,
   },
   {
+    method: "PUT",
+    url: "/customer/update-expertise",
+    handler: customerHandler.updateExpertise,
+  },
+  {
     method: "GET",
     url: "/client/job-posting/:client_id",
     handler: clientHandlers.getJobviaclientIdHandler,
