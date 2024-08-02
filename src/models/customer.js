@@ -51,6 +51,13 @@ const Customer = sequelize.define("customers", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  hourly_rate: {
+    type: DataTypes.INTEGER,
+  },
+  experience: {
+    type: DataTypes.ENUM("beginner", "intermediate", "expert"),
+    defaultValue: "beginner",
+  },
 });
 
 module.exports = Customer;

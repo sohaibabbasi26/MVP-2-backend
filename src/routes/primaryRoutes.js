@@ -150,11 +150,7 @@ const routes = [
     url: "/set-expertise",
     handler: primaryHandlers.setExpertise,
   },
-  {
-    method: "PUT",
-    url: "/set-experience",
-    handler: primaryHandlers.setExperience,
-  },
+
   {
     method: "PUT",
     url: "/profile-info-update",
