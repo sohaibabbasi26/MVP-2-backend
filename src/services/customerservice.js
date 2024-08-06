@@ -1,5 +1,27 @@
 const { Op } = require("sequelize");
 const Customer = require("../models/customer");
+const Test = require("../models/test");
+//get test of certain customer
+const getCustomertestsService = async (customer_id) => {
+  try {
+    const data = await Test.findOne({
+      where: {
+        customer_id,
+      },
+    });
+    if (data) {
+      return {
+        data,
+        message: `Successfully retrieved Data`,
+      };
+    } else {
+      return { message: `No tests Data for given Customer` };
+    }
+  } catch (error) {
+    console.log(`Error while getting tests for customer`);
+  }
+};
+
 //get customer by expertise
 const getCustomerViaExpertise = async (expertise) => {
   try {
@@ -22,6 +44,7 @@ const getCustomerViaExpertise = async (expertise) => {
     );
   }
 };
+//add expertise of customer
 async function customerUpdateExpertise(body) {
   try {
     const customer_id = body.customer_id;
@@ -60,7 +83,7 @@ async function getallcustomers() {
     return;
   }
 }
-
+//get customer by id
 const getCustomerByIdService = async (id) => {
   const client = await Customer.findOne({
     attributes: [
@@ -94,4 +117,5 @@ module.exports = {
   getCustomerViaExpertise,
   getallcustomers,
   customerUpdateExpertise,
+  getCustomertestsService,
 };

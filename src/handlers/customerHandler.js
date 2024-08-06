@@ -3,6 +3,7 @@ const {
   customerUpdateExpertise,
   getallcustomers,
   getCustomerByIdService,
+  getCustomertestsService,
 } = require("../services/customerservice");
 
 //getting all the customers
@@ -29,6 +30,18 @@ const getCustomerWithExpertise = async (req, res) => {
     });
   }
 };
+//get tests via customer id
+const CustomergettestsHandler = async (req, res) => {
+  try {
+    const customer_id = req.params.customer_id;
+    console.log(customer_id);
+    const data = await getCustomertestsService(customer_id);
+    res.status(200).send(data);
+  } catch (error) {
+    console.log(`Error while getting tests for particular customers: ${error}`);
+  }
+};
+
 //update expertise of customer
 const updateExpertise = async (req, res) => {
   try {
@@ -41,6 +54,8 @@ const updateExpertise = async (req, res) => {
     console.log(`Error while updating Expertise ${error}`);
   }
 };
+
+//get customer by Id
 const getCustomerById = async (req, res) => {
   try {
     const { customer_id } = req.query;
@@ -63,4 +78,5 @@ module.exports = {
   customers,
   getCustomerWithExpertise,
   updateExpertise,
+  CustomergettestsHandler,
 };

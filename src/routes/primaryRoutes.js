@@ -166,6 +166,11 @@ const routes = [
     url: "/client/job-posting/:client_id",
     handler: clientHandlers.getJobviaclientIdHandler,
   },
+  {
+    method: "GET",
+    url: "/tests/customer/:customer_id",
+    handler: customerHandler.CustomergettestsHandler,
+  },
 ];
 
 module.exports = { routes };
