@@ -4,7 +4,19 @@ const {
   getallcustomers,
   getCustomerByIdService,
   getCustomertestsService,
+  getcodingresultService,
 } = require("../services/customerservice");
+//get coding_result of customer
+const GetcodingresultHandler = async (req, res) => {
+  try {
+    const customer_id = req.params.customer_id;
+    console.log(customer_id);
+    const data = await getcodingresultService(customer_id);
+    res.status(200).send(data);
+  } catch (error) {
+    console.log(`Error while getting tests for particular customers: ${error}`);
+  }
+};
 
 //getting all the customers
 async function customers(req, res) {
@@ -79,4 +91,5 @@ module.exports = {
   getCustomerWithExpertise,
   updateExpertise,
   CustomergettestsHandler,
+  GetcodingresultHandler,
 };

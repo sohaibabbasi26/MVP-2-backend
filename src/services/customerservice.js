@@ -1,6 +1,27 @@
 const { Op } = require("sequelize");
 const Customer = require("../models/customer");
 const Test = require("../models/test");
+const CodingResults = require("../models/codingResults");
+//get coding_test result of a customer
+const getcodingresultService = async (customer_id) => {
+  try {
+    const data = await CodingResults.findOne({
+      where: {
+        customer_id,
+      },
+    });
+    if (data) {
+      return {
+        data,
+        message: `Successfully retrieved Data`,
+      };
+    } else {
+      return { message: `No tests Data for given Customer` };
+    }
+  } catch (error) {
+    return error;
+  }
+};
 //get test of certain customer
 const getCustomertestsService = async (customer_id) => {
   try {
@@ -118,4 +139,5 @@ module.exports = {
   getallcustomers,
   customerUpdateExpertise,
   getCustomertestsService,
+  getcodingresultService,
 };

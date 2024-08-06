@@ -171,6 +171,11 @@ const routes = [
     url: "/tests/customer/:customer_id",
     handler: customerHandler.CustomergettestsHandler,
   },
+  {
+    method: "GET",
+    url: "/coding-results/customer/:customer_id",
+    handler: customerHandler.GetcodingresultHandler,
+  },
 ];
 
 module.exports = { routes };
