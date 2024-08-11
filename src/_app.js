@@ -5,8 +5,13 @@ const { routes } = require('../src/routes/primaryRoutes')
 require('dotenv').config()
 const { syncModels } = require("../src/utilities/syncModels");
 const {generateJwtSecret} = require('../src/utilities/jwtSecretGenerator');
+const cors = require("@fastify/cors");
 
 const serverInit = () => {
+
+    fastify.register(cors, { 
+        origin: process.env.ALLOWED_CLIENT
+    });
 
     routes.forEach((route) => {
         fastify.route(route);

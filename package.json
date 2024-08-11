@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/sohaibabbasi26/MVP-2-backend#readme",
   "dependencies": {
+    "@fastify/cors": "^9.0.1",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
