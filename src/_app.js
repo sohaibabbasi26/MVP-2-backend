@@ -22,7 +22,7 @@ const serverInit = () => {
     const jwtSecret = generateJwtSecret();
     console.log("Generated JWT secret:", jwtSecret);
 
-    fastify.listen({ port: process.env.SERVER_PORT }, function (err, address) {
+    fastify.listen({ port: process.env.SERVER_PORT, host: process.env.SERVER_HOST}, function (err, address) {
         if (err) {
             fastify.log.error(err)
             process.exit(1)
