@@ -9,8 +9,8 @@ const cors = require("@fastify/cors");
 
 const serverInit = () => {
 
-    fastify.register(cors, { 
-        origin: process.env.ALLOWED_CLIENT
+    fastify.register(cors, {
+        origin: process.env.ALLOWED_CLIENT || "*"
     });
 
     routes.forEach((route) => {
