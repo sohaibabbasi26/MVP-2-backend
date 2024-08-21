@@ -1,3 +1,4 @@
+const Client = require("../models/client");
 const {
   assigningCustomerservice,
   getcustomerwithid,
@@ -6,6 +7,45 @@ const {
   fetchClientRequestService,
 } = require("../services/adminService");
 const { updateclient_service } = require("../services/clientservice");
+const { checkClientInDb } = require("../utilities/checkClientInDb");
+const { encryptPasword } = require("../utilities/encryptPassword");
+const { jwtSignature } = require("../utilities/jwtSign");
+
+// Admin registering client
+async function registerClientHandler(req, res) {
+  try {
+    const { name, client_location, email, password, contact_no } = req.body;
+    const method = "POST";
+    const isClientInDb = await checkClientInDb(email, method);
+    if (isClientInDb === true) {
+      return `Client with these credentials already exists`;
+    } else {
+      try {
+        const hashedPassword = await encryptPasword(password);
+        const newData = {
+          name,
+          client_location,
+          email,
+          password: hashedPassword,
+          contact_no,
+          approved: true,
+        };
+        const result = await Client.create(newData);
+        jwtSignature(result?.dataValues);
+        return "Admin has created a new Client Account ", result;
+      } catch (err) {
+        console.log(
+          "ERROR WHILE CREATING CLIENT:",
+          err,
+          "\n error source :  error source: src -> services -> primaryServices -> signup"
+        );
+        return "ERROR WHILE CREATING CLIENT:", err;
+      }
+    }
+  } catch (e) {
+    console.log("error registering client handler", e);
+  }
+}
 
 //Client and customer assigned
 
@@ -110,4 +150,5 @@ module.exports = {
   getcustomerwithclientid,
   assigningCustomerHandler,
   scheduleinterviewhandler,
+  registerClientHandler,
 };

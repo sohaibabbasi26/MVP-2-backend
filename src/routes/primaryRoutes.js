@@ -176,6 +176,11 @@ const routes = [
     url: "/coding-results/customer/:customer_id",
     handler: customerHandler.GetcodingresultHandler,
   },
+  {
+    method: "POST",
+    url: "/admin/register-client",
+    handler: adminHandler.registerClientHandler,
+  },
 ];
 
 module.exports = { routes };

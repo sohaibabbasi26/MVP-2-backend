@@ -36,6 +36,7 @@ const Client = sequelize.define("clients", {
   },
   approved: {
     type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   status: {
     type: DataTypes.ENUM("Active", "In-Active"),
