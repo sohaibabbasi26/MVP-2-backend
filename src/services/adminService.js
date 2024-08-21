@@ -216,6 +216,34 @@ const approveCustomerService = async (customer_id) => {
   }
 };
 
+const approveClientService = async (client_id) => {
+  try {
+    const approved = await Client.update(
+      { approved: true },
+      {
+        where: {
+          client_id,
+        },
+      }
+    );
+
+    if (approved > 0) {
+      return {
+        approved: true,
+        message: "client has been approved",
+      };
+    } else {
+      return {
+        is_approved: true,
+        message: "client not been approved",
+      };
+    }
+  } catch (error) {
+    console.log("error at root project -> services -> adminService.js");
+    console.log(error);
+  }
+};
+
 const fetchClientRequestService = async () => {
   try {
     const clientsWithRequests = await Client.findAll({
@@ -252,4 +280,5 @@ module.exports = {
   admin_interview_scheduling_service,
   assigningCustomerservice,
   getcustomerwithid,
+  approveClientService,
 };

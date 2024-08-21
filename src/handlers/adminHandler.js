@@ -5,6 +5,7 @@ const {
   admin_interview_scheduling_service,
   approveCustomerService,
   fetchClientRequestService,
+  approveClientService,
 } = require("../services/adminService");
 const { updateclient_service } = require("../services/clientservice");
 const { checkClientInDb } = require("../utilities/checkClientInDb");
@@ -144,6 +145,26 @@ const fetchClientRequestHandler = (req, res) => {
     });
 };
 
+const approveClientHandler = async (req, res) => {
+  const { client_id } = req.body;
+
+  if (client_id) {
+    const clientApproveService = await approveClientService(client_id);
+    let statusCode = 200;
+    if (!clientApproveService.approved) {
+      statusCode = 404;
+    }
+    res.status(statusCode).send({
+      is_approved: clientApproveService.approved,
+      message: "client approved",
+    });
+  } else {
+    res.status(403).rend({
+      message: "invalid client id",
+    });
+  }
+};
+
 module.exports = {
   approveCustomerHandler,
   fetchClientRequestHandler,
@@ -151,4 +172,5 @@ module.exports = {
   assigningCustomerHandler,
   scheduleinterviewhandler,
   registerClientHandler,
+  approveClientHandler,
 };

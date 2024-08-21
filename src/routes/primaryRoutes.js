@@ -181,6 +181,11 @@ const routes = [
     url: "/admin/register-client",
     handler: adminHandler.registerClientHandler,
   },
+  {
+    method: "POST",
+    url: "/admin/approve-client",
+    handler: adminHandler.approveClientHandler,
+  },
 ];
 
 module.exports = { routes };
