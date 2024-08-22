@@ -65,7 +65,10 @@ const routes = [
     method: "POST",
     url: "/create-positions",
     handler: primaryHandlers.createPositions,
-    preHandler: authValidation.validateJobPost,
+    preHandler: [
+      primaryHandlers.checkRole("client", "admin"),
+      authValidation.validateJobPost, // Validate the job post data
+    ],
   },
   {
     method: "POST",

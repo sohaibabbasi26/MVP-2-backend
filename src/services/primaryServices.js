@@ -159,6 +159,7 @@ async function customerLogin(data) {
           return "Invalid password";
         } else {
           const token = await jwtSignature(fetchedCustomer.dataValues); // Pass customer_id and email
+          
           return token;
         }
       } catch (err) {

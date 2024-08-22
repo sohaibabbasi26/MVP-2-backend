@@ -2,6 +2,7 @@ const services = require("../services/primaryServices");
 const { checkAdminInDb } = require("../utilities/checkAdminInDb");
 const { checkClientInDb } = require("../utilities/checkClientInDb");
 const { checkCustomerInDb } = require("../utilities/checkCustomerExists");
+const jwt = require("jsonwebtoken");
 
 async function serverCheck(req, res) {
   try {
@@ -32,25 +33,85 @@ async function signup(req, res) {
   }
 }
 
-async function login(req, res) {
+async function login(req, reply) {
   try {
     const data = req?.body;
     console.log("data:", data);
 
+    let result;
+
     if (data?.user_role === "customer") {
-      const result = await services.customerLogin(data);
-      res.send(result);
+      result = await services.customerLogin(data);
     } else if (data?.user_role === "client") {
-      const result = await services.clientLogin(data);
-      res.send(result);
+      result = await services.clientLogin(data);
     } else if (data?.user_role === "admin") {
-      const result = await services.adminLogin(data);
-      res.send(result);
+      result = await services.adminLogin(data);
     }
+
+    if (result) {
+      // Set both token and user_role cookies
+      reply.setCookie("token", result, {
+        httpOnly: true,
+        sameSite: "Strict",
+      });
+      reply.setCookie("user_role", data.user_role, {
+        httpOnly: true,
+        sameSite: "Strict",
+      });
+    }
+
+    return reply
+      .status(200)
+      .send({ message: `Login Successfully`, token: result });
   } catch (err) {
-    console.log("ERROR:", err);
-    return;
+    console.error("ERROR:", err);
+    return reply
+      .status(500)
+      .send({ message: "Internal Server Error", error: err.message });
   }
+}
+async function verifyToken(req, reply) {
+  try {
+    const token =
+      req.headers["authorization"]?.split(" ")[1] || req.cookies.token;
+
+    if (!token) {
+      return reply
+        .status(401)
+        .send({ message: "Access Denied: No Token Provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+    req.user = decoded; // Attach the decoded token data to the request object
+  } catch (err) {
+    return reply.status(401).send({ message: "Invalid Token" });
+  }
+}
+
+function checkRole(...roles) {
+  return async function (req, reply) {
+    try {
+      const userRole = req.cookies.user_role;
+
+      if (!userRole) {
+        return reply
+          .status(401)
+          .send({ message: "Access Denied: Invalid User Role" });
+      }
+
+      await verifyToken(req, reply);
+
+      if (!roles.includes(userRole)) {
+        return reply.status(403).send({
+          message: "Access Denied: Insufficient Permissions For This User",
+        });
+      }
+    } catch (error) {
+      // Handle any errors that occur during token verification or role checking
+      return reply.status(500).send({ message: "Internal Server Error" });
+    }
+  };
 }
 
 async function getRandomQuestions(req, res) {
@@ -284,4 +345,5 @@ module.exports = {
   setExpertise,
   setExperience,
   profileInfoUpdate,
+  checkRole,
 };

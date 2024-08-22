@@ -1,35 +1,40 @@
-const fastify = require('fastify')({
-    logger: true
+const fastify = require("fastify")({
+  logger: true,
 });
-const { routes } = require('../src/routes/primaryRoutes')
-require('dotenv').config()
+const { routes } = require("../src/routes/primaryRoutes");
+require("dotenv").config();
 const { syncModels } = require("../src/utilities/syncModels");
-const {generateJwtSecret} = require('../src/utilities/jwtSecretGenerator');
+const { generateJwtSecret } = require("../src/utilities/jwtSecretGenerator");
 const cors = require("@fastify/cors");
+const fastifyCookie = require("fastify-cookie");
+
+fastify.register(fastifyCookie);
 
 const serverInit = () => {
+  fastify.register(cors, {
+    origin: process.env.ALLOWED_CLIENT || "*",
+  });
 
-    fastify.register(cors, {
-        origin: process.env.ALLOWED_CLIENT || "*"
-    });
+  routes.forEach((route) => {
+    fastify.route(route);
+  });
 
-    routes.forEach((route) => {
-        fastify.route(route);
-    });
+  // connectDb();
+  syncModels();
+  const jwtSecret = generateJwtSecret();
+  console.log("Generated JWT secret:", jwtSecret);
 
-    // connectDb();
-    syncModels();
-    const jwtSecret = generateJwtSecret();
-    console.log("Generated JWT secret:", jwtSecret);
-
-    fastify.listen({ port: process.env.SERVER_PORT, host: process.env.SERVER_HOST}, function (err, address) {
-        if (err) {
-            fastify.log.error(err)
-            process.exit(1)
-        }
-    });
-}
+  fastify.listen(
+    { port: process.env.SERVER_PORT, host: process.env.SERVER_HOST },
+    function (err, address) {
+      if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+      }
+    }
+  );
+};
 
 module.exports = {
-    serverInit
-}
+  serverInit,
+};
