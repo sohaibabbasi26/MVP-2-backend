@@ -1,8 +1,10 @@
+// models/Adminassigned.js
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../configurations/sequelizePgSQL");
-const Customer = require("./customer");
-const Client = require("./client");
-const JobPostings = require("./jobPostings");
+const Customer = require("./customer"); // Ensure correct import
+const Client = require("./client"); // Ensure correct import
+const JobPostings = require("./jobPostings"); // Ensure correct import
+
 const Adminassigned = sequelize.define("admin_assigned_customer", {
   admin_assigned_id: {
     type: DataTypes.UUID,
@@ -37,7 +39,6 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
     },
     onDelete: "CASCADE",
   },
-  //extra work
   client_response: {
     type: DataTypes.ENUM("Accept", "Pending", "Decline"),
     defaultValue: "Pending",
@@ -49,4 +50,31 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
   },
 });
 
+// Define the association
+Adminassigned.belongsTo(Customer, {
+  as: "customer",
+  foreignKey: "customer_id",
+});
+Customer.hasMany(Adminassigned, {
+  as: "adminassigneds",
+  foreignKey: "customer_id",
+});
+
+Adminassigned.belongsTo(Client, {
+  as: "client",
+  foreignKey: "client_id",
+});
+Client.hasMany(Adminassigned, {
+  as: "adminassigneds",
+  foreignKey: "client_id",
+});
+
+Adminassigned.belongsTo(JobPostings, {
+  as: "job_postings",
+  foreignKey: "job_posting_id",
+});
+JobPostings.hasMany(Adminassigned, {
+  as: "adminassigneds",
+  foreignKey: "job_posting_id",
+});
 module.exports = Adminassigned;

@@ -182,6 +182,33 @@ async function getcustomerwithid(client_id) {
           [Sequelize.Op.or]: ["Accept", "Pending"],
         },
       },
+      include: [
+        {
+          model: Customer,
+          Client,
+          as: "customer",
+          attributes: ["customer_id", "name", "email"],
+        },
+        {
+          model: Client,
+          as: "client", // Alias for Client association
+          attributes: ["client_id", "name", "email"],
+        },
+        {
+          model: JobPostings,
+          as: "job_postings", // Alias for Client association
+          attributes: [
+            "job_posting_id",
+            "position",
+            "expertise",
+            "job_type",
+            "description",
+            "applied_customers_count",
+            "assigned_customer",
+            "location",
+          ],
+        },
+      ],
     });
     return result;
   } catch (error) {
