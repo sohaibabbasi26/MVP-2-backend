@@ -92,9 +92,11 @@ async function verifyToken(req, reply) {
 function checkRole(...roles) {
   return async function (req, reply) {
     try {
+      console.log("Request cookies:", req.cookies);
       const userRole = req.cookies.user_role;
-
+      console.log("User role #################:", userRole);
       if (!userRole) {
+        console.log("No user role found.");
         return reply
           .status(401)
           .send({ message: "Access Denied: Invalid User Role" });
@@ -102,13 +104,17 @@ function checkRole(...roles) {
 
       await verifyToken(req, reply);
 
+      console.log("Checking roles:", roles, "User role:", userRole);
       if (!roles.includes(userRole)) {
+        console.log("User does not have the required role.");
         return reply.status(403).send({
           message: "Access Denied: Insufficient Permissions For This User",
         });
       }
+
+      // Proceed to the next middleware or route handler
     } catch (error) {
-      // Handle any errors that occur during token verification or role checking
+      console.error("Error occurred in checkRole:", error);
       return reply.status(500).send({ message: "Internal Server Error" });
     }
   };

@@ -20,11 +20,13 @@ const routes = [
     method: "GET",
     url: "/customers",
     handler: customerHandlers.customers,
+    preHandler: primaryHandlers.checkRole("admin", "client"),
   },
   {
     method: "GET",
     url: "/clients",
     handler: clientHandlers.clients,
+    preHandler: primaryHandlers.checkRole("admin", "client"),
   },
   {
     method: "GET",
@@ -79,8 +81,12 @@ const routes = [
     method: "POST",
     url: "/assigned-customer",
     handler: adminHandler.assigningCustomerHandler,
-    prehander: adminValidation.validate_assigningCustomerSchema,
+    preHandler: [
+      primaryHandlers.checkRole("admin"),
+      adminValidation.validate_assigningCustomerSchema,
+    ],
   },
+
   {
     method: "PUT",
     url: "/client-profile-update/:client_id",
@@ -97,23 +103,27 @@ const routes = [
     method: "POST",
     url: "/admin/approve-customer",
     handler: adminHandler.approveCustomerHandler,
+    preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/client/create-request",
     handler: clientHandlers.createClientRequestHandler,
     preHandler: clientValidation.validateClientRequest,
+    preHandler: primaryHandlers.checkRole("client"),
   },
   {
     method: "GET",
     url: "/admin/fetch-client-requests",
     handler: adminHandler.fetchClientRequestHandler,
+    preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/client/client-response",
     preHandler: clientValidation.validateClientResponse, //accept Pending Reject
     handler: clientHandlers.clientResponseHandler,
+    preHandler: primaryHandlers.checkRole("client"),
   },
   {
     method: "POST",
@@ -147,22 +157,26 @@ const routes = [
     method: "PUT",
     url: "/set-hourly-rate",
     handler: primaryHandlers.setHourlyRate,
+    preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "PUT",
     url: "/set-expertise",
     handler: primaryHandlers.setExpertise,
+    preHandler: primaryHandlers.checkRole("customer"),
   },
 
   {
     method: "PUT",
     url: "/profile-info-update",
     handler: primaryHandlers.profileInfoUpdate,
+    preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "PUT",
     url: "/customer/update-expertise",
     handler: customerHandler.updateExpertise,
+    preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "GET",
@@ -183,11 +197,13 @@ const routes = [
     method: "POST",
     url: "/admin/register-client",
     handler: adminHandler.registerClientHandler,
+    preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/admin/approve-client",
     handler: adminHandler.approveClientHandler,
+    preHandler: primaryHandlers.checkRole("admin"),
   },
 ];
 
