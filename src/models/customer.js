@@ -72,7 +72,6 @@ const Customer = sequelize.define("customers", {
   },
   experience: {
     type: DataTypes.ENUM("beginner", "Intermediate", "Expert"),
-    defaultValue: "Intermediate",
   },
 });
 
