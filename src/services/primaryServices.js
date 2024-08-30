@@ -159,7 +159,7 @@ async function customerLogin(data) {
           return "Invalid password";
         } else {
           const token = await jwtSignature(fetchedCustomer.dataValues); // Pass customer_id and email
-          
+
           return token;
         }
       } catch (err) {
@@ -693,47 +693,20 @@ async function setExperienceService({ experience, customer_id }) {
   }
 }
 
-async function profileInfoUpdateService({ prop, customer_id, value }) {
-  const customer = await Customer.findOne({
+async function updatecustomer_service(body, customer_id) {
+  const data = await Customer.findOne({
     where: {
       customer_id: customer_id,
     },
   });
-
-  try {
-    if (!customer) {
-      return "no such customer was found in the db";
-    } else {
-      const updateObject = {};
-      updateObject[prop] = value;
-
-      console.log("update property object", updateObject);
-
-      const result = await Customer.update(updateObject, {
-        where: {
-          customer_id: customer_id,
-        },
-      });
-
-      console.log("Result:", result);
-
-      if (result[0] > 0) {
-        ``;
-        return `New ${prop} updated for customer ID: ${customer_id}`;
-      } else {
-        throw new Error(
-          "No update performed. It is possible the customer ID did not match."
-        );
-      }
-    }
-  } catch (err) {
+  if (!data) {
     console.log(
-      "ERROR occured during updating the experience of a customer:",
-      err,
-      "\nError source: src -> services -> primaryServices.js -> setExperienceService"
+      "customer not found => src->services->customer->updatecustomer_service"
     );
-    return "ERROR occured during updating the experience of a customer:", err;
   }
+
+  await data.update(body);
+  return body;
 }
 
 module.exports = {
@@ -753,5 +726,5 @@ module.exports = {
   getCustomerResultService,
   setHourlyRateService,
   setExperienceService,
-  profileInfoUpdateService,
+  updatecustomer_service,
 };

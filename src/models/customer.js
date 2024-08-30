@@ -37,10 +37,26 @@ const Customer = sequelize.define("customers", {
   position: {
     type: DataTypes.JSONB,
   },
-  job_status: {
-    type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
-    defaultValue: "Un-Assigned",
-    allowNull: false,
+  // job_status: {
+  //   type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
+  //   defaultValue: "Un-Assigned",
+  //   allowNull: false,
+  // },
+  talent_status: {
+    type: DataTypes.ENUM("Hired", "Trial", "Interviewing", "Open", "Fulfilled"),
+  },
+  status: {
+    type: DataTypes.ENUM("Active", "In-Active"),
+    defaultValue: "Active",
+  },
+  job_type: {
+    type: DataTypes.ENUM("remote", "on-site"),
+  },
+  notice_period: {
+    type: DataTypes.ENUM("1 week", "2 week", "4 week", "Immediate"),
+  },
+  commitment: {
+    type: DataTypes.ENUM("full-time", "half-time"),
   },
   assigned_clients: {
     type: DataTypes.JSONB,
@@ -55,7 +71,8 @@ const Customer = sequelize.define("customers", {
     type: DataTypes.INTEGER,
   },
   experience: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM("beginner", "Intermediate", "Expert"),
+    defaultValue: "Intermediate",
   },
 });
 

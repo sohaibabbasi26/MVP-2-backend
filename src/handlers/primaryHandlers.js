@@ -317,22 +317,25 @@ async function setExperience(request, reply) {
   }
 }
 
-async function profileInfoUpdate(request, reply) {
+async function customer_updateprofile(req, res) {
+  const body = req.body;
+  const customer_id = req.params.customer_id;
+
+  if (body.password) {
+    delete body.password;
+  }
+  if (body.email) {
+    delete body.email;
+  }
+
   try {
-    const { customer_id, prop, value } = request?.body;
-    const result = await services.profileInfoUpdateService({
-      customer_id,
-      prop,
-      value,
-    });
-    reply.status(200).send(result);
-  } catch (err) {
-    console.log(
-      "Some error occured while handling the route",
-      err,
-      "\nError source: src -> handlers -> primaryHandlers.js -> profileInfoUpdate"
-    );
-    return "Some error occured while handling the route", err;
+    const data = await services.updatecustomer_service(body, customer_id);
+    res.status(200).send({ data, message: "Profile Updated Successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send({ message: "An error occurred while updating the profile." });
   }
 }
 
@@ -350,6 +353,6 @@ module.exports = {
   setHourlyRate,
   setExpertise,
   setExperience,
-  profileInfoUpdate,
+  customer_updateprofile,
   checkRole,
 };
