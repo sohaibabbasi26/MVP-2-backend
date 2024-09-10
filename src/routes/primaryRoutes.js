@@ -20,13 +20,13 @@ const routes = [
     method: "GET",
     url: "/customers",
     handler: customerHandlers.customers,
-    preHandler: primaryHandlers.checkRole("admin", "client"),
+    // preHandler: primaryHandlers.checkRole("admin", "client"),
   },
   {
     method: "GET",
     url: "/clients",
     handler: clientHandlers.clients,
-    preHandler: primaryHandlers.checkRole("admin", "client"),
+    // preHandler: primaryHandlers.checkRole("admin", "client"),
   },
   {
     method: "GET",
@@ -69,7 +69,7 @@ const routes = [
     url: "/create-positions",
     handler: primaryHandlers.createPositions,
     preHandler: [
-      primaryHandlers.checkRole("client", "admin"),
+      // primaryHandlers.checkRole("client", "admin"),
       authValidation.validateJobPost, // Validate the job post data
     ],
   },
@@ -83,7 +83,7 @@ const routes = [
     url: "/assigned-customer",
     handler: adminHandler.assigningCustomerHandler,
     preHandler: [
-      primaryHandlers.checkRole("admin"),
+      // primaryHandlers.checkRole("admin"),
       adminValidation.validate_assigningCustomerSchema,
     ],
   },
@@ -104,27 +104,27 @@ const routes = [
     method: "POST",
     url: "/admin/approve-customer",
     handler: adminHandler.approveCustomerHandler,
-    preHandler: primaryHandlers.checkRole("admin"),
+    // preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/client/create-request",
     handler: clientHandlers.createClientRequestHandler,
     preHandler: clientValidation.validateClientRequest,
-    preHandler: primaryHandlers.checkRole("client"),
+    // preHandler: primaryHandlers.checkRole("client"),
   },
   {
     method: "GET",
     url: "/admin/fetch-client-requests",
     handler: adminHandler.fetchClientRequestHandler,
-    preHandler: primaryHandlers.checkRole("admin"),
+    // preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/client/client-response",
     preHandler: clientValidation.validateClientResponse, //accept Pending Reject
     handler: clientHandlers.clientResponseHandler,
-    preHandler: primaryHandlers.checkRole("client"),
+    // preHandler: primaryHandlers.checkRole("client"),
   },
   {
     method: "POST",
@@ -158,26 +158,25 @@ const routes = [
     method: "PUT",
     url: "/set-hourly-rate",
     handler: primaryHandlers.setHourlyRate,
-    preHandler: primaryHandlers.checkRole("customer"),
+    // preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "PUT",
     url: "/set-expertise",
     handler: primaryHandlers.setExpertise,
-    preHandler: primaryHandlers.checkRole("customer"),
+    // preHandler: primaryHandlers.checkRole("customer"),
   },
-
   {
     method: "PUT",
-    url: "/profile-info-update",
-    handler: primaryHandlers.profileInfoUpdate,
-    preHandler: primaryHandlers.checkRole("customer"),
+    url: "/profile-info-update/:customer_id",
+    handler: primaryHandlers.customer_updateprofile,
+    // preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "PUT",
     url: "/customer/update-expertise",
     handler: customerHandler.updateExpertise,
-    preHandler: primaryHandlers.checkRole("customer"),
+    // preHandler: primaryHandlers.checkRole("customer"),
   },
   {
     method: "GET",
@@ -198,13 +197,13 @@ const routes = [
     method: "POST",
     url: "/admin/register-client",
     handler: adminHandler.registerClientHandler,
-    preHandler: primaryHandlers.checkRole("admin"),
+    // preHandler: primaryHandlers.checkRole("admin"),
   },
   {
     method: "POST",
     url: "/admin/approve-client",
     handler: adminHandler.approveClientHandler,
-    preHandler: primaryHandlers.checkRole("admin"),
+    // preHandler: primaryHandlers.checkRole("admin"),
   },
 ];
 

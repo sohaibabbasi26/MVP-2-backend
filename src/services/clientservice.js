@@ -204,13 +204,12 @@ const declineCustomerService = async (
     );
 
     customer.update({
-      job_status: "Un-Assigned",
       assigned_clients: updated_clients.length > 0 ? updated_clients : null,
       position: updated_position.length > 0 ? updated_position : null,
     });
 
     job_postings.update({
-      job_status: "Un-Assigned",
+      job_status: "Open",
       assigned_customer:
         updated_job_assigned_customers.length > 0
           ? updated_job_assigned_customers
@@ -279,28 +278,18 @@ const clientAcceptService = async (body) => {
       }
 
       // Update Adminassigned table
-      await Adminassigned.update(
-        {
-          client_response: "Accept",
+      await Adminassigned.update({
+        where: {
+          job_posting_id: job_id,
         },
-        {
-          where: {
-            job_posting_id: job_id,
-          },
-        }
-      );
+      });
 
       // Update Customer table
-      await Customer.update(
-        {
-          job_status: "On-Job",
+      await Customer.update({
+        where: {
+          customer_id: customer_id,
         },
-        {
-          where: {
-            customer_id: customer_id,
-          },
-        }
-      );
+      });
 
       // Update Client table with assigned customer if not already assigned
       const assignedCustomers = client.assigned_customers || [];
@@ -387,7 +376,7 @@ const clientPendingService = async (body) => {
       );
       await JobPostings.update(
         {
-          job_status: "Assigned",
+          job_status: "Hired",
         },
         {
           where: {
@@ -397,7 +386,7 @@ const clientPendingService = async (body) => {
       );
       await Customer.update(
         {
-          job_status: "Assigned",
+          job_status: "Hired",
         },
         {
           where: {

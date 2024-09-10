@@ -129,7 +129,7 @@ async function assigningCustomerservice(body) {
 
       await JobPostings.update(
         {
-          job_status: "Assigned",
+          job_status: "Hired",
           assigned_customer: assignedCustomers,
         },
         {
@@ -141,7 +141,7 @@ async function assigningCustomerservice(body) {
 
       await Customer.update(
         {
-          job_status: "Assigned",
+          talent_status: "Hired",
           position: position,
           assigned_clients: assignedClients,
         },
