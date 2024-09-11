@@ -188,7 +188,10 @@ async function customerLogin(data) {
         return "ERROR WHILE LOGGING IN:", err;
       }
     } else {
-      return "Customer not found";
+      return {
+        status: 404,
+        message: "Client not found"
+      };
     }
   } catch (err) {
     console.log(
