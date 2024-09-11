@@ -5,7 +5,7 @@ const Customer = require("./customer");
 const Client = sequelize.define("clients", {
   client_location: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,
@@ -32,7 +32,7 @@ const Client = sequelize.define("clients", {
   },
   contact_no: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   approved: {
     type: DataTypes.BOOLEAN,

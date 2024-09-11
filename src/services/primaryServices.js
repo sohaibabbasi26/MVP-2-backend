@@ -74,23 +74,33 @@ async function customerSignup(data) {
 
 async function clientSignup(data) {
   try {
-    const { name, client_location, email, password, contact_no, method } = data;
+    const { name, 
+      //client_location, 
+      email, password, 
+      //contact_no, 
+      method } = data;
     const isClientInDb = await checkClientInDb(email, method);
     if (isClientInDb === true) {
-      return `Client with these credentials already exists`;
+      return {
+        status: 409,
+        message: `Client with these credentials already exists`
+      };
     } else {
       try {
         const hashedPassword = await encryptPasword(password);
         const newData = {
           name,
-          client_location,
+          //client_location,
           email,
           password: hashedPassword,
-          contact_no,
+          //contact_no,
         };
         const result = await Client.create(newData);
         jwtSignature(result?.dataValues);
-        return "CLIENT has been created successfully.";
+        return {
+          status: 200,
+          message:"CLIENT has been created successfully."
+        };
       } catch (err) {
         console.log(
           "ERROR WHILE CREATING CLIENT:",
@@ -156,11 +166,18 @@ async function customerLogin(data) {
           fetchedCustomer?.password
         );
         if (!compareAndCheck) {
-          return "Invalid password";
+          return {
+            status: 403,
+            message: "Invalid Password",
+          };
         } else {
           const token = await jwtSignature(fetchedCustomer.dataValues); // Pass customer_id and email
-
-          return token;
+          return {
+            status: 200,
+            message: "Customer logged in successfully",
+            token: token,
+            data
+          };
         }
       } catch (err) {
         console.log(
@@ -187,7 +204,6 @@ async function clientLogin(data) {
   try {
     const { email, password, method } = data;
     const fetchedClient = await checkClientInDb(email, method);
-    console.log("///////////////////////",fetchedClient)
     if (fetchedClient) {
       try {
         const compareAndCheck = await comparePassword(
@@ -195,7 +211,10 @@ async function clientLogin(data) {
           fetchedClient?.password
         );
         if (!compareAndCheck) {
-          return "Invalid password";
+          return {
+            status: 403,
+            message: "Invalid Password",
+          }
         } else {
           const token = await jwtSignature(fetchedClient?.dataValues);
           return {

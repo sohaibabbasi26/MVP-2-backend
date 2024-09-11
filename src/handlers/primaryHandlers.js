@@ -62,7 +62,7 @@ async function login(req, reply) {
 
     return reply
       .status(result.status)
-      .send({ result });
+      .send({ ...result });
   } catch (err) {
     console.error("ERROR:", err);
     return reply
