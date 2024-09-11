@@ -187,6 +187,7 @@ async function clientLogin(data) {
   try {
     const { email, password, method } = data;
     const fetchedClient = await checkClientInDb(email, method);
+    console.log("///////////////////////",fetchedClient)
     if (fetchedClient) {
       try {
         const compareAndCheck = await comparePassword(
@@ -197,7 +198,12 @@ async function clientLogin(data) {
           return "Invalid password";
         } else {
           const token = await jwtSignature(fetchedClient?.dataValues);
-          return token;
+          return {
+            status: 200,
+            message: "Client logged in successfully",
+            token: token,
+            data
+          };
         }
       } catch (err) {
         console.log(
@@ -208,7 +214,10 @@ async function clientLogin(data) {
         return "ERROR WHILE LOGGING IN:", err;
       }
     } else {
-      return "Customer not found";
+      return {
+        status: 404,
+        message: "Client not found"
+      };
     }
   } catch (err) {
     console.log(

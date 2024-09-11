@@ -48,7 +48,7 @@ async function login(req, reply) {
       result = await services.adminLogin(data);
     }
 
-    if (result) {
+    if (result.status===200) {
       // Set both token and user_role cookies
       reply.setCookie("token", result, {
         httpOnly: true,
@@ -61,8 +61,8 @@ async function login(req, reply) {
     }
 
     return reply
-      .status(200)
-      .send({ message: `Login Successfully`, token: result });
+      .status(result.status)
+      .send({ result });
   } catch (err) {
     console.error("ERROR:", err);
     return reply

@@ -19,7 +19,7 @@ const checkClientInDb = async (email, method) => {
             if(client){
                 return client;
             } else{
-                return "Couldn't find any client";
+                return null;
             }
         }
         
