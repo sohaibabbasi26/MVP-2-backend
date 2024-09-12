@@ -235,8 +235,11 @@ async function clientLogin(data) {
             status: 200,
             message: "Client logged in successfully",
             token: token,
-            id: fetchedClient?.client_id,
-            data
+            data:{
+              id: fetchedClient?.client_id,
+              email: fetchedClient?.email,
+              name: fetchedClient?.name
+            }
           };
         }
       } catch (err) {
