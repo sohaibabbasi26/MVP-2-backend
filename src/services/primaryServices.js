@@ -37,17 +37,19 @@ const { SimpleQueue } = require("../utilities/TemporaryQueue");
 
 async function customerSignup(data) {
   try {
-    const { name, 
-      email, 
-      password, 
-      //contact_no, 
-      method } = data;
+    const {
+      name,
+      email,
+      password,
+      //contact_no,
+      method,
+    } = data;
     const isCustomerInDb = await checkCustomerInDb(email, method);
     if (isCustomerInDb === true) {
       return {
         status: 409,
-        message: 'User with these credentials already exists'
-      }
+        message: "User with these credentials already exists",
+      };
     } else {
       try {
         const hashedPassword = await encryptPasword(password);
@@ -61,7 +63,7 @@ async function customerSignup(data) {
         jwtSignature(result?.dataValues);
         return {
           status: 200,
-          message: '"User has been created successfully."'
+          message: '"User has been created successfully."',
         };
       } catch (err) {
         console.log(
@@ -84,16 +86,19 @@ async function customerSignup(data) {
 
 async function clientSignup(data) {
   try {
-    const { name, 
-      //client_location, 
-      email, password, 
-      //contact_no, 
-      method } = data;
+    const {
+      name,
+      //client_location,
+      email,
+      password,
+      //contact_no,
+      method,
+    } = data;
     const isClientInDb = await checkClientInDb(email, method);
     if (isClientInDb === true) {
       return {
         status: 409,
-        message: `Client with these credentials already exists`
+        message: `Client with these credentials already exists`,
       };
     } else {
       try {
@@ -109,7 +114,7 @@ async function clientSignup(data) {
         jwtSignature(result?.dataValues);
         return {
           status: 200,
-          message:"CLIENT has been created successfully."
+          message: "CLIENT has been created successfully.",
         };
       } catch (err) {
         console.log(
@@ -187,7 +192,7 @@ async function customerLogin(data) {
             message: "Customer logged in successfully",
             token: token,
             id: fetchedCustomer?.customer_id,
-            data
+            data,
           };
         }
       } catch (err) {
@@ -201,7 +206,7 @@ async function customerLogin(data) {
     } else {
       return {
         status: 404,
-        message: "Client not found"
+        message: "Client not found",
       };
     }
   } catch (err) {
@@ -228,18 +233,17 @@ async function clientLogin(data) {
           return {
             status: 403,
             message: "Invalid Password",
-          }
+          };
         } else {
           const token = await jwtSignature(fetchedClient?.dataValues);
           return {
             status: 200,
             message: "Client logged in successfully",
             token: token,
-            data:{
-              id: fetchedClient?.client_id,
-              email: fetchedClient?.email,
-              name: fetchedClient?.name
-            }
+
+            id: fetchedClient?.client_id,
+            email: fetchedClient?.email,
+            name: fetchedClient?.name,
           };
         }
       } catch (err) {
@@ -253,7 +257,7 @@ async function clientLogin(data) {
     } else {
       return {
         status: 404,
-        message: "Client not found"
+        message: "Client not found",
       };
     }
   } catch (err) {
