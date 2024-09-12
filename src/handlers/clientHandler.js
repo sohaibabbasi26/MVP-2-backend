@@ -56,6 +56,12 @@ async function client_updateprofile(req, res) {
 const getClientById = async (req, res) => {
   try {
     const { client_id } = req.query;
+    if(!client_id){
+      res.status(400).send({
+        status: 400,
+        message:"client_id is required in params"
+      })
+    }
     const client = await getClientByIdService(client_id);
 
     if (client) {
