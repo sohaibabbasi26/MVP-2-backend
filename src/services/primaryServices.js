@@ -37,10 +37,17 @@ const { SimpleQueue } = require("../utilities/TemporaryQueue");
 
 async function customerSignup(data) {
   try {
-    const { name, email, password, contact_no, method } = data;
+    const { name, 
+      email, 
+      password, 
+      //contact_no, 
+      method } = data;
     const isCustomerInDb = await checkCustomerInDb(email, method);
     if (isCustomerInDb === true) {
-      return `User with these credentials already exists`;
+      return {
+        status: 409,
+        message: 'User with these credentials already exists'
+      }
     } else {
       try {
         const hashedPassword = await encryptPasword(password);
@@ -48,11 +55,14 @@ async function customerSignup(data) {
           name,
           email,
           password: hashedPassword,
-          contact_no,
+          //contact_no,
         };
         const result = await Customer.create(newData);
         jwtSignature(result?.dataValues);
-        return "User has been created successfully.";
+        return {
+          status: 200,
+          message: '"User has been created successfully."'
+        };
       } catch (err) {
         console.log(
           "ERROR WHILE CREATING CUSTOMER:",
