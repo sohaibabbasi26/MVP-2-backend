@@ -186,6 +186,7 @@ async function customerLogin(data) {
             status: 200,
             message: "Customer logged in successfully",
             token: token,
+            id: fetchedCustomer?.customer_id,
             data
           };
         }
@@ -234,6 +235,7 @@ async function clientLogin(data) {
             status: 200,
             message: "Client logged in successfully",
             token: token,
+            id: fetchedClient?.client_id,
             data
           };
         }

@@ -205,6 +205,11 @@ const routes = [
     handler: adminHandler.approveClientHandler,
     // preHandler: primaryHandlers.checkRole("admin"),
   },
+  {
+    method:'GET',
+    url:'/client',
+    handler: clientHandlers.getClientById
+  }
 ];
 
 module.exports = { routes };
