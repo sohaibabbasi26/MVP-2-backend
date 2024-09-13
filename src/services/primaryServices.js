@@ -362,7 +362,7 @@ async function createPositionsService(data) {
   const {
     position,
     client_id,
-    expertise,
+    skills,
     job_type,
     description,
     status,
@@ -386,7 +386,7 @@ async function createPositionsService(data) {
       const requestBody = {
         position,
         client_id,
-        expertise,
+        skills,
         job_type,
         description,
         status,

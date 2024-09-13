@@ -9,6 +9,7 @@ const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
 const resetPasswordValidation = require("../pre-handlers/passwordResetValidation");
+const jobHandler= require('../handlers/jobHandler')
 
 const routes = [
   {
@@ -209,6 +210,11 @@ const routes = [
     method:'GET',
     url:'/client',
     handler: clientHandlers.getClientById
+  },
+  {
+    method:'GET',
+    url:'/jobs',
+    handler: jobHandler.getAllJobs
   }
 ];
 

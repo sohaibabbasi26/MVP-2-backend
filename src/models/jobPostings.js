@@ -20,7 +20,7 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  expertise: {
+  skills: {
     type: DataTypes.JSONB,
     allowNull: false,
   },
