@@ -11,10 +11,10 @@ const JobPostings = sequelize.define("job_postings", {
   client_id: {
     type: DataTypes.UUID,
     allowNull: false,
-    references:{
+    references: {
       model: Client,
-      key:'client_id'
-    }
+      key: "client_id",
+    },
   },
   position: {
     type: DataTypes.STRING,
@@ -25,13 +25,13 @@ const JobPostings = sequelize.define("job_postings", {
     allowNull: false,
   },
   commitment: {
-    type: DataTypes.ENUM('Full-Time','Part-Time'),
-    defaultValue:'Full-Time',
+    type: DataTypes.ENUM("full-time", "part-time"),
+    defaultValue: "full-time",
     allowNull: false,
   },
   job_type: {
-    type: DataTypes.ENUM('on-site','remote'),
-    defaultValue:'Full-Time',
+    type: DataTypes.ENUM("on-site", "remote"),
+    defaultValue: "Full-Time",
     allowNull: false,
   },
   description: {
@@ -40,7 +40,7 @@ const JobPostings = sequelize.define("job_postings", {
   },
   status: {
     type: DataTypes.ENUM("active", "closed"),
-    defaultValue: "Active",
+    defaultValue: "active",
   },
   applied_customers_count: {
     type: DataTypes.INTEGER,
@@ -56,33 +56,33 @@ const JobPostings = sequelize.define("job_postings", {
   //ADDED job_status because we dont wanna use multiple joins to get status
   job_status: {
     type: DataTypes.ENUM("fulfilled", "hired", "open"), //fulfilled, hired, open
-    defaultValue: "Open",
+    defaultValue: "open",
     allowNull: false,
   },
-  start_date:{
+  start_date: {
     type: DataTypes.DATE,
     allowNull: true,
-    defaultValue: Date.now()
+    defaultValue: Date.now(),
   },
   assigned_customer: {
     type: DataTypes.JSONB,
   },
-  application_questions:{
+  application_questions: {
     type: DataTypes.JSONB,
-    allowNull:true
+    allowNull: true,
   },
-  project_length:{
+  project_length: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  workday_overlap:{
+  workday_overlap: {
     type: DataTypes.STRING,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 //association
-JobPostings.hasMany(Client,{foreignKey:'client_id'});
-Client.belongsTo(JobPostings,{foreignKey:'client_id'});
+JobPostings.hasMany(Client, { foreignKey: "client_id" });
+Client.belongsTo(JobPostings, { foreignKey: "client_id" });
 
 module.exports = JobPostings;
