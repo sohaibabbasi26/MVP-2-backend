@@ -24,8 +24,13 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.JSONB,
     allowNull: false,
   },
-  job_type: {
+  commitment: {
     type: DataTypes.ENUM('Full-Time','Part-Time'),
+    defaultValue:'Full-Time',
+    allowNull: false,
+  },
+  job_type: {
+    type: DataTypes.ENUM('On-Site','Remote'),
     defaultValue:'Full-Time',
     allowNull: false,
   },
@@ -54,10 +59,26 @@ const JobPostings = sequelize.define("job_postings", {
     defaultValue: "Open",
     allowNull: false,
   },
-
+  start_date:{
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: Date.now()
+  },
   assigned_customer: {
     type: DataTypes.JSONB,
   },
+  application_questions:{
+    type: DataTypes.JSONB,
+    allowNull:true
+  },
+  project_length:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  workday_overlap:{
+    type: DataTypes.STRING,
+    allowNull: false
+  }
 });
 
 //association

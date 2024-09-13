@@ -369,6 +369,10 @@ async function createPositionsService(data) {
     applied_customers_count,
     location,
     is_test_required,
+    application_questions,
+    start_date,
+    project_length,
+    workday_overlap
   } = data;
 
   try {
@@ -389,6 +393,10 @@ async function createPositionsService(data) {
         applied_customers_count,
         location,
         is_test_required,
+        start_date,
+        project_length,
+        application_questions,
+        workday_overlap
       };
       console.log("request body: ", requestBody);
       try {

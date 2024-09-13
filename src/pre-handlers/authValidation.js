@@ -26,7 +26,11 @@ const jobPostSchema = Joi.object({
     status: Joi.string().min(2).max(50).required(),
     applied_customers_count: Joi.number().required(),
     location: Joi.string().min(2).max(50).required(),
-    is_test_required: Joi.boolean().required()
+    is_test_required: Joi.boolean().required(),
+    application_questions: Joi.array().optional(),
+    project_length: Joi.string().required(),
+    start_date: Joi.string().required(),
+    workday_overlap: Joi.string().required()
 })
 
 const genRandQuesSchema = Joi.object({
