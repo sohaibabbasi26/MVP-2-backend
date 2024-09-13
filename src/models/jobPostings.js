@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../configurations/sequelizePgSQL");
+const Client = require("./client");
 
 const JobPostings = sequelize.define("job_postings", {
   job_posting_id: {
@@ -10,6 +11,10 @@ const JobPostings = sequelize.define("job_postings", {
   client_id: {
     type: DataTypes.UUID,
     allowNull: false,
+    references:{
+      model: Client,
+      key:'client_id'
+    }
   },
   position: {
     type: DataTypes.STRING,
@@ -20,7 +25,8 @@ const JobPostings = sequelize.define("job_postings", {
     allowNull: false,
   },
   job_type: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('Full-Time','Part-Time'),
+    defaultValue:'Full-Time',
     allowNull: false,
   },
   description: {
@@ -55,5 +61,7 @@ const JobPostings = sequelize.define("job_postings", {
 });
 
 //association
+JobPostings.hasMany(Client,{foreignKey:'client_id'});
+Client.belongsTo(JobPostings,{foreignKey:'client_id'});
 
 module.exports = JobPostings;
