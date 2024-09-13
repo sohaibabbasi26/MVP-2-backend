@@ -11,7 +11,7 @@ const JobPostings = require("../models/jobPostings");
 //get job posting via client-Id
 async function getJobviaclientIdService(client_id) {
   try {
-    const result = await JobPostings.findOne({
+    const result = await JobPostings.findAll({
       where: {
         client_id,
       },
