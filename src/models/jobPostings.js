@@ -30,7 +30,7 @@ const JobPostings = sequelize.define("job_postings", {
     allowNull: false,
   },
   job_type: {
-    type: DataTypes.ENUM('On-Site','Remote'),
+    type: DataTypes.ENUM('on-site','remote'),
     defaultValue:'Full-Time',
     allowNull: false,
   },
@@ -39,7 +39,7 @@ const JobPostings = sequelize.define("job_postings", {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("Active", "Closed"),
+    type: DataTypes.ENUM("active", "closed"),
     defaultValue: "Active",
   },
   applied_customers_count: {
@@ -55,7 +55,7 @@ const JobPostings = sequelize.define("job_postings", {
   },
   //ADDED job_status because we dont wanna use multiple joins to get status
   job_status: {
-    type: DataTypes.ENUM("Fulfilled", "Hired", "Open"), //fulfilled, hired, open
+    type: DataTypes.ENUM("fulfilled", "hired", "open"), //fulfilled, hired, open
     defaultValue: "Open",
     allowNull: false,
   },

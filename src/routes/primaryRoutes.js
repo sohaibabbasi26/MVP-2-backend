@@ -32,7 +32,7 @@ const routes = [
     method: "GET",
     url: "/assigned-customer/:client_id",
     handler: adminHandler.getcustomerwithclientid,
-    preHandler: primaryHandlers.checkRole("admin", "client", "customer"),
+    //preHandler: primaryHandlers.checkRole("admin", "client", "customer"),
   },
   {
     method: "POST",
