@@ -54,4 +54,6 @@ const JobPostings = sequelize.define("job_postings", {
   },
 });
 
+//association
+
 module.exports = JobPostings;

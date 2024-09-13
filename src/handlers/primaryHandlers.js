@@ -19,13 +19,13 @@ async function signup(req, res) {
     console.log("data:", data);
     if (data?.user_role === "customer") {
       const result = await services.customerSignup(data);
-      res.send(result);
+      res.status(result.status).send(result);
     } else if (data?.user_role === "client") {
       const result = await services.clientSignup(data);
-      res.send(result);
+      res.status(result.status).send(result);
     } else if (data?.user_role === "admin") {
       const result = await services.adminSignup(data);
-      res.send(result);
+      res.status(result.status).send(result);
     }
   } catch (err) {
     console.log("ERROR:", err);
