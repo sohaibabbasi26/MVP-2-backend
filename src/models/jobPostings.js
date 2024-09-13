@@ -31,7 +31,7 @@ const JobPostings = sequelize.define("job_postings", {
   },
   job_type: {
     type: DataTypes.ENUM("on-site", "remote"),
-    defaultValue: "Full-Time",
+    defaultValue: "on-site",
     allowNull: false,
   },
   description: {
