@@ -20,6 +20,11 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  experience:{
+    type: DataTypes.ENUM('beginner','intermediate','expert'),
+    allowNull: false,
+    defaultValue:'beginner'
+  },
   skills: {
     type: DataTypes.JSONB,
     allowNull: false,
