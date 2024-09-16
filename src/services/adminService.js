@@ -87,16 +87,16 @@ async function assigningCustomerservice(body) {
       },
     });
 
-    if (!customer.is_approved) {
-      return {
-        message: `Customer is not approved.`,
-      };
-    }
-    if (!client.approved) {
-      return {
-        message: `Client is not approved.`,
-      };
-    }
+    // if (!customer.is_approved) {
+    //   return {
+    //     message: `Customer is not approved.`,
+    //   };
+    // }
+    // if (!client.approved) {
+    //   return {
+    //     message: `Client is not approved.`,
+    //   };
+    // }
 
     if (customer && client && jobPosting) {
       let position = customer.position || [];
@@ -127,21 +127,21 @@ async function assigningCustomerservice(body) {
         position.push({ job_posting_id: body.job_posting_id });
       }
 
-      await JobPostings.update(
-        {
-          job_status: "Hired",
-          assigned_customer: assignedCustomers,
-        },
-        {
-          where: {
-            job_posting_id: body.job_posting_id,
-          },
-        }
-      );
+      // await JobPostings.update(
+      //   {
+      //     job_status: "hired",
+      //     assigned_customer: assignedCustomers,
+      //   },
+      //   {
+      //     where: {
+      //       job_posting_id: body.job_posting_id,
+      //     },
+      //   }
+      // );
 
       await Customer.update(
         {
-          talent_status: "Hired",
+          talent_status: "interviewing",
           position: position,
           assigned_clients: assignedClients,
         },
