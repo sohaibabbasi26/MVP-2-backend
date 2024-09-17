@@ -164,7 +164,9 @@ async function sendMail(req, res) {
     //   const client = await checkClientInDb(to);
     //   if (client === true) {
         const result = await services.sendMailService(mailOptions);
-        res.send("Email sent successfully.");
+        res.status(result.status).send({
+          ...result
+        });
     //   } else {
     //     res.send("Client not found.");
     //   }

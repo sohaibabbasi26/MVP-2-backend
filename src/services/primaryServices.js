@@ -347,15 +347,29 @@ async function getRandomQuestionsService(data) {
 }
 
 async function sendMailService(mailOptions) {
+  let msg = null;
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email:", error);
-      return error;
-    } else {
-      console.log("Email sent:", info.response);
-      return;
-    }
+      msg = {
+        status: 500,
+        message: error,
+      };
+    } msg= {
+        status: 200,
+        message: "Email sent successfully.",
+      };
+    
   });
+
+  if(msg){
+    return msg;
+  }
+
+  return{
+    status: 200,
+    message: "Email sent successfully.",
+  }
 }
 
 async function createPositionsService(data) {
@@ -373,7 +387,7 @@ async function createPositionsService(data) {
     application_questions,
     start_date,
     project_length,
-    workday_overlap
+    workday_overlap,
   } = data;
 
   try {
@@ -398,7 +412,7 @@ async function createPositionsService(data) {
         start_date,
         project_length,
         application_questions,
-        workday_overlap
+        workday_overlap,
       };
       console.log("request body: ", requestBody);
       try {
