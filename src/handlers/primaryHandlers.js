@@ -152,7 +152,7 @@ async function createPositions(req, res) {
 
 async function sendMail(req, res) {
   try {
-    const { to, subject, text, user_role } = req.body;
+    const { to, subject, text } = req.body;
     const mailOptions = {
       from: "sobiabbasi22@gmail.com",
       to,
@@ -160,33 +160,33 @@ async function sendMail(req, res) {
       text,
     };
 
-    if (user_role === "client") {
-      const client = await checkClientInDb(to);
-      if (client === true) {
+    // if (user_role === "client") {
+    //   const client = await checkClientInDb(to);
+    //   if (client === true) {
         const result = await services.sendMailService(mailOptions);
         res.send("Email sent successfully.");
-      } else {
-        res.send("Client not found.");
-      }
-    } else if (user_role === "admin") {
-      const admin = await checkAdminInDb(to);
-      if (admin === true) {
-        const result = await services.sendMailService(mailOptions);
-        res.send("Email sent successfully.");
-      } else {
-        res.send("Admin not found.");
-      }
-    } else if (user_role === "customer") {
-      const customer = await checkCustomerInDb(to);
-      if (customer === true) {
-        const result = await services.sendMailService(mailOptions);
-        res.send("Email sent successfully.");
-      } else {
-        res.send("Customer not found.");
-      }
-    } else {
-      res.status(400).send("Invalid user role specified");
-    }
+    //   } else {
+    //     res.send("Client not found.");
+    //   }
+    // } else if (user_role === "admin") {
+    //   const admin = await checkAdminInDb(to);
+    //   if (admin === true) {
+        // const result = await services.sendMailService(mailOptions);
+        // res.send("Email sent successfully.");
+    //   } else {
+    //     res.send("Admin not found.");
+    //   }
+    // } else if (user_role === "customer") {
+    //   const customer = await checkCustomerInDb(to);
+    //   if (customer === true) {
+    //     const result = await services.sendMailService(mailOptions);
+    //     res.send("Email sent successfully.");
+    //   } else {
+    //     res.send("Customer not found.");
+    //   }
+    // } else {
+    //   res.status(400).send("Invalid user role specified");
+    // }
   } catch (e) {
     console.log("Internal Server Error Occurred:", e);
     res.status(500).send("Internal Server Error Occurred");
