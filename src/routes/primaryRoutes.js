@@ -78,6 +78,7 @@ const routes = [
     method: "POST",
     url: "/send-email",
     handler: primaryHandlers.sendMail,
+    preHandler: authValidation.validateSendEmail
   },
   {
     method: "POST",
