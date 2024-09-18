@@ -356,17 +356,16 @@ async function sendMailService(mailOptions) {
         message: error,
       };
     }
-    
   });
 
-  if(msg){
+  if (msg) {
     return msg;
   }
 
-  return{
+  return {
     status: 200,
     message: "Email sent successfully.",
-  }
+  };
 }
 
 async function createPositionsService(data) {
@@ -691,7 +690,10 @@ async function setExpertiseService({ expertise, customer_id }) {
 
   try {
     if (!customer) {
-      return "no such customer was found in the db";
+      return {
+        status: 400,
+        message: "no such customer was found in the db",
+      };
     } else {
       const result = await Customer.update(
         {
@@ -705,13 +707,16 @@ async function setExpertiseService({ expertise, customer_id }) {
       );
 
       if (result[0] > 0) {
-        ``;
-        return `New expertise updated for customer ID: ${customer_id}`;
-      } else {
-        throw new Error(
-          "No update performed. It is possible the customer ID did not match."
-        );
+        return {
+          status: 200,
+          message: `New expertise updated for customer ID: ${customer_id}`,
+        };
       }
+      return {
+        status: 500,
+        message:
+          "No update performed. It is possible the customer ID did not match.",
+      };
     }
   } catch (err) {
     console.log(
@@ -719,7 +724,10 @@ async function setExpertiseService({ expertise, customer_id }) {
       err,
       "\nError source: src -> services -> primaryServices.js -> setExpertiseService"
     );
-    return "ERROR occured during updating the expertise of a customer:", err;
+    return {
+      status: 500,
+      message:err,
+    };
   }
 }
 
