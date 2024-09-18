@@ -355,10 +355,7 @@ async function sendMailService(mailOptions) {
         status: 500,
         message: error,
       };
-    } msg= {
-        status: 200,
-        message: "Email sent successfully.",
-      };
+    }
     
   });
 
