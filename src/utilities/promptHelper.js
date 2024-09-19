@@ -1,4 +1,4 @@
-function createPrompt(expertise, level, limit) {
+function createPrompt(expertise) {
     if (!Array.isArray(expertise)) {
         expertise = [expertise];
     }
