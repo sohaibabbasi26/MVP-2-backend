@@ -226,7 +226,8 @@ const routes = [
   {
     method:'POST',
     url:'/create-stripe-account',
-    handler: clientHandlers.createStripeAccount
+    handler: clientHandlers.createStripeAccount,
+    preHandler: clientValidation.validateClientStripeAccountResponse
   }
 ];
 
