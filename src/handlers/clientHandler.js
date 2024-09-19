@@ -8,6 +8,7 @@ const {
   declineCustomerService,
   client_interview_service,
   getJobviaclientIdService,
+  createClientStripeAccountService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -174,6 +175,11 @@ const clientResponseHandler = (req, res) => {
   }
 };
 
+const createStripeAccount= async(req,res)=>{
+  const result= await createClientStripeAccountService(req.body);
+  res.status(result.status).send({...result})
+}
+
 module.exports = {
   clients,
   client_updateprofile,
@@ -182,4 +188,5 @@ module.exports = {
   createClientRequestHandler,
   clientinterviewhandler,
   getJobviaclientIdHandler,
+  createStripeAccount
 };

@@ -72,6 +72,7 @@ async function assigningCustomerservice(body) {
     const customer = await Customer.findOne({
       where: {
         customer_id: body.customer_id,
+        hourly_rate: body.hourly_rate
       },
     });
 

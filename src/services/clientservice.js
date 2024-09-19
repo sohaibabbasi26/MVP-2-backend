@@ -6,6 +6,7 @@ const Customer = require("../models/customer");
 const ClientInterview = require("../models/client_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const JobPostings = require("../models/jobPostings");
+const Payment_Client = require("../models/payment_client");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -409,6 +410,38 @@ const clientPendingService = async (body) => {
     console.error("Error in clientAccept Service:", error.message);
   }
 };
+
+const createClientStripeAccountService = async (body) => {
+  const { client_id, stripe_id } = body;
+  let msg = null;
+  try {
+    const clientFind = await Client.findOne({
+      where: {
+        client_id,
+      },
+    });
+
+    if (!clientFind) {
+      return {
+        status: 404,
+        message: "client not found",
+      };
+    }
+    await Payment_Client.create({
+      client_id,
+      stripe_id,
+    });
+    return {
+      status: 200,
+      message: "account created successfully",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
 module.exports = {
   getClientByIdService,
   createClientRequestService,
@@ -419,4 +452,5 @@ module.exports = {
   clientPendingService,
   declineCustomerService,
   getJobviaclientIdService,
+  createClientStripeAccountService,
 };

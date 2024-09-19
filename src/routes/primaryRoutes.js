@@ -222,6 +222,11 @@ const routes = [
     method: 'POST',
     url:'/prepare-test',
     handler: testHandler.getRandomQuestions
+  },
+  {
+    method:'POST',
+    url:'/create-stripe-account',
+    handler: clientHandlers.createStripeAccount
   }
 ];
 
