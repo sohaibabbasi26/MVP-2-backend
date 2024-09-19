@@ -13,6 +13,14 @@ async function getRandomQuestions(req, res) {
     res.status(result.status).send({...result});
 }
 
+async function getCandidateTestQuestion(req,res) {
+    const {candidate_id}=req.query;
+    const result= await testService.getCandidateTestQuestionService(candidate_id)
+
+    res.status(result.status).send({...result})
+}
+
 module.exports={
-    getRandomQuestions
+    getRandomQuestions,
+    getCandidateTestQuestion
 }

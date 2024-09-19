@@ -115,6 +115,7 @@ async function clientSignup(data) {
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
+          client_id: result.client_id
         };
       } catch (err) {
         console.log(

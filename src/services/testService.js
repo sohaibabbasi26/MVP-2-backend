@@ -1,3 +1,4 @@
+const Customer = require("../models/customer");
 const Questions = require("../models/questions");
 const {
   convertTextToQuestionArray,
@@ -59,6 +60,40 @@ async function getRandomQuestions(
   }
 }
 
+const getCandidateTestQuestionService=async(candidate_id)=>{
+  const customer = await Customer.findOne({
+    where: {
+      customer_id: candidate_id,
+    },
+  });
+
+  if(!customer){
+    return{
+      status: 404,
+      message: 'customer not found'
+    }
+  }
+
+  const questions= await Questions.findOne({
+    where:{
+      customer_id: candidate_id,
+    }
+  });
+
+  if(questions){
+    return {
+      status: 200,
+      data: questions.question
+    }
+  }
+
+  return {
+    status: 404,
+    message:"question not found"
+  }
+}
+
 module.exports = {
   getRandomQuestions,
+  getCandidateTestQuestionService
 };
