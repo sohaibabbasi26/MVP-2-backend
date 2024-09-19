@@ -183,6 +183,12 @@ const routes = [
   },
   {
     method: "GET",
+    url: "/get-customer-expertise",
+    handler: customerHandler.getCustomerExpertise,
+    // preHandler: primaryHandlers.checkRole("customer"),
+  },
+  {
+    method: "GET",
     url: "/client/job-posting/:client_id",
     handler: clientHandlers.getJobviaclientIdHandler,
   },

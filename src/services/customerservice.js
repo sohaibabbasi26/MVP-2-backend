@@ -133,6 +133,22 @@ const getCustomerByIdService = async (id) => {
   }
 };
 
+const getCustomerExpertiseService=async(customer_id)=>{
+  const customer= await Customer.findByPk(customer_id);
+
+  if(customer){
+    return {
+      status: 200,
+      message:"skills fetched successfully",
+      data: customer.expertise
+    }
+  }
+  return {
+    status: 404,
+    message:"customer not found"
+  }
+}
+
 module.exports = {
   getCustomerByIdService,
   getCustomerViaExpertise,
@@ -140,4 +156,5 @@ module.exports = {
   customerUpdateExpertise,
   getCustomertestsService,
   getcodingresultService,
+  getCustomerExpertiseService
 };

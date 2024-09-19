@@ -180,7 +180,7 @@ async function getcustomerwithid(client_id) {
       where: {
         client_id,
         client_response: {
-          [Sequelize.Op.or]: ["Accept", "Pending"],
+          [Sequelize.Op.or]: ["accept", "pending"],
         },
       },
       include: [
@@ -201,7 +201,7 @@ async function getcustomerwithid(client_id) {
           attributes: [
             "job_posting_id",
             "position",
-            "expertise",
+            "skills",
             "job_type",
             "description",
             "applied_customers_count",
