@@ -375,6 +375,7 @@ async function createPositionsService(data) {
     skills,
     job_type,
     description,
+    commitment,
     status,
     experience,
     applied_customers_count,
@@ -401,6 +402,7 @@ async function createPositionsService(data) {
         job_type,
         description,
         experience,
+        commitment,
         status,
         applied_customers_count,
         location,
@@ -726,7 +728,7 @@ async function setExpertiseService({ expertise, customer_id }) {
     );
     return {
       status: 500,
-      message:err,
+      message: err,
     };
   }
 }

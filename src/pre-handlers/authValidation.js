@@ -24,6 +24,7 @@ const jobPostSchema = Joi.object({
     experience: Joi.string().required(),
     job_type: Joi.string().min(2).max(50).required(),
     description: Joi.string().min(2).max(1000).required(),
+    commitment: Joi.string().min(2).max(50).required(),
     status: Joi.string().min(2).max(50).required(),
     applied_customers_count: Joi.number().required(),
     location: Joi.string().min(2).max(50).required(),
