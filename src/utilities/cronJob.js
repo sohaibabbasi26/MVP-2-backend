@@ -6,11 +6,11 @@ const JobPostings = require('../models/jobPostings');
 const Results = require('../models/results');
 
 
-async function processJob(job, job_posting_id, resultQueue) {
+async function processJob(job) {
     const { question_answer, customer_id, testId } = job;
     console.log("job:", job);
     try {
-        const assessment = await verificationOfAnswers(question_answer, resultQueue);
+        const assessment = await verificationOfAnswers(question_answer);
         const prompt = await resultGenerationPrompt();
         if (assessment) {
             const OpenAIresponse = await getReportCompletion(

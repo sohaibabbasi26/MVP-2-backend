@@ -9,8 +9,8 @@ const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
 const resetPasswordValidation = require("../pre-handlers/passwordResetValidation");
-const jobHandler= require('../handlers/jobHandler')
-const testHandler= require('../handlers/testHandler')
+const jobHandler = require("../handlers/jobHandler");
+const testHandler = require("../handlers/testHandler");
 
 const routes = [
   {
@@ -79,7 +79,7 @@ const routes = [
     method: "POST",
     url: "/send-email",
     handler: primaryHandlers.sendMail,
-    preHandler: authValidation.validateSendEmail
+    preHandler: authValidation.validateSendEmail,
   },
   {
     method: "POST",
@@ -134,12 +134,12 @@ const routes = [
     url: "/client/client-interview",
     handler: clientHandlers.clientinterviewhandler,
   },
-  {
-    method: "POST",
-    url: "/take-test",
-    handler: primaryHandlers.takeTest,
-    preHandler: authValidation.validateTakeTestBody,
-  },
+  // {
+  //   method: "POST",
+  //   url: "/take-test",
+  //   handler: primaryHandlers.takeTest,
+  //   preHandler: authValidation.validateTakeTestBody,
+  // },
   {
     method: "POST",
     url: "/gen-coding-ques",
@@ -220,37 +220,49 @@ const routes = [
     // preHandler: primaryHandlers.checkRole("admin"),
   },
   {
-    method:'GET',
-    url:'/client',
-    handler: clientHandlers.getClientById
+    method: "GET",
+    url: "/client",
+    handler: clientHandlers.getClientById,
   },
   {
-    method:'GET',
-    url:'/jobs',
-    handler: jobHandler.getAllJobs
+    method: "GET",
+    url: "/jobs",
+    handler: jobHandler.getAllJobs,
   },
   {
-    method: 'POST',
-    url:'/prepare-test',
-    handler: testHandler.getRandomQuestions
+    method: "POST",
+    url: "/prepare-test",
+    handler: testHandler.getRandomQuestions,
   },
   {
-    method:'POST',
-    url:'/create-stripe-account',
+    method: "POST",
+    url: "/create-stripe-account",
     handler: clientHandlers.createStripeAccount,
-    preHandler: clientValidation.validateSetClientStripeAccount
+    preHandler: clientValidation.validateSetClientStripeAccount,
   },
   {
-    method:'GET',
-    url:'/get-candidate-test-questions',
-    handler: testHandler.getCandidateTestQuestion
+    method: "GET",
+    url: "/get-candidate-test-questions",
+    handler: testHandler.getCandidateTestQuestion,
   },
   {
-    method:'GET',
-    url:'/get-client-stripe-account',
+    method: "GET",
+    url: "/get-client-stripe-account",
     handler: clientHandlers.getStripeAccount,
-    preHandler: clientValidation.validateGetClientStripeAccount
-  }
+    preHandler: clientValidation.validateGetClientStripeAccount,
+  },
+  {
+    method: "POST",
+    url: "/take-test",
+    handler: testHandler.takeTest,
+    preHandler: authValidation.validateTakeTestBody,
+  },
+  {
+    method: "POST",
+    url: "/speech-to-text",
+    handler: testHandler.SpeechToTextGeneration,
+    //preHandler: authValidation.validateTakeTestBody,
+  },
 ];
 
 module.exports = { routes };

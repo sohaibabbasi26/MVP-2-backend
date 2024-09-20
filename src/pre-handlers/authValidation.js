@@ -47,8 +47,8 @@ const genCodingquestionSchema = Joi.object({
 
 const takeTestSchema = Joi.object({
     question_answer: Joi.array().required(),
-    customer_id: Joi.string().min(8).max(50),
-    job_posting_id: Joi.string().min(8).max(50)
+    candidate_id: Joi.string().min(8).max(50),
+    //job_posting_id: Joi.string().min(8).max(50)
 })
 
 const emailSendSchema= Joi.object({

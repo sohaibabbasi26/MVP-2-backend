@@ -36,4 +36,4 @@ async function transcribeAudio(filename) {
     return transcript;
 }
 
-module.exports = transcribeAudio;
+module.exports = {transcribeAudio};
