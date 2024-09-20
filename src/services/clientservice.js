@@ -442,6 +442,34 @@ const createClientStripeAccountService = async (body) => {
     };
   }
 };
+
+const getClientStripeAccountService = async (query) => {
+  const { client_id } = query;
+  try {
+    const payment = await Payment_Client.findOne({
+      where: {
+        client_id,
+      },
+    });
+
+    if (payment)
+      return {
+        status: 200,
+        message: "client account fetched successfully",
+        data: payment
+      };
+
+    return {
+      status: 404,
+      message: "client account not registered",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
 module.exports = {
   getClientByIdService,
   createClientRequestService,
@@ -453,4 +481,5 @@ module.exports = {
   declineCustomerService,
   getJobviaclientIdService,
   createClientStripeAccountService,
+  getClientStripeAccountService,
 };

@@ -3,7 +3,7 @@ const { sequelize } = require("../../configurations/sequelizePgSQL");
 const Client = require("./client");
 
 const Payment_Client = sequelize.define("payment_client", {
-  payment_client_id: {
+  id: {
     primaryKey: true,
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,

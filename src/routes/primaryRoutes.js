@@ -233,12 +233,18 @@ const routes = [
     method:'POST',
     url:'/create-stripe-account',
     handler: clientHandlers.createStripeAccount,
-    preHandler: clientValidation.validateClientStripeAccountResponse
+    preHandler: clientValidation.validateSetClientStripeAccount
   },
   {
     method:'GET',
     url:'/get-candidate-test-questions',
     handler: testHandler.getCandidateTestQuestion
+  },
+  {
+    method:'GET',
+    url:'/get-client-stripe-account',
+    handler: clientHandlers.getStripeAccount,
+    preHandler: clientValidation.validateGetClientStripeAccount
   }
 ];
 
