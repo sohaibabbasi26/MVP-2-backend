@@ -194,6 +194,11 @@ const routes = [
   },
   {
     method: "GET",
+    url: "/client/job-posting-by-client",
+    handler: clientHandlers.getJobviaclientIdAndJobIdHandler,
+  },
+  {
+    method: "GET",
     url: "/tests/customer/:customer_id",
     handler: customerHandler.CustomergettestsHandler,
   },

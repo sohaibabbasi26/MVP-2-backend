@@ -22,6 +22,20 @@ async function getJobviaclientIdService(client_id) {
     console.log(`Error is at src->clientservice->getjobviaclientId`);
   }
 }
+
+async function getJobviaclientIdAndJobIdService(client_id,job_posting_id) {
+  try {
+    const result = await JobPostings.findOne({
+      where: {
+        client_id,
+        job_posting_id
+      },
+    });
+    return { result, message: "Successfully retrieved Jobs" };
+  } catch (error) {
+    console.log(`Error is at src->clientservice->getjobviaclientId`);
+  }
+}
 //Client Api
 async function getallclients(req, res) {
   try {
@@ -472,6 +486,7 @@ const getClientStripeAccountService = async (query) => {
 };
 module.exports = {
   getClientByIdService,
+  getJobviaclientIdAndJobIdService,
   createClientRequestService,
   getallclients,
   updateclient_service,

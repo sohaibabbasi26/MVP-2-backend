@@ -10,6 +10,7 @@ const {
   getJobviaclientIdService,
   createClientStripeAccountService,
   getClientStripeAccountService,
+  getJobviaclientIdAndJobIdService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -32,6 +33,17 @@ async function getJobviaclientIdHandler(req, res) {
     console.log(`Error fetching Job ${error}`);
   }
 }
+
+async function getJobviaclientIdAndJobIdHandler(req, res) {
+  try {
+    const {client_id,job_posting_id} = req.query;
+    const result = await getJobviaclientIdAndJobIdService(client_id,job_posting_id);
+    res.send(result);
+  } catch (error) {
+    console.log(`Error fetching Job ${error}`);
+  }
+}
+
 //Client update_profile
 async function client_updateprofile(req, res) {
   const body = req.body;
@@ -195,5 +207,6 @@ module.exports = {
   clientinterviewhandler,
   getJobviaclientIdHandler,
   createStripeAccount,
-  getStripeAccount
+  getStripeAccount,
+  getJobviaclientIdAndJobIdHandler
 };
