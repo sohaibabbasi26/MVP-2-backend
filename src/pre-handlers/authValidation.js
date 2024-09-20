@@ -24,6 +24,7 @@ const jobPostSchema = Joi.object({
     experience: Joi.string().required(),
     job_type: Joi.string().min(2).max(50).required(),
     description: Joi.string().min(2).max(1000).required(),
+    commitment: Joi.string().min(2).max(50).required(),
     status: Joi.string().min(2).max(50).required(),
     applied_customers_count: Joi.number().required(),
     location: Joi.string().min(2).max(50).required(),
@@ -46,8 +47,14 @@ const genCodingquestionSchema = Joi.object({
 
 const takeTestSchema = Joi.object({
     question_answer: Joi.array().required(),
-    customer_id: Joi.string().min(8).max(50),
-    job_posting_id: Joi.string().min(8).max(50)
+    candidate_id: Joi.string().min(8).max(50),
+    //job_posting_id: Joi.string().min(8).max(50)
+})
+
+const emailSendSchema= Joi.object({
+    to: Joi.string().email().required(),
+    subject: Joi.string().required(),
+    text: Joi.string().required()
 })
 
 const validateRegister = (request, reply, done) => {
@@ -124,11 +131,24 @@ const validateLogin = (request, reply, done) => {
     }
 };
 
+const validateSendEmail= (req,res,done)=>{
+    try {
+        const { error } = emailSendSchema.validate(req.body);
+        if (error) {
+            return res.status(400).send(error.details);
+        }
+        done();
+    }catch(e){
+        console.log("ERR:",e)
+    }
+}
+
 module.exports = {
     validateRegister,
     validateLogin,
     validateRandomQuestionGen,
     validateJobPost,
     validateTakeTestBody,
-    validateCodingGenBody
+    validateCodingGenBody,
+    validateSendEmail
 }

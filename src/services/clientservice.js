@@ -6,6 +6,7 @@ const Customer = require("../models/customer");
 const ClientInterview = require("../models/client_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const JobPostings = require("../models/jobPostings");
+const Payment_Client = require("../models/payment_client");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -14,6 +15,20 @@ async function getJobviaclientIdService(client_id) {
     const result = await JobPostings.findAll({
       where: {
         client_id,
+      },
+    });
+    return { result, message: "Successfully retrieved Jobs" };
+  } catch (error) {
+    console.log(`Error is at src->clientservice->getjobviaclientId`);
+  }
+}
+
+async function getJobviaclientIdAndJobIdService(client_id,job_posting_id) {
+  try {
+    const result = await JobPostings.findOne({
+      where: {
+        client_id,
+        job_posting_id
       },
     });
     return { result, message: "Successfully retrieved Jobs" };
@@ -409,8 +424,69 @@ const clientPendingService = async (body) => {
     console.error("Error in clientAccept Service:", error.message);
   }
 };
+
+const createClientStripeAccountService = async (body) => {
+  const { client_id, stripe_id } = body;
+  let msg = null;
+  try {
+    const clientFind = await Client.findOne({
+      where: {
+        client_id,
+      },
+    });
+
+    if (!clientFind) {
+      return {
+        status: 404,
+        message: "client not found",
+      };
+    }
+    await Payment_Client.create({
+      client_id,
+      stripe_id,
+    });
+    return {
+      status: 200,
+      message: "account created successfully",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
+
+const getClientStripeAccountService = async (query) => {
+  const { client_id } = query;
+  try {
+    const payment = await Payment_Client.findOne({
+      where: {
+        client_id,
+      },
+    });
+
+    if (payment)
+      return {
+        status: 200,
+        message: "client account fetched successfully",
+        data: payment
+      };
+
+    return {
+      status: 404,
+      message: "client account not registered",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
 module.exports = {
   getClientByIdService,
+  getJobviaclientIdAndJobIdService,
   createClientRequestService,
   getallclients,
   updateclient_service,
@@ -419,4 +495,6 @@ module.exports = {
   clientPendingService,
   declineCustomerService,
   getJobviaclientIdService,
+  createClientStripeAccountService,
+  getClientStripeAccountService,
 };

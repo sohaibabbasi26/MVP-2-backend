@@ -288,7 +288,7 @@ async function setExpertise(request, reply) {
       customer_id,
       expertise,
     });
-    reply.status(200).send(result);
+    reply.status(result.status).send({...result});
   } catch (err) {
     console.log(
       "Some error occured while handling the route",

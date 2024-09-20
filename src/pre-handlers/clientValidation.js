@@ -62,6 +62,15 @@ const client_request_schema = Joi.object({
   }),
 });
 
+const set_client_stripe_account_schema= Joi.object({
+  client_id: Joi.string().required(),
+  stripe_id: Joi.string().required()
+})
+
+const get_client_stripe_account_schema= Joi.object({
+  client_id: Joi.string().required(),
+})
+
 const validateClientRequest = (req, res, next) => {
   const { error } = client_request_schema.validate(req.body);
   if (error) {
@@ -84,8 +93,32 @@ const validateClientResponse = (req, res, next) => {
   }
 };
 
+const validateSetClientStripeAccount= (req, res, next) => {
+  const { error } = set_client_stripe_account_schema.validate(req.body);
+  if (error) {
+    res.status(400).send({
+      message: error["message"],
+    });
+  } else {
+    next();
+  }
+};
+
+const validateGetClientStripeAccount= (req, res, next) => {
+  const { error } = get_client_stripe_account_schema.validate(req.query);
+  if (error) {
+    res.status(400).send({
+      message: error["message"],
+    });
+  } else {
+    next();
+  }
+};
+
 module.exports = {
   validateClientRequest,
   validateClientProfileUpdate,
   validateClientResponse,
+  validateSetClientStripeAccount,
+  validateGetClientStripeAccount
 };

@@ -12,6 +12,7 @@ const assigningCustomerSchema = Joi.object({
   customer_id: Joi.string().min(2).max(50).required(),
   client_id: Joi.string().min(2).max(50).required(),
   job_posting_id: Joi.string().min(2).max(50).required(),
+  hourly_rate: Joi.number().greater(0)
 });
 
 const validate_assigningCustomerSchema = (req, res, next) => {
