@@ -7,7 +7,10 @@ const {
 } = require("../utilities/convTextToQuesArray");
 const { processJob } = require("../utilities/cronJob");
 const { getCompletion } = require("../utilities/OpenAIgateways");
-const { createPrompt } = require("../utilities/promptHelper");
+const {
+  createPrompt,
+  CodingAssignmentPrompt,
+} = require("../utilities/promptHelper");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
 const { transcribeAudio } = require("../utilities/transcribeAudio");
 
@@ -141,11 +144,11 @@ async function takeTest({ question_answer, candidate_id }) {
           message: "Failed to create test.",
         };
       }
-    }else{
+    } else {
       return {
         status: 404,
-        message: "customer not found"
-      }
+        message: "customer not found",
+      };
     }
   } catch (err) {
     console.error("Error in takeTest:", err);
@@ -158,78 +161,85 @@ async function takeTest({ question_answer, candidate_id }) {
 
 async function speechToTextGeneration(audioFilename) {
   if (!audioFilename) {
-      throw new Error("No file name detected!");
+    throw new Error("No file name detected!");
   }
 
   try {
-      console.log("In service file!");
-      const transcription = await transcribeAudio(audioFilename);
-      if (!transcription || !transcription.text) {
-          console.log("Transcription failed or returned undefined.");
-          return "Transcription failed.";
-      }
-      console.log("Transcription:", transcription.text);
-      return transcription.text;
+    console.log("In service file!");
+    const transcription = await transcribeAudio(audioFilename);
+    if (!transcription || !transcription.text) {
+      console.log("Transcription failed or returned undefined.");
+      return "Transcription failed.";
+    }
+    console.log("Transcription:", transcription.text);
+    return transcription.text;
   } catch (err) {
-      console.error("Error in SpeechToTextGeneration:", err);
-      return "Error during transcription.";
+    console.error("Error in SpeechToTextGeneration:", err);
+    return "Error during transcription.";
   }
 }
 
-const getCodingQuestionService= async(candidate_id)=>{
+const getCodingQuestionService = async (candidate_id) => {
   try {
     const prompt = await CodingAssignmentPrompt();
     console.log("Prompt for coding assignment:", prompt);
     if (prompt) {
+      try {
+        const completion = await getCompletion(prompt);
+        console.log("COMPLETION:", completion.choices[0].message);
+        const data = completion.choices[0].message.content;
+
+        let JsonifiedData;
         try {
-            const completion = await getCompletion(prompt);
-            console.log("COMPLETION:", completion.choices[0].message);
-            const data = completion.choices[0].message.content;
-
-            let JsonifiedData;
-            try {
-                JsonifiedData = await JSON.parse(data);
-            } catch (parseError) {
-                console.error(
-                    "Error parsing JSON:",
-                    parseError,
-                    "Raw data:",
-                    data
-                );
-            }
-            console.log("jsonified data:", JsonifiedData);
-
-            const reqBody = {
-                assesment: JsonifiedData,
-                //position_id: position_id,
-                customer_id: candidate_id,
-            };
-
-            try {
-                const setAssessment = await CodingAssessment.create(
-                    reqBody
-                );
-                console.log("assessment:", setAssessment);
-                return setAssessment;
-            } catch (err) {
-                console.log("ERR:", err);
-            }
-            return JsonifiedData;
-        } catch (err) {
-            console.log("ERR:", err);
-            return;
+          JsonifiedData = await JSON.parse(data);
+        } catch (parseError) {
+          console.error("Error parsing JSON:", parseError, "Raw data:", data);
         }
+        console.log("jsonified data:", JsonifiedData);
+
+        const reqBody = {
+          assesment: JsonifiedData,
+          //position_id: position_id,
+          customer_id: candidate_id,
+        };
+
+        try {
+          const setAssessment = await CodingAssessment.create(reqBody);
+          console.log("assessment:", setAssessment);
+          return {
+            status: 200,
+            message: "coding of a freelancer fetched",
+            codingQuestion: setAssessment,
+          };
+        } catch (err) {
+          console.log("ERR:", err);
+          return {
+            status: 500,
+            message: err.message,
+          };
+        }
+        return JsonifiedData;
+      } catch (err) {
+        console.log("ERR:", err);
+        return {
+          status: 500,
+          message: err.message,
+        };
+      }
     }
-} catch (err) {
+  } catch (err) {
     console.log("ERROR:", err);
-    return;
-}
-}
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
 
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestionService,
   takeTest,
   speechToTextGeneration,
-  getCodingQuestionService
+  getCodingQuestionService,
 };
