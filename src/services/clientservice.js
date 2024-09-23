@@ -484,6 +484,70 @@ const getClientStripeAccountService = async (query) => {
     };
   }
 };
+
+const getCandidatesOfClientService=(data)=>{
+  try{
+    switch(data.filter){
+      case "hired":
+
+      default:
+        return {
+          status: 401,
+          message: "invalid filter"
+        }
+    }
+  }catch(err){
+    return {
+      status: 500,
+      err: err.message
+    }
+  }
+}
+
+const getAllCandidatesOfClientJobService=async(client_id)=>{
+  try{
+    const clientJobsWithCandidates= await Adminassigned.findAll({
+      where:{
+        client_id
+      },
+      include:[
+        {
+          model: Customer,
+          Client,
+          as: "customer",
+          attributes: ["customer_id", "name", "email","experience","hourly_rate","commitment","position"],
+        },
+        {
+          model: JobPostings,
+          as: "job_postings", // Alias for Client association
+          attributes: [
+            "job_posting_id",
+            "position",
+            "skills",
+            "job_type",
+            "description",
+            "applied_customers_count",
+            "assigned_customer",
+            "location",
+          ],
+        },
+      ]
+    });
+    
+    if(clientJobsWithCandidates){
+      return {
+        status: 200,
+        data: clientJobsWithCandidates
+      }
+    }
+  }catch(err){
+    return {
+      status: 500,
+      err: err.message
+    }
+  }
+}
+
 module.exports = {
   getClientByIdService,
   getJobviaclientIdAndJobIdService,
@@ -497,4 +561,6 @@ module.exports = {
   getJobviaclientIdService,
   createClientStripeAccountService,
   getClientStripeAccountService,
+  getCandidatesOfClientService,
+  getAllCandidatesOfClientJobService
 };

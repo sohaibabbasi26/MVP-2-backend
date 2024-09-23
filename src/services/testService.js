@@ -1,4 +1,5 @@
 const CodingAssessment = require("../models/codingAssessment");
+const CodingResults = require("../models/codingResults");
 const Customer = require("../models/customer");
 const Questions = require("../models/questions");
 const Test = require("../models/test");
@@ -6,11 +7,13 @@ const {
   convertTextToQuestionArray,
 } = require("../utilities/convTextToQuesArray");
 const { processJob } = require("../utilities/cronJob");
-const { getCompletion } = require("../utilities/OpenAIgateways");
+const { getCompletion, getCodingVerifiedCompletion } = require("../utilities/OpenAIgateways");
 const {
   createPrompt,
   CodingAssignmentPrompt,
+  CodingExcersiceVerificationPrompt,
 } = require("../utilities/promptHelper");
+const { refineApiResponseForCoding } = require("../utilities/refinedCodingResults");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
 const { transcribeAudio } = require("../utilities/transcribeAudio");
 const axios = require("axios");
@@ -273,11 +276,59 @@ async function executeCode({
   }
 }
 
+async function getCodingSubmit({
+  code,
+  exercise,
+  constraints,
+  output,
+  candidate_id,
+}) {
+  try {
+      const prompt = await CodingExcersiceVerificationPrompt(
+          code,
+          exercise,
+          constraints,
+          output
+      );
+      const completion = await getCodingVerifiedCompletion(prompt);
+      const data = completion.choices[0].message.content
+          .replace(/```/g, "")
+          .trim();
+
+      console.log(" data:", data);
+
+      let JsonifiedData;
+      try {
+          // JsonifiedData = JSON.parse(data);
+          JsonifiedData = await refineApiResponseForCoding(data);
+      } catch (parseError) {
+          console.error(
+              "Error parsing JSON:",
+              parseError,
+              "Raw data:",
+              data
+          );
+          return { error: parseError.message, rawData: data };
+      }
+
+      const dataEntry = await CodingResults.create({
+          result: JsonifiedData,
+          candidate_id: candidate_id,
+      });
+      console.log("Data entered in the DB table:", dataEntry);
+      return dataEntry;
+  } catch (err) {
+      console.error("ERR:", err);
+      return { error: err.message };
+  }
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestionService,
   takeTest,
   speechToTextGeneration,
   getCodingQuestionService,
-  executeCode
+  executeCode,
+  getCodingSubmit
 };
