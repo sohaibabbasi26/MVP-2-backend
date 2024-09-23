@@ -193,7 +193,7 @@ async function getcustomerwithid(client_id) {
         {
           model: Client,
           as: "client", // Alias for Client association
-          attributes: ["client_id", "name", "email"],
+          attributes: ["client_id", "name", "email","experience","hourly_rate","commitment","position"],
         },
         {
           model: JobPostings,

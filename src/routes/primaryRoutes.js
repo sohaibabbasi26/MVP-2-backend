@@ -270,6 +270,11 @@ const routes = [
   },
   {
     method: "POST",
+    url: "/execute-code",
+    handler: testHandler.executeCode,
+},
+  {
+    method: "POST",
     url: "/logout",
     handler: primaryHandlers.logout,
     //preHandler: authValidation.validateTakeTestBody,

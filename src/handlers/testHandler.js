@@ -63,10 +63,20 @@ const getCodingQuestionHandler= async(req,res)=>{
   res.status(result.status).send({...result})
 }
 
+async function executeCode(req, res) {
+  const { language, script } = req.body;
+  const result = await testService.executeCode({
+      language,
+      script
+  });
+  res.status(result.status).send(result);
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestion,
   takeTest,
   SpeechToTextGeneration,
-  getCodingQuestionHandler
+  getCodingQuestionHandler,
+  executeCode
 };

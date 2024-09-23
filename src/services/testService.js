@@ -13,6 +13,7 @@ const {
 } = require("../utilities/promptHelper");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
 const { transcribeAudio } = require("../utilities/transcribeAudio");
+const axios = require("axios");
 
 require("dotenv").config();
 
@@ -236,10 +237,47 @@ const getCodingQuestionService = async (candidate_id) => {
   }
 };
 
+async function executeCode({
+  language,
+  script
+}) {
+  const program = {
+      script: script,
+      language: language,
+      stdin: "",
+      versionIndex: "0",
+      clientId: process.env.EXECUTE_CODE_CLIENT_ID,
+      clientSecret: process.env.EXECUTE_CODE_CLIENT_SECRET,
+  };
+
+  try {
+      const response = await axios({
+          method: "POST",
+          url: "https://api.jdoodle.com/v1/execute",
+          data: program,
+          headers: {
+              "Content-Type": "application/json",
+          },
+      });
+
+      console.log("response:", response);
+      console.log("OUTPUT:", response.data.output);
+
+      return { status: 200, data: response.data };
+  } catch (error) {
+      console.error(error);
+      return {
+          status: error.response?.status || 500,
+          message: error.message,
+      };
+  }
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestionService,
   takeTest,
   speechToTextGeneration,
   getCodingQuestionService,
+  executeCode
 };
