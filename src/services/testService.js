@@ -1,3 +1,4 @@
+const CodingAssessment = require("../models/codingAssessment");
 const Customer = require("../models/customer");
 const Questions = require("../models/questions");
 const Test = require("../models/test");
@@ -175,9 +176,60 @@ async function speechToTextGeneration(audioFilename) {
   }
 }
 
+const getCodingQuestionService= async(candidate_id)=>{
+  try {
+    const prompt = await CodingAssignmentPrompt();
+    console.log("Prompt for coding assignment:", prompt);
+    if (prompt) {
+        try {
+            const completion = await getCompletion(prompt);
+            console.log("COMPLETION:", completion.choices[0].message);
+            const data = completion.choices[0].message.content;
+
+            let JsonifiedData;
+            try {
+                JsonifiedData = await JSON.parse(data);
+            } catch (parseError) {
+                console.error(
+                    "Error parsing JSON:",
+                    parseError,
+                    "Raw data:",
+                    data
+                );
+            }
+            console.log("jsonified data:", JsonifiedData);
+
+            const reqBody = {
+                assesment: JsonifiedData,
+                //position_id: position_id,
+                customer_id: candidate_id,
+            };
+
+            try {
+                const setAssessment = await CodingAssessment.create(
+                    reqBody
+                );
+                console.log("assessment:", setAssessment);
+                return setAssessment;
+            } catch (err) {
+                console.log("ERR:", err);
+            }
+            return JsonifiedData;
+        } catch (err) {
+            console.log("ERR:", err);
+            return;
+        }
+    }
+} catch (err) {
+    console.log("ERROR:", err);
+    return;
+}
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestionService,
   takeTest,
-  speechToTextGeneration
+  speechToTextGeneration,
+  getCodingQuestionService
 };

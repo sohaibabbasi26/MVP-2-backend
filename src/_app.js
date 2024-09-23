@@ -7,9 +7,18 @@ const { syncModels } = require("../src/utilities/syncModels");
 const { generateJwtSecret } = require("../src/utilities/jwtSecretGenerator");
 const cors = require("@fastify/cors");
 const fastifyCookie = require("fastify-cookie");
+const fastifySession = require("fastify-session");
 
 fastify.register(fastifyCookie);
-
+fastify.register(fastifySession, {
+  secret: process.env.SESSION_KEY,
+  cookie: {
+    secure: true, // Set to true for production with HTTPS
+    maxAge: 1800000,
+  },
+  saveUninitialized: false,
+  resave: false,
+});
 const serverInit = () => {
   fastify.register(cors, {
     origin: process.env.ALLOWED_CLIENT || "*",

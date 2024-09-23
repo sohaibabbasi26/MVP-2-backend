@@ -263,6 +263,17 @@ const routes = [
     handler: testHandler.SpeechToTextGeneration,
     //preHandler: authValidation.validateTakeTestBody,
   },
+  {
+    method: "GET",
+    url: "/get-coding-question",
+    handler: testHandler.getCodingQuestionHandler,
+  },
+  {
+    method: "POST",
+    url: "/logout",
+    handler: primaryHandlers.logout,
+    //preHandler: authValidation.validateTakeTestBody,
+  },
 ];
 
 module.exports = { routes };
