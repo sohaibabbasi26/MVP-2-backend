@@ -198,7 +198,7 @@ const getCodingQuestionService = async (candidate_id) => {
         console.log("jsonified data:", JsonifiedData);
 
         const reqBody = {
-          assesment: JsonifiedData,
+          assessment: JsonifiedData,
           //position_id: position_id,
           customer_id: candidate_id,
         };

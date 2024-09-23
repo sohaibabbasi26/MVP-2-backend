@@ -10,7 +10,7 @@ const CodingAssessment = sequelize.define('codingAssessment',{
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
     },
-    assesment: {
+    assessment: {
         type: DataTypes.JSONB,
         allowNull:false
     },

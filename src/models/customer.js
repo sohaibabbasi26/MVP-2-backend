@@ -57,7 +57,7 @@ const Customer = sequelize.define("customers", {
     type: DataTypes.ENUM("1 week", "2 week", "4 week", "immediate"),
   },
   commitment: {
-    type: DataTypes.ENUM("full-time", "half-time"),
+    type: DataTypes.ENUM("full-time", "part-time"),
   },
   assigned_clients: {
     type: DataTypes.JSONB,
