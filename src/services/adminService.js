@@ -188,7 +188,7 @@ async function getcustomerwithid(client_id) {
           model: Customer,
           Client,
           as: "customer",
-          attributes: ["customer_id", "name", "email"],
+          attributes: ["customer_id", "name", "email","experience","hourly_rate","commitment","position"],
         },
         {
           model: Client,
