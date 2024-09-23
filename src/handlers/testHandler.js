@@ -72,11 +72,29 @@ async function executeCode(req, res) {
   res.status(result.status).send(result);
 }
 
+async function getCodingSubmit(req, res) {
+  try {
+      const { code, exercise, constraints, output, candidate_id } =
+          req?.body;
+      const transcriptionResult = await appMediator.getCodingSubmit({
+          code,
+          exercise,
+          constraints,
+          output,
+          candidate_id,
+      });
+      res.send(transcriptionResult);
+  } catch (err) {
+      console.log("failed at HANDLER with ERROR:", err);
+  }
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestion,
   takeTest,
   SpeechToTextGeneration,
   getCodingQuestionHandler,
-  executeCode
+  executeCode,
+  getCodingSubmit
 };

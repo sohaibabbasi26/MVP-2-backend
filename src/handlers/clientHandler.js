@@ -11,6 +11,8 @@ const {
   createClientStripeAccountService,
   getClientStripeAccountService,
   getJobviaclientIdAndJobIdService,
+  getCandidatesOfClientService,
+  getAllCandidatesOfClientJobService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -188,6 +190,15 @@ const clientResponseHandler = (req, res) => {
   }
 };
 
+const getCandidatesOfClient=async(req,res)=>{
+  const result= await getCandidatesOfClientService(req.query);
+  res.status(result.status).send({...result})
+}
+const getAllCandidatesOfClientJob=async(req,res)=>{
+  const result= await getAllCandidatesOfClientJobService(req.query.client_id);
+  res.status(result.status).send({...result})
+}
+
 const createStripeAccount= async(req,res)=>{
   const result= await createClientStripeAccountService(req.body);
   res.status(result.status).send({...result})
@@ -208,5 +219,7 @@ module.exports = {
   getJobviaclientIdHandler,
   createStripeAccount,
   getStripeAccount,
-  getJobviaclientIdAndJobIdHandler
+  getJobviaclientIdAndJobIdHandler,
+  getCandidatesOfClient,
+  getAllCandidatesOfClientJob
 };
