@@ -28,6 +28,7 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "fastify-cookie": "^5.7.0",
+    "fastify-session": "^5.2.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.14",

@@ -193,7 +193,8 @@ async function customerLogin(data) {
             message: "Customer logged in successfully",
             token: token,
             id: fetchedCustomer?.customer_id,
-            data,
+            email: fetchedCustomer?.email,
+            name: fetchedCustomer?.name,
           };
         }
       } catch (err) {

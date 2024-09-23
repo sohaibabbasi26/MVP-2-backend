@@ -57,9 +57,16 @@ async function SpeechToTextGeneration(req, res) {
     }
 }
 
+const getCodingQuestionHandler= (req,res)=>{
+  const {candidate_id}= req.query;
+  const result= testService.getCodingQuestionService(candidate_id);
+  res.send(result)
+}
+
 module.exports = {
   getRandomQuestions,
   getCandidateTestQuestion,
   takeTest,
-  SpeechToTextGeneration
+  SpeechToTextGeneration,
+  getCodingQuestionHandler
 };

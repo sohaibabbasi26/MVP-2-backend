@@ -50,7 +50,13 @@ async function login(req, reply) {
 
     if (result.status === 200) {
       // Set both token and user_role cookies
-      reply.setCookie("token", result, {
+      req.session.user = {
+        id: result?.id,
+        email: result?.email,
+        name: result?.name,
+        token: result?.token,
+      };
+      reply.setCookie("token", result?.token, {
         httpOnly: true,
         sameSite: "Strict",
       });
@@ -161,18 +167,18 @@ async function sendMail(req, res) {
     // if (user_role === "client") {
     //   const client = await checkClientInDb(to);
     //   if (client === true) {
-        const result = await services.sendMailService(mailOptions);
-        res.status(result.status).send({
-          ...result
-        });
+    const result = await services.sendMailService(mailOptions);
+    res.status(result.status).send({
+      ...result,
+    });
     //   } else {
     //     res.send("Client not found.");
     //   }
     // } else if (user_role === "admin") {
     //   const admin = await checkAdminInDb(to);
     //   if (admin === true) {
-        // const result = await services.sendMailService(mailOptions);
-        // res.send("Email sent successfully.");
+    // const result = await services.sendMailService(mailOptions);
+    // res.send("Email sent successfully.");
     //   } else {
     //     res.send("Admin not found.");
     //   }
@@ -288,7 +294,7 @@ async function setExpertise(request, reply) {
       customer_id,
       expertise,
     });
-    reply.status(result.status).send({...result});
+    reply.status(result.status).send({ ...result });
   } catch (err) {
     console.log(
       "Some error occured while handling the route",
@@ -339,6 +345,21 @@ async function customer_updateprofile(req, res) {
   }
 }
 
+const logout=(req,res)=>{
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(400).send({ message: 'No active session' });
+  }
+
+  // Clear all cookies
+  res.clearCookie('client');
+  res.clearCookie('token');
+  res.clearCookie('user_role');
+  res.clearCookie('sessionId');
+  res.status(200).send({ message: 'Logout successful' })
+}
+
 module.exports = {
   serverCheck,
   signup,
@@ -355,4 +376,5 @@ module.exports = {
   setExperience,
   customer_updateprofile,
   checkRole,
+  logout
 };
