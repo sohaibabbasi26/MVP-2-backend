@@ -76,7 +76,7 @@ async function getCodingSubmit(req, res) {
   try {
       const { code, exercise, constraints, output, candidate_id } =
           req?.body;
-      const transcriptionResult = await appMediator.getCodingSubmit({
+      const transcriptionResult = await testService.getCodingSubmit({
           code,
           exercise,
           constraints,

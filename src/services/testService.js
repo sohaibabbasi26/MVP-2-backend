@@ -313,7 +313,7 @@ async function getCodingSubmit({
 
       const dataEntry = await CodingResults.create({
           result: JsonifiedData,
-          candidate_id: candidate_id,
+          customer_id: candidate_id,
       });
       console.log("Data entered in the DB table:", dataEntry);
       return dataEntry;
