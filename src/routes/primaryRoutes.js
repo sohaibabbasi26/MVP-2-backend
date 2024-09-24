@@ -95,7 +95,7 @@ const routes = [
     method: "PUT",
     url: "/client-profile-update/:client_id",
     handler: clientHandlers.client_updateprofile,
-    preHandler: clientValidation.validateClientProfileUpdate,
+    //preHandler: clientValidation.validateClientProfileUpdate,
   },
   {
     method: "POST",
