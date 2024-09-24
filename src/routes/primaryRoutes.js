@@ -279,14 +279,14 @@ const routes = [
     handler: testHandler.getCodingSubmit,
   },
   {
-    method: 'GET',
-    url:'/get-candidates-of-client',
-    handler: clientHandlers.getCandidatesOfClient
+    method: "GET",
+    url: "/get-candidates-of-client",
+    handler: clientHandlers.getCandidatesOfClient,
   },
   {
-    method: 'GET',
-    url:'/get-all-candidates-of-clients-job',
-    handler: clientHandlers.getAllCandidatesOfClientJob
+    method: "GET",
+    url: "/get-all-candidates-of-clients-job",
+    handler: clientHandlers.getAllCandidatesOfClientJob,
   },
   {
     method: "POST",
