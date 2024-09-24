@@ -57,10 +57,36 @@ async function SpeechToTextGeneration(req, res) {
     }
 }
 
-const getCodingQuestionHandler= (req,res)=>{
+const getCodingQuestionHandler= async(req,res)=>{
   const {candidate_id}= req.query;
-  const result= testService.getCodingQuestionService(candidate_id);
-  res.send(result)
+  const result= await testService.getCodingQuestionService(candidate_id);
+  res.status(result.status).send({...result})
+}
+
+async function executeCode(req, res) {
+  const { language, script } = req.body;
+  const result = await testService.executeCode({
+      language,
+      script
+  });
+  res.status(result.status).send(result);
+}
+
+async function getCodingSubmit(req, res) {
+  try {
+      const { code, exercise, constraints, output, candidate_id } =
+          req?.body;
+      const transcriptionResult = await appMediator.getCodingSubmit({
+          code,
+          exercise,
+          constraints,
+          output,
+          candidate_id,
+      });
+      res.send(transcriptionResult);
+  } catch (err) {
+      console.log("failed at HANDLER with ERROR:", err);
+  }
 }
 
 module.exports = {
@@ -68,5 +94,7 @@ module.exports = {
   getCandidateTestQuestion,
   takeTest,
   SpeechToTextGeneration,
-  getCodingQuestionHandler
+  getCodingQuestionHandler,
+  executeCode,
+  getCodingSubmit
 };

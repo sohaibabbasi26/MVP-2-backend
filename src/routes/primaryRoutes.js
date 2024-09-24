@@ -270,6 +270,26 @@ const routes = [
   },
   {
     method: "POST",
+    url: "/execute-code",
+    handler: testHandler.executeCode,
+  },
+  {
+    method: "POST",
+    url: "/get-code-submit",
+    handler: testHandler.getCodingSubmit,
+  },
+  {
+    method: 'GET',
+    url:'/get-candidates-of-client',
+    handler: clientHandlers.getCandidatesOfClient
+  },
+  {
+    method: 'GET',
+    url:'/get-all-candidates-of-clients-job',
+    handler: clientHandlers.getAllCandidatesOfClientJob
+  },
+  {
+    method: "POST",
     url: "/logout",
     handler: primaryHandlers.logout,
     //preHandler: authValidation.validateTakeTestBody,
