@@ -139,6 +139,10 @@ const getClientByIdService = async (id) => {
       "approved",
       "createdAt",
       "updatedAt",
+      "city",
+      "area_code",
+      "country",
+      "province",
     ],
     where: {
       client_id: id,
