@@ -37,6 +37,10 @@ const Customer = sequelize.define("customers", {
   position: {
     type: DataTypes.JSONB,
   },
+  specialization:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   // job_status: {
   //   type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
   //   defaultValue: "Un-Assigned",
@@ -74,6 +78,22 @@ const Customer = sequelize.define("customers", {
   experience: {
     type: DataTypes.ENUM("beginner", "intermediate", "expert"),
   },
+  city:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  country:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  area_code:{
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  province:{
+    type: DataTypes.STRING,
+    allowNull: true
+  }
 });
 
 module.exports = Customer;
