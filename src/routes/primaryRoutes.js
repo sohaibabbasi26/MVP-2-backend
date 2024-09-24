@@ -283,11 +283,11 @@ const routes = [
     url: "/get-code-submit",
     handler: testHandler.getCodingSubmit,
   },
-  {
-    method: 'GET',
-    url:'/get-candidates-of-client',
-    handler: clientHandlers.getCandidatesOfClient
-  },
+  // {
+  //   method: 'GET',
+  //   url:'/get-candidates-of-client',
+  //   handler: clientHandlers.getCandidatesOfClient
+  // },
   {
     method: 'GET',
     url:'/get-all-candidates-of-clients-job',
