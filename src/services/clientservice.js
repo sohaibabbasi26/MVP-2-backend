@@ -508,10 +508,14 @@ const getCandidatesOfClientService = (data) => {
   }
 };
 
-const getAllCandidatesOfClientJobService = async (client_id, customer_id) => {
+const getAllCandidatesOfClientJobService = async (
+  client_id,
+  customer_id,
+  job_posting_id
+) => {
   try {
     let clientJobsWithCandidates = null;
-    if (!customer_id) {
+    if (!customer_id&&!job_posting_id) {
       clientJobsWithCandidates = await Adminassigned.findAll({
         where: {
           client_id,
@@ -552,6 +556,7 @@ const getAllCandidatesOfClientJobService = async (client_id, customer_id) => {
         where: {
           client_id,
           customer_id,
+          job_posting_id,
         },
         include: [
           {
