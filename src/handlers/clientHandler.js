@@ -195,7 +195,8 @@ const getCandidatesOfClient=async(req,res)=>{
   res.status(result.status).send({...result})
 }
 const getAllCandidatesOfClientJob=async(req,res)=>{
-  const result= await getAllCandidatesOfClientJobService(req.query.client_id);
+  const {client_id,customer_id}=req.query;
+    result= await getAllCandidatesOfClientJobService(client_id,customer_id);
   res.status(result.status).send({...result})
 }
 
