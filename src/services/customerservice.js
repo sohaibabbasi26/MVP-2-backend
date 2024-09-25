@@ -97,11 +97,7 @@ async function getallcustomers(customer_id) {
   try {
     let result = null;
     if (customer_id)
-      result = await Customer.findAll({
-        where: {
-          customer_id,
-        },
-      });
+      result = await Customer.findByPk(customer_id);
     else {
       result = await Customer.findAll();
     }
