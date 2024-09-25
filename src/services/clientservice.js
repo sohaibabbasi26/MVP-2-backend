@@ -23,12 +23,12 @@ async function getJobviaclientIdService(client_id) {
   }
 }
 
-async function getJobviaclientIdAndJobIdService(client_id,job_posting_id) {
+async function getJobviaclientIdAndJobIdService(client_id, job_posting_id) {
   try {
     const result = await JobPostings.findOne({
       where: {
         client_id,
-        job_posting_id
+        job_posting_id,
       },
     });
     return { result, message: "Successfully retrieved Jobs" };
@@ -139,6 +139,10 @@ const getClientByIdService = async (id) => {
       "approved",
       "createdAt",
       "updatedAt",
+      "city",
+      "area_code",
+      "country",
+      "province",
     ],
     where: {
       client_id: id,
@@ -470,7 +474,7 @@ const getClientStripeAccountService = async (query) => {
       return {
         status: 200,
         message: "client account fetched successfully",
-        data: payment
+        data: payment,
       };
 
     return {
@@ -485,68 +489,120 @@ const getClientStripeAccountService = async (query) => {
   }
 };
 
-const getCandidatesOfClientService=(data)=>{
-  try{
-    switch(data.filter){
+const getCandidatesOfClientService = (data) => {
+  try {
+    switch (data.filter) {
       case "hired":
 
       default:
         return {
           status: 401,
-          message: "invalid filter"
-        }
+          message: "invalid filter",
+        };
     }
-  }catch(err){
+  } catch (err) {
     return {
       status: 500,
-      err: err.message
-    }
+      err: err.message,
+    };
   }
-}
+};
 
-const getAllCandidatesOfClientJobService=async(client_id)=>{
-  try{
-    const clientJobsWithCandidates= await Adminassigned.findAll({
-      where:{
-        client_id
-      },
-      include:[
-        {
-          model: Customer,
-          Client,
-          as: "customer",
-          attributes: ["customer_id", "name", "email","experience","hourly_rate","commitment","position"],
+const getAllCandidatesOfClientJobService = async (
+  client_id,
+  customer_id,
+  job_posting_id
+) => {
+  try {
+    let clientJobsWithCandidates = null;
+    if (!customer_id&&!job_posting_id) {
+      clientJobsWithCandidates = await Adminassigned.findAll({
+        where: {
+          client_id,
         },
-        {
-          model: JobPostings,
-          as: "job_postings", // Alias for Client association
-          attributes: [
-            "job_posting_id",
-            "position",
-            "skills",
-            "job_type",
-            "description",
-            "applied_customers_count",
-            "assigned_customer",
-            "location",
-          ],
+        include: [
+          {
+            model: Customer,
+            Client,
+            as: "customer",
+            attributes: [
+              "customer_id",
+              "name",
+              "email",
+              "experience",
+              "hourly_rate",
+              "commitment",
+              "position",
+            ],
+          },
+          {
+            model: JobPostings,
+            as: "job_postings", // Alias for Client association
+            attributes: [
+              "job_posting_id",
+              "position",
+              "skills",
+              "job_type",
+              "description",
+              "applied_customers_count",
+              "assigned_customer",
+              "location",
+            ],
+          },
+        ],
+      });
+    } else {
+      clientJobsWithCandidates = await Adminassigned.findAll({
+        where: {
+          client_id,
+          customer_id,
+          job_posting_id,
         },
-      ]
-    });
-    
-    if(clientJobsWithCandidates){
+        include: [
+          {
+            model: Customer,
+            Client,
+            as: "customer",
+            attributes: [
+              "customer_id",
+              "name",
+              "email",
+              "experience",
+              "hourly_rate",
+              "commitment",
+              "position",
+            ],
+          },
+          {
+            model: JobPostings,
+            as: "job_postings", // Alias for Client association
+            attributes: [
+              "job_posting_id",
+              "position",
+              "skills",
+              "job_type",
+              "description",
+              "applied_customers_count",
+              "assigned_customer",
+              "location",
+            ],
+          },
+        ],
+      });
+    }
+    if (clientJobsWithCandidates) {
       return {
         status: 200,
-        data: clientJobsWithCandidates
-      }
+        data: clientJobsWithCandidates,
+      };
     }
-  }catch(err){
+  } catch (err) {
     return {
       status: 500,
-      err: err.message
-    }
+      err: err.message,
+    };
   }
-}
+};
 
 module.exports = {
   getClientByIdService,
@@ -562,5 +618,5 @@ module.exports = {
   createClientStripeAccountService,
   getClientStripeAccountService,
   getCandidatesOfClientService,
-  getAllCandidatesOfClientJobService
+  getAllCandidatesOfClientJobService,
 };
