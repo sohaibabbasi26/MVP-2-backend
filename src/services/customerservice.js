@@ -101,7 +101,19 @@ async function getallcustomers(customer_id) {
     else {
       result = await Customer.findAll();
     }
-    return result;
+
+    if(result){
+      return {
+        status: 200,
+        data: result
+      }
+    }
+
+    return {
+      status: 404,
+      message: "no customer",
+      data: null
+    };
   } catch (error) {
     console.log(
       `Error while retrieving customers =>src->services->getallcustomers ${error} `

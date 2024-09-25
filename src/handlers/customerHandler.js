@@ -23,10 +23,12 @@ const GetcodingresultHandler = async (req, res) => {
 async function customers(req, res) {
   try {
     const data = await getallcustomers(req.query.customer_id);
-    res.send(data);
+    res.status(data.status).send({...data});
   } catch (error) {
     console.log(`Error while getting customers data ${error}`);
-    return;
+    res.status(500).send({
+      message: error.message
+    });
   }
 }
 //getting all the customers with their expertise
