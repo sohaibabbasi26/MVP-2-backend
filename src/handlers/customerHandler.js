@@ -22,7 +22,7 @@ const GetcodingresultHandler = async (req, res) => {
 //getting all the customers
 async function customers(req, res) {
   try {
-    const data = await getallcustomers();
+    const data = await getallcustomers(req.query.customer_id);
     res.send(data);
   } catch (error) {
     console.log(`Error while getting customers data ${error}`);
