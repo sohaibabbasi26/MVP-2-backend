@@ -93,10 +93,27 @@ async function customerUpdateExpertise(body) {
   }
 }
 //customers Api
-async function getallcustomers() {
+async function getallcustomers(customer_id) {
   try {
-    const result = await Customer.findAll();
-    return result;
+    let result = null;
+    if (customer_id)
+      result = await Customer.findByPk(customer_id);
+    else {
+      result = await Customer.findAll();
+    }
+
+    if(result){
+      return {
+        status: 200,
+        data: result
+      }
+    }
+
+    return {
+      status: 404,
+      message: "no customer",
+      data: null
+    };
   } catch (error) {
     console.log(
       `Error while retrieving customers =>src->services->getallcustomers ${error} `
@@ -137,21 +154,21 @@ const getCustomerByIdService = async (id) => {
   }
 };
 
-const getCustomerExpertiseService=async(customer_id)=>{
-  const customer= await Customer.findByPk(customer_id);
+const getCustomerExpertiseService = async (customer_id) => {
+  const customer = await Customer.findByPk(customer_id);
 
-  if(customer){
+  if (customer) {
     return {
       status: 200,
-      message:"skills fetched successfully",
-      data: customer.expertise
-    }
+      message: "skills fetched successfully",
+      data: customer.expertise,
+    };
   }
   return {
     status: 404,
-    message:"customer not found"
-  }
-}
+    message: "customer not found",
+  };
+};
 
 module.exports = {
   getCustomerByIdService,
@@ -160,5 +177,5 @@ module.exports = {
   customerUpdateExpertise,
   getCustomertestsService,
   getcodingresultService,
-  getCustomerExpertiseService
+  getCustomerExpertiseService,
 };

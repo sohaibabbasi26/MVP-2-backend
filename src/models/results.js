@@ -1,5 +1,6 @@
 const {sequelize} = require('../../configurations/sequelizePgSQL');
 const {DataTypes} = require('sequelize');
+const Customer = require('./customer');
 
 const Result = sequelize.define('results',{
     result_id : {
@@ -18,8 +19,14 @@ const Result = sequelize.define('results',{
     },
     customer_id : {
         type : DataTypes.UUID,
-        allowNull:false
+        references:{
+            model: Customer,
+            key:'customer_id'
+        },
     }
 })
+
+Result.hasOne(Customer,{foreignKey:'customer_id'});
+Customer.belongsTo(Result,{foreignKey:'customer_id'});
 
 module.exports= Result;

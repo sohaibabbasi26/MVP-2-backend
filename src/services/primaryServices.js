@@ -602,13 +602,36 @@ async function getCustomerResultService({ customer_id }) {
     } else {
       try {
         const result = await Results.findOne({
-          where: {
-            customer_id: customer_id,
-          },
+          // where: {
+          //   customer_id: customer_id,
+          // },
+          include:[
+            {
+              model: Customer,
+              on:{
+                customer_id: customer_id,
+              },
+              attributes: [
+                "customer_id",
+                "name",
+                "email",
+                "specialization",
+                "experience",
+                "hourly_rate",
+                "commitment",
+                "expertise",
+                "job_type",
+                "experience",
+                "position",
+              ],
+              
+            }
+          ]
         });
         console.log("the fetched results are:", result?.dataValues);
         return {
-          message: result?.dataValues,
+          status: 200,
+          data: result?.dataValues,
         };
       } catch (err) {
         console.log(
