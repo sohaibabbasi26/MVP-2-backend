@@ -93,6 +93,10 @@ const Customer = sequelize.define("customers", {
   province:{
     type: DataTypes.STRING,
     allowNull: true
+  },
+  customer_location:{
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 
