@@ -96,23 +96,22 @@ async function customerUpdateExpertise(body) {
 async function getallcustomers(customer_id) {
   try {
     let result = null;
-    if (customer_id)
-      result = await Customer.findByPk(customer_id);
+    if (customer_id) result = await Customer.findByPk(customer_id);
     else {
       result = await Customer.findAll();
     }
 
-    if(result){
+    if (result) {
       return {
         status: 200,
-        data: result
-      }
+        data: result,
+      };
     }
 
     return {
       status: 404,
       message: "no customer",
-      data: null
+      data: null,
     };
   } catch (error) {
     console.log(
@@ -121,6 +120,34 @@ async function getallcustomers(customer_id) {
     return;
   }
 }
+
+const getCustomerByEmail = async (email) => {
+  try {
+    const customer = await Customer.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (customer) {
+      return {
+        status: 200,
+        data: customer,
+      };
+    }
+
+    return {
+      status: 404,
+      message: "customer not found",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
+
 //get customer by id
 const getCustomerByIdService = async (id) => {
   const client = await Customer.findOne({
@@ -178,4 +205,5 @@ module.exports = {
   getCustomertestsService,
   getcodingresultService,
   getCustomerExpertiseService,
+  getCustomerByEmail,
 };
