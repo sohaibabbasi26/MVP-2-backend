@@ -345,20 +345,20 @@ async function customer_updateprofile(req, res) {
   }
 }
 
-const logout=(req,res)=>{
+const logout = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(400).send({ message: 'No active session' });
+    return res.status(400).send({ message: "No active session" });
   }
 
   // Clear all cookies
-  res.clearCookie('client');
-  res.clearCookie('token');
-  res.clearCookie('user_role');
-  res.clearCookie('sessionId');
-  res.status(200).send({ message: 'Logout successful' })
-}
+  res.clearCookie("client");
+  res.clearCookie("token");
+  res.clearCookie("user_role");
+  res.clearCookie("sessionId");
+  res.status(200).send({ message: "Logout successful" });
+};
 
 module.exports = {
   serverCheck,
@@ -376,5 +376,5 @@ module.exports = {
   setExperience,
   customer_updateprofile,
   checkRole,
-  logout
+  logout,
 };
