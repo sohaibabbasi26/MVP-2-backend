@@ -44,6 +44,12 @@ const routes = [
   },
   {
     method: "POST",
+    url: "/signup-google",
+    handler: primaryHandlers.signupGoogle,
+    preHandler: authValidation.validateGoogleRegister,
+  },
+  {
+    method: "POST",
     url: "/login",
     handler: primaryHandlers.login,
     preHandler: authValidation.validateLogin,
@@ -237,7 +243,7 @@ const routes = [
   {
     method: "GET",
     url: "/client-by-email",
-    handler: clientHandlers.getClientByEmailHandler
+    handler: clientHandlers.getClientByEmailHandler,
   },
   {
     method: "GET",
@@ -299,9 +305,9 @@ const routes = [
   //   handler: clientHandlers.getCandidatesOfClient
   // },
   {
-    method: 'GET',
-    url:'/get-all-candidates-of-clients-job',
-    handler: clientHandlers.getAllCandidatesOfClientJob
+    method: "GET",
+    url: "/get-all-candidates-of-clients-job",
+    handler: clientHandlers.getAllCandidatesOfClientJob,
   },
   {
     method: "POST",
