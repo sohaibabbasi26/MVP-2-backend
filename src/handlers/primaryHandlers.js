@@ -13,6 +13,26 @@ async function serverCheck(req, res) {
   }
 }
 
+async function signupGoogle(req, res) {
+  try {
+    const data = req?.body;
+    console.log("data:", data);
+    if (data?.user_role === "customer") {
+      const result = await services.customerSignupGoogle(data);
+      res.status(result.status).send(result);
+    } else if (data?.user_role === "client") {
+      const result = await services.clientSignupGoogle(data);
+      res.status(result.status).send(result);
+    }
+  } catch (err) {
+    console.log("ERROR:", err);
+    return {
+      status: 500,
+      message: err.message
+    };
+  }
+}
+
 async function signup(req, res) {
   try {
     const data = req?.body;
@@ -362,6 +382,7 @@ const logout = (req, res) => {
 
 module.exports = {
   serverCheck,
+  signupGoogle,
   signup,
   login,
   getRandomQuestions,
