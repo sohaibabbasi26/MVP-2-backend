@@ -13,6 +13,7 @@ const {
   getJobviaclientIdAndJobIdService,
   getCandidatesOfClientService,
   getAllCandidatesOfClientJobService,
+  getClientByEmail,
 } = require("../services/clientservice");
 
 //Client Api
@@ -67,6 +68,12 @@ async function client_updateprofile(req, res) {
       .status(500)
       .send({ message: "An error occurred while updating the profile." });
   }
+}
+
+const getClientByEmailHandler=async (req,res)=>{
+  const { email } = req.query;
+  const result= await getClientByEmail(email);
+  res.status(result.status).send({...result})
 }
 
 const getClientById = async (req, res) => {
@@ -222,5 +229,6 @@ module.exports = {
   getStripeAccount,
   getJobviaclientIdAndJobIdHandler,
   getCandidatesOfClient,
-  getAllCandidatesOfClientJob
+  getAllCandidatesOfClientJob,
+  getClientByEmailHandler
 };
