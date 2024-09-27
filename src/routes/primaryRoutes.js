@@ -231,6 +231,11 @@ const routes = [
   },
   {
     method: "GET",
+    url: "/customer-by-email",
+    handler: customerHandler.getCustomerByEmailHandler,
+  },
+  {
+    method: "GET",
     url: "/jobs",
     handler: jobHandler.getAllJobs,
   },
