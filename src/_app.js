@@ -6,10 +6,12 @@ require("dotenv").config();
 const { syncModels } = require("../src/utilities/syncModels");
 const { generateJwtSecret } = require("../src/utilities/jwtSecretGenerator");
 const cors = require("@fastify/cors");
-const fastifyCookie = require("fastify-cookie");
-const fastifySession = require("fastify-session");
+const fastifyCookie = require("@fastify/cookie");
+const fastifySession = require("@fastify/session");
 
-fastify.register(fastifyCookie);
+fastify.register(fastifyCookie); // Register this first
+
+// Then register fastify-session after fastify-cookie is registered
 fastify.register(fastifySession, {
   secret: process.env.SESSION_KEY,
   cookie: {
@@ -19,6 +21,7 @@ fastify.register(fastifySession, {
   saveUninitialized: false,
   resave: false,
 });
+
 const serverInit = () => {
   fastify.register(cors, {
     origin: process.env.ALLOWED_CLIENT || "*",
@@ -28,7 +31,6 @@ const serverInit = () => {
     fastify.route(route);
   });
 
-  // connectDb();
   syncModels();
   const jwtSecret = generateJwtSecret();
   console.log("Generated JWT secret:", jwtSecret);
