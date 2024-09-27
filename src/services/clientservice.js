@@ -604,7 +604,35 @@ const getAllCandidatesOfClientJobService = async (
   }
 };
 
+const getClientByEmail = async (email) => {
+  try {
+    const customer = await Client.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (customer) {
+      return {
+        status: 200,
+        data: customer,
+      };
+    }
+
+    return {
+      status: 404,
+      message: "customer not found",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
+
 module.exports = {
+  getClientByEmail,
   getClientByIdService,
   getJobviaclientIdAndJobIdService,
   createClientRequestService,
