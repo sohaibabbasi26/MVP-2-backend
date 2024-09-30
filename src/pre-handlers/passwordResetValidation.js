@@ -3,7 +3,7 @@ const Joi = require("joi");
 const passwordResetValidationSchema= Joi.object({
     email: Joi.string().email().required(),
     user_role: Joi.string().required(),
-    current_password: Joi.string().required(),
+    //current_password: Joi.string().required(),
     new_password: Joi.string().min(8).required()
 });
 
