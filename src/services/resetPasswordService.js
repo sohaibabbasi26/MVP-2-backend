@@ -37,7 +37,7 @@ const resetPassword = async (body) => {
 
     if (user) {
       //check password of the user and compare it
-      if (await comparePassword(body.current_password, user.password)) {
+      if (!await comparePassword(body.new_password, user.password)) {
         //enable user to reset the password
         await user.update({
           password: await encryptPasword(body.new_password),
@@ -50,7 +50,7 @@ const resetPassword = async (body) => {
       } else {
         return {
           status: 403,
-          message: "your current password does not match with the database",
+          message: "you can not use previous password as your new password",
         };
       }
     } else {

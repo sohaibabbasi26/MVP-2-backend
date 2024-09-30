@@ -621,7 +621,7 @@ const getClientByEmail = async (email) => {
 
     return {
       status: 404,
-      message: "customer not found",
+      message: "client not found",
     };
   } catch (err) {
     return {
