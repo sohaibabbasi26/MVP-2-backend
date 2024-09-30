@@ -13,6 +13,26 @@ async function serverCheck(req, res) {
   }
 }
 
+async function signupGoogle(req, res) {
+  try {
+    const data = req?.body;
+    console.log("data:", data);
+    if (data?.user_role === "customer") {
+      const result = await services.customerSignupGoogle(data);
+      res.status(result.status).send(result);
+    } else if (data?.user_role === "client") {
+      const result = await services.clientSignupGoogle(data);
+      res.status(result.status).send(result);
+    }
+  } catch (err) {
+    console.log("ERROR:", err);
+    return {
+      status: 500,
+      message: err.message
+    };
+  }
+}
+
 async function signup(req, res) {
   try {
     const data = req?.body;
@@ -345,23 +365,24 @@ async function customer_updateprofile(req, res) {
   }
 }
 
-const logout=(req,res)=>{
+const logout = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(400).send({ message: 'No active session' });
+    return res.status(400).send({ message: "No active session" });
   }
 
   // Clear all cookies
-  res.clearCookie('client');
-  res.clearCookie('token');
-  res.clearCookie('user_role');
-  res.clearCookie('sessionId');
-  res.status(200).send({ message: 'Logout successful' })
-}
+  res.clearCookie("client");
+  res.clearCookie("token");
+  res.clearCookie("user_role");
+  res.clearCookie("sessionId");
+  res.status(200).send({ message: "Logout successful" });
+};
 
 module.exports = {
   serverCheck,
+  signupGoogle,
   signup,
   login,
   getRandomQuestions,
@@ -376,5 +397,5 @@ module.exports = {
   setExperience,
   customer_updateprofile,
   checkRole,
-  logout
+  logout,
 };

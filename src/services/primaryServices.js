@@ -35,6 +35,46 @@ const { generateCodeQues } = require("../utilities/generateCodeQues");
 const transporter = require("../../configurations/gmailConfig");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
 
+async function customerSignupGoogle(data) {
+  try {
+    const { name, email, method } = data;
+    const isCustomerInDb = await checkCustomerInDb(email, method);
+    if (isCustomerInDb === true) {
+      return {
+        status: 409,
+        message: "User with these credentials already exists",
+      };
+    } else {
+      try {
+        const newData = {
+          name,
+          email,
+        };
+        const result = await Customer.create(newData);
+        jwtSignature(result?.dataValues);
+        return {
+          status: 200,
+          message: '"User has been created successfully."',
+        };
+      } catch (err) {
+        console.log(
+          "ERROR WHILE CREATING CUSTOMER:",
+          err,
+          "\n error source :  error source: src -> services -> primaryServices -> signup"
+        );
+        return "ERROR WHILE CREATING CUSTOMER:", err;
+      }
+    }
+  } catch (err) {
+    console.log(
+      "some error occured while signing up:",
+      err,
+      "\n error source: src -> services -> primaryServices -> signup"
+    );
+    return "Some error occured while signing up";
+  }
+}
+
 async function customerSignup(data) {
   try {
     const {
@@ -84,6 +124,50 @@ async function customerSignup(data) {
   }
 }
 
+async function clientSignupGoogle(data) {
+  try {
+    const { name, email, method } = data;
+    const isClientInDb = await checkClientInDb(email, method);
+    if (isClientInDb === true) {
+      return {
+        status: 409,
+        message: `Client with these credentials already exists`,
+      };
+    } else {
+      try {
+        const newData = {
+          name,
+          email,
+        };
+        const result = await Client.create(newData);
+        jwtSignature(result?.dataValues);
+        return {
+          status: 200,
+          message: "CLIENT has been created successfully.",
+          client_id: result.client_id,
+        };
+      } catch (err) {
+        console.log(
+          "ERROR WHILE CREATING CLIENT:",
+          err,
+          "\n error source :  error source: src -> services -> primaryServices -> signup"
+        );
+        return {
+          status: 500,
+          message: "ERROR WHILE CREATING CLIENT:" + err.message,
+        };
+      }
+    }
+  } catch (err) {
+    console.log(
+      "some error occured while signing up:",
+      err,
+      "\n error source: src -> services -> primaryServices -> signup"
+    );
+    return "Some error occured while signing up";
+  }
+}
+
 async function clientSignup(data) {
   try {
     const {
@@ -115,7 +199,7 @@ async function clientSignup(data) {
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
-          client_id: result.client_id
+          client_id: result.client_id,
         };
       } catch (err) {
         console.log(
@@ -605,10 +689,10 @@ async function getCustomerResultService({ customer_id }) {
           // where: {
           //   customer_id: customer_id,
           // },
-          include:[
+          include: [
             {
               model: Customer,
-              on:{
+              on: {
                 customer_id: customer_id,
               },
               attributes: [
@@ -624,9 +708,8 @@ async function getCustomerResultService({ customer_id }) {
                 "experience",
                 "position",
               ],
-              
-            }
-          ]
+            },
+          ],
         });
         console.log("the fetched results are:", result?.dataValues);
         return {
@@ -816,7 +899,9 @@ async function updatecustomer_service(body, customer_id) {
 }
 
 module.exports = {
+  customerSignupGoogle,
   customerSignup,
+  clientSignupGoogle,
   clientSignup,
   customerLogin,
   clientLogin,
