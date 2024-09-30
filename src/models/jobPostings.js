@@ -60,7 +60,7 @@ const JobPostings = sequelize.define("job_postings", {
   },
   //ADDED job_status because we dont wanna use multiple joins to get status
   job_status: {
-    type: DataTypes.ENUM("fulfilled", "hired", "open"), //fulfilled, hired, open
+    type: DataTypes.ENUM("fulfilled", "hired", "open", "trial"), //fulfilled, hired, open
     defaultValue: "open",
     allowNull: false,
   },
