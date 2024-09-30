@@ -275,7 +275,8 @@ async function customerLogin(data) {
             name: fetchedCustomer.dataValues?.name,
             email: fetchedCustomer.dataValues?.email,
             id: fetchedCustomer?.customer_id,
-            status: fetchedCustomer.dataValues?.status
+            status: fetchedCustomer.dataValues?.status,
+            user_role: 'customer'
           }); // Pass customer_id and email
           return {
             status: 200,
@@ -331,7 +332,8 @@ async function clientLogin(data) {
             name: fetchedClient.dataValues?.name,
             email: fetchedClient.dataValues?.email,
             id: fetchedClient?.client_id,
-            status: fetchedClient.dataValues?.status
+            status: fetchedClient.dataValues?.status,
+            user_role: 'client'
           });
           
           return {
