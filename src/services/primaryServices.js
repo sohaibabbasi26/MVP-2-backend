@@ -271,7 +271,12 @@ async function customerLogin(data) {
             message: "Invalid Password",
           };
         } else {
-          const token = await jwtSignature(fetchedCustomer.dataValues); // Pass customer_id and email
+          const token = await jwtSignature({
+            name: fetchedCustomer.dataValues?.name,
+            email: fetchedCustomer.dataValues?.email,
+            id: fetchedCustomer.dataValues?.customer_id,
+            status: fetchedCustomer.dataValues?.status
+          }); // Pass customer_id and email
           return {
             status: 200,
             message: "Customer logged in successfully",
@@ -321,7 +326,14 @@ async function clientLogin(data) {
             message: "Invalid Password",
           };
         } else {
-          const token = await jwtSignature(fetchedClient?.dataValues);
+          // const token = await jwtSignature(fetchedClient?.dataValues);
+          const token = await jwtSignature({
+            name: fetchedClient.dataValues?.name,
+            email: fetchedClient.dataValues?.email,
+            id: fetchedClient.dataValues?.customer_id,
+            status: fetchedClient.dataValues?.status
+          });
+          
           return {
             status: 200,
             message: "Client logged in successfully",
