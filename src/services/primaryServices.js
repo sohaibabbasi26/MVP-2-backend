@@ -274,7 +274,7 @@ async function customerLogin(data) {
           const token = await jwtSignature({
             name: fetchedCustomer.dataValues?.name,
             email: fetchedCustomer.dataValues?.email,
-            id: fetchedCustomer.dataValues?.customer_id,
+            id: fetchedCustomer?.customer_id,
             status: fetchedCustomer.dataValues?.status
           }); // Pass customer_id and email
           return {
@@ -330,7 +330,7 @@ async function clientLogin(data) {
           const token = await jwtSignature({
             name: fetchedClient.dataValues?.name,
             email: fetchedClient.dataValues?.email,
-            id: fetchedClient.dataValues?.customer_id,
+            id: fetchedClient?.client_id,
             status: fetchedClient.dataValues?.status
           });
           
