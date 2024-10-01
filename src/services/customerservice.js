@@ -197,6 +197,20 @@ const getCustomerExpertiseService = async (customer_id) => {
   };
 };
 
+const getCustomerJobsService=(job_posting_id,candidate_id)=>{
+  try{
+    return {
+      status: 200,
+      message: "customer jobs fetched successfully"
+    }
+  }catch(err){
+    return {
+      status: 500,
+      message: err.message
+    }
+  }
+}
+
 module.exports = {
   getCustomerByIdService,
   getCustomerViaExpertise,
@@ -206,4 +220,5 @@ module.exports = {
   getcodingresultService,
   getCustomerExpertiseService,
   getCustomerByEmail,
+  getCustomerJobsService
 };

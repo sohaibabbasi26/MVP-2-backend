@@ -310,6 +310,11 @@ const routes = [
     handler: clientHandlers.getAllCandidatesOfClientJob,
   },
   {
+    method: 'GET',
+    url:'/get-candidate-jobs',
+    handler: customerHandler.getCustomerJobs
+  },
+  {
     method: "POST",
     url: "/logout",
     handler: primaryHandlers.logout,
