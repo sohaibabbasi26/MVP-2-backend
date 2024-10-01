@@ -101,6 +101,13 @@ const getCustomerByEmailHandler=async (req,res)=>{
   res.status(result.status).send({...result})
 }
 
+const getCustomerJobs=async (req,res)=>{
+  const { job_posting_id,candidate_id } = req.query;
+  const result= await getCustomerByEmail(email);
+  res.status(result.status).send({...result})
+}
+
+
 module.exports = {
   getCustomerByEmailHandler,
   getCustomerById,
@@ -109,5 +116,6 @@ module.exports = {
   updateExpertise,
   CustomergettestsHandler,
   GetcodingresultHandler,
-  getCustomerExpertise
+  getCustomerExpertise,
+  getCustomerJobs
 };

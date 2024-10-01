@@ -335,7 +335,7 @@ async function clientLogin(data) {
             status: fetchedClient.dataValues?.status,
             user_role: 'client'
           });
-          
+
           return {
             status: 200,
             message: "Client logged in successfully",
@@ -695,14 +695,15 @@ async function getCustomerResultService({ customer_id }) {
     if (!check) {
       console.log("No customer found with id:", customer_id);
       return {
+        status: 404,
         message: "No such customer available.",
       };
     } else {
       try {
         const result = await Results.findOne({
-          // where: {
-          //   customer_id: customer_id,
-          // },
+          where: {
+            customer_id: customer_id,
+          },
           include: [
             {
               model: Customer,
@@ -725,11 +726,18 @@ async function getCustomerResultService({ customer_id }) {
             },
           ],
         });
-        console.log("the fetched results are:", result?.dataValues);
+
+        if (result?.dataValues) {
+          console.log("the fetched results are:", result?.dataValues);
+          return {
+            status: 200,
+            data: result?.dataValues,
+          };
+        }
         return {
-          status: 200,
-          data: result?.dataValues,
-        };
+          status: 404,
+          message: "Customer has not given test"
+        }
       } catch (err) {
         console.log(
           "Error while finding the client's result:",
@@ -737,6 +745,7 @@ async function getCustomerResultService({ customer_id }) {
           "\nError source: src -> services -> primaryServices.js -> getCustomerResultService"
         );
         return {
+          status: 500,
           message: "Error while finding the client:",
           err,
         };
