@@ -266,6 +266,8 @@ const clientAcceptService = async (body) => {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
     const job_id = body.job_posting_id;
+    const job_status= body?.job_status  //hired or trial
+    const talent_status= body?.talent_status
 
     // Fetch the customer and client records
     const customer = await Customer.findOne({
@@ -297,19 +299,27 @@ const clientAcceptService = async (body) => {
       }
 
       // Update Adminassigned table
-      await Adminassigned.update({
-        where: {
-          job_posting_id: job_id,
+      await Adminassigned.update(
+        {
+          client_response:'accept'
         },
-      });
+        {where: {
+          job_posting_id: job_id,
+        },}
+      );
 
       // Update Customer table
-      await Customer.update({
+      await Customer.update(
+        {
+          talent_status
+        },
+        {
         where: {
           customer_id: customer_id,
         },
       });
 
+      
       // Update Client table with assigned customer if not already assigned
       const assignedCustomers = client.assigned_customers || [];
       const customerExists = assignedCustomers.some(
@@ -332,7 +342,8 @@ const clientAcceptService = async (body) => {
       // Update JobPostings table
       await JobPostings.update(
         {
-          job_status: "trial",
+          job_status,
+          assigned_customer: assignedCustomers
         },
         {
           where: {
@@ -358,7 +369,7 @@ const clientAcceptService = async (body) => {
     console.error("Error in clientAcceptService:", error.message);
     return {
       status: 500,
-      message: "Internal server error",
+      message: error.message,
     };
   }
 };

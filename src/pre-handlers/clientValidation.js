@@ -21,6 +21,14 @@ const client_response_schema = Joi.object({
     "any.required": "job posting id is required",
     "string.base": "job posting must be a string.",
   }),
+  job_status: Joi.string().required().messages({
+    "any.required": "job posting id is required",
+    "string.base": "job posting must be a string.",
+  }),
+  talent_status: Joi.string().required().messages({
+    "any.required": "job posting id is required",
+    "string.base": "job posting must be a string.",
+  }),
   response_status: Joi.string()
     .required()
     .valid("accept", "decline", "pending")
