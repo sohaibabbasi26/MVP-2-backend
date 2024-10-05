@@ -156,12 +156,12 @@ async function clientinterviewhandler(req, res) {
 
 const clientResponseHandler = (req, res) => {
   try {
-    const { customer_id, client_id, job_posting_id, response_status } =
+    const { customer_id, client_id, job_posting_id, response_status, job_status, talent_status } =
       req.body;
 
     switch (response_status) {
       case "decline":
-        declineCustomerService(client_id, customer_id, job_posting_id).then(
+        declineCustomerService(client_id, customer_id, job_posting_id, talent_status,job_status).then(
           (result) => {
             res.status(result.status).send({
               message: result.message,

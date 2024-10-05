@@ -86,8 +86,8 @@ const JobPostings = sequelize.define("job_postings", {
   },
 });
 
-//association
-JobPostings.hasMany(Client, { foreignKey: "client_id" });
-Client.belongsTo(JobPostings, { foreignKey: "client_id" });
+// //association
+// JobPostings.hasMany(Client, { foreignKey: "client_id" });
+// Client.belongsTo(JobPostings, { foreignKey: "client_id" });
 
 module.exports = JobPostings;

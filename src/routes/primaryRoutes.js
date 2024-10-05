@@ -9,6 +9,7 @@ const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
 const resetPasswordValidation = require("../pre-handlers/passwordResetValidation");
+const jobValidation= require('../pre-handlers/jobValidation')
 const jobHandler = require("../handlers/jobHandler");
 const testHandler = require("../handlers/testHandler");
 
@@ -313,6 +314,12 @@ const routes = [
     method: 'GET',
     url:'/get-candidate-jobs',
     handler: customerHandler.getCustomerJobs
+  },
+  {
+    method:'GET',
+    url:'/get-job-candidates',
+    handler: jobHandler.getJobCandidates,
+    preHandler: jobValidation.getHiredCandidatesValidation
   },
   {
     method: "POST",
