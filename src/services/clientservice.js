@@ -179,7 +179,9 @@ const createClientRequestService = async (body) => {
 const declineCustomerService = async (
   client_id,
   customer_id,
-  job_posting_id
+  job_posting_id,
+  talent_status,
+  job_status
 ) => {
   try {
     const client = await Client.findByPk(client_id);
@@ -225,10 +227,11 @@ const declineCustomerService = async (
     customer.update({
       assigned_clients: updated_clients.length > 0 ? updated_clients : null,
       position: updated_position.length > 0 ? updated_position : null,
+      talent_status
     });
 
     job_postings.update({
-      job_status: "open",
+      job_status,
       assigned_customer:
         updated_job_assigned_customers.length > 0
           ? updated_job_assigned_customers
@@ -237,7 +240,7 @@ const declineCustomerService = async (
 
     await Adminassigned.update(
       {
-        client_response: "Decline",
+        client_response: "decline",
       },
       {
         where: {
@@ -266,8 +269,8 @@ const clientAcceptService = async (body) => {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
     const job_id = body.job_posting_id;
-    const job_status= body?.job_status  //hired or trial
-    const talent_status= body?.talent_status
+    const job_status = body?.job_status  //hired or trial
+    const talent_status = body?.talent_status
 
     // Fetch the customer and client records
     const customer = await Customer.findOne({
@@ -284,6 +287,10 @@ const clientAcceptService = async (body) => {
 
     if (customer && client) {
       // Fetch the job posting record
+      //association
+      JobPostings.belongsTo(Client, { foreignKey: "client_id" });
+      Client.hasMany(JobPostings, { foreignKey: "client_id" });
+      
       const jobPosting = await JobPostings.findOne({
         where: {
           job_posting_id: job_id,
@@ -301,11 +308,13 @@ const clientAcceptService = async (body) => {
       // Update Adminassigned table
       await Adminassigned.update(
         {
-          client_response:'accept'
+          client_response: 'accept'
         },
-        {where: {
-          job_posting_id: job_id,
-        },}
+        {
+          where: {
+            job_posting_id: job_id,
+          },
+        }
       );
 
       // Update Customer table
@@ -314,12 +323,12 @@ const clientAcceptService = async (body) => {
           talent_status
         },
         {
-        where: {
-          customer_id: customer_id,
-        },
-      });
+          where: {
+            customer_id: customer_id,
+          },
+        });
 
-      
+
       // Update Client table with assigned customer if not already assigned
       const assignedCustomers = client.assigned_customers || [];
       const customerExists = assignedCustomers.some(
@@ -526,7 +535,7 @@ const getAllCandidatesOfClientJobService = async (
 ) => {
   try {
     let clientJobsWithCandidates = null;
-    if (!customer_id&&!job_posting_id) {
+    if (!customer_id && !job_posting_id) {
       clientJobsWithCandidates = await Adminassigned.findAll({
         where: {
           client_id,
