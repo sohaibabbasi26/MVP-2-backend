@@ -20,18 +20,18 @@ const getJobCandidates = async (query) => {
     JobPostings.belongsTo(Client, { foreignKey: "client_id" });
     Client.hasMany(JobPostings, { foreignKey: "client_id" });
 
-    let res=null
+    let res = null
     if (query?.job_status === 'hired-and-trial') {
-        res= getJobStatusHiredAndTrial(query.client_id)
+        res = getJobStatusHiredAndTrial(query.client_id)
     }
     if (query?.job_status === 'all') {
-        res= getJobStatusAll(query.client_id)
+        res = getJobStatusAll(query.client_id)
     }
-    if(query?.job_status!=='hired-and-trial'&& query?.job_status!='all'){
-        res= getJobStatus(query?.job_status,query?.client_id)
+    if (query?.job_status !== 'hired-and-trial' && query?.job_status != 'all') {
+        res = getJobStatus(query?.job_status, query?.client_id)
     }
 
-    if(res){
+    if (res) {
         return res
     }
     return {
@@ -40,7 +40,7 @@ const getJobCandidates = async (query) => {
     }
 }
 
-const getJobStatus = async (job_status,client_id) => {
+const getJobStatus = async (job_status, client_id) => {
 
     let accepted_candidates = null;
     if (client_id) {
@@ -50,7 +50,7 @@ const getJobStatus = async (job_status,client_id) => {
                 job_status
             }
         });
-    }else{
+    } else {
         accepted_candidates = await JobPostings.findAll({
             where: {
                 job_status
@@ -61,18 +61,19 @@ const getJobStatus = async (job_status,client_id) => {
         });
     }
 
-    if (accepted_candidates && accepted_candidates.length > 0) {
+    if (accepted_candidates && accepted_candidates.length > 0 && accepted_candidates?.assigned_customer && accepted_candidates?.assigned_customer?.length > 0) {
         let result = []
         //get customer info
+        let customer_info = null;
         for (let j = 0; j < accepted_candidates?.length; j++) {
             let job = accepted_candidates[j];
             const assigned_customer = job?.assigned_customer
             for (let i = 0; i < assigned_customer?.length; i++) {
                 customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
             }
-            let days_passed=0;
-            if(job_status==="hired"||job_status==="trial"){
-                days_passed= calculateDays(job?.updatedAt)
+            let days_passed = 0;
+            if (job_status === "hired" || job_status === "trial") {
+                days_passed = calculateDays(job?.updatedAt)
             }
             result.push({
                 customer_info,
@@ -105,7 +106,7 @@ const getJobStatusAll = async (client_id) => {
                 client_id
             }
         });
-    }else{
+    } else {
         accepted_candidates = await JobPostings.findAll({
             include: {
                 model: Client,
@@ -113,8 +114,9 @@ const getJobStatusAll = async (client_id) => {
         });
     }
 
-    if (accepted_candidates && accepted_candidates.length > 0) {
+    if (accepted_candidates && accepted_candidates.length > 0 && accepted_candidates?.assigned_customer && accepted_candidates?.assigned_customer?.length > 0) {
         let result = []
+        let customer_info = null
         //get customer info
         for (let j = 0; j < accepted_candidates?.length; j++) {
             let job = accepted_candidates[j];
@@ -149,7 +151,7 @@ const getJobStatusHiredAndTrial = async (client_id) => {
     if (client_id) {
         accepted_candidates = await JobPostings.findAll({
             where: {
-                [Op.and]:{
+                [Op.and]: {
                     client_id,
                     [Op.or]: {
                         job_status: 'hired',
@@ -158,7 +160,7 @@ const getJobStatusHiredAndTrial = async (client_id) => {
                 }
             }
         });
-    }else{
+    } else {
         accepted_candidates = await JobPostings.findAll({
             where: {
                 [Op.or]: {
@@ -170,25 +172,30 @@ const getJobStatusHiredAndTrial = async (client_id) => {
                 model: Client,
             }
         });
-    }
 
+    }
     if (accepted_candidates && accepted_candidates.length > 0) {
         let result = []
         //get customer info
+        let customer_info = null
         for (let j = 0; j < accepted_candidates?.length; j++) {
-            let job = accepted_candidates[j];
-            const assigned_customer = job?.assigned_customer
-            for (let i = 0; i < assigned_customer?.length; i++) {
-                customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
+            if (accepted_candidates[j].assigned_customer && accepted_candidates[j].assigned_customer?.length > 0) {
+                let job = accepted_candidates[j];
+                const assigned_customer = job?.assigned_customer
+                for (let i = 0; i < assigned_customer?.length; i++) {
+                    customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
+                }
+                const days_passed = calculateDays(job?.updatedAt)
+                result.push({
+                    customer_info,
+                    client: job?.client,
+                    job,
+                    days_passed
+                })
             }
-            const days_passed= calculateDays(job?.updatedAt)
-            result.push({
-                customer_info,
-                client: job?.client,
-                job,
-                days_passed
-            })
         }
+
+        console.log(result)
 
         return {
             status: 200,
