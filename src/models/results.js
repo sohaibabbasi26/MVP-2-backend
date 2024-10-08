@@ -26,7 +26,7 @@ const Result = sequelize.define('results',{
     }
 })
 
-Result.hasOne(Customer,{foreignKey:'customer_id'});
-Customer.belongsTo(Result,{foreignKey:'customer_id'});
+Customer.hasOne(Result,{foreignKey:'customer_id'});
+Result.belongsTo(Customer,{foreignKey:'customer_id'});
 
 module.exports= Result;

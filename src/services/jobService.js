@@ -153,27 +153,28 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
             where: {
                 [Op.and]: {
                     client_id,
-                    [Op.or]: {
-                        job_status: 'hired',
-                        job_status: 'trial'
-                    },
+                    [Op.or]: [
+                        { job_status: 'hired' },
+                        { job_status: 'trial' }
+                    ] 
                 }
             }
         });
     }else{
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                [Op.or]: {
-                    job_status: 'hired',
-                    job_status: 'trial'
+            accepted_candidates = await JobPostings.findAll({
+                where: {
+                    [Op.or]: [
+                        { job_status: 'hired' },
+                        { job_status: 'trial' }
+                    ]            
                 },
-            },
-            include: {
-                model: Client,
-            }
-        });
-
+                include: {
+                    model: Client,
+                }
+            });
+        console.log('else block executed')
     }
+    console.log(accepted_candidates)
     if (accepted_candidates && accepted_candidates.length > 0) {
         let result = []
         //get customer info
@@ -183,7 +184,7 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
                 let job = accepted_candidates[j];
                 const assigned_customer = job?.assigned_customer
                 for (let i = 0; i < assigned_customer?.length; i++) {
-                    if(candidate_id){
+                    if(candidate_id && assigned_customer[i].customer_id===candidate_id){
                         customer_info = await Customer.findByPk(candidate_id)
                     }else{
 
