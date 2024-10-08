@@ -22,7 +22,7 @@ const getJobCandidates = async (query) => {
 
     let res = null
     if (query?.job_status === 'hired-and-trial') {
-        res = getJobStatusHiredAndTrial(query.client_id)
+        res = getJobStatusHiredAndTrial(query.client_id, query?.candidate_id)
     }
     if (query?.job_status === 'all') {
         res = getJobStatusAll(query.client_id)
@@ -145,7 +145,7 @@ const getJobStatusAll = async (client_id) => {
 
 }
 
-const getJobStatusHiredAndTrial = async (client_id) => {
+const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
 
     let accepted_candidates = null;
     if (client_id) {
@@ -160,7 +160,7 @@ const getJobStatusHiredAndTrial = async (client_id) => {
                 }
             }
         });
-    } else {
+    }else{
         accepted_candidates = await JobPostings.findAll({
             where: {
                 [Op.or]: {
@@ -183,7 +183,12 @@ const getJobStatusHiredAndTrial = async (client_id) => {
                 let job = accepted_candidates[j];
                 const assigned_customer = job?.assigned_customer
                 for (let i = 0; i < assigned_customer?.length; i++) {
-                    customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
+                    if(candidate_id){
+                        customer_info = await Customer.findByPk(candidate_id)
+                    }else{
+
+                        customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
+                    }
                 }
                 const days_passed = calculateDays(job?.updatedAt)
                 result.push({
