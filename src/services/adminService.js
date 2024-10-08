@@ -127,17 +127,17 @@ async function assigningCustomerservice(body) {
         position.push({ job_posting_id: body.job_posting_id });
       }
 
-      // await JobPostings.update(
-      //   {
-      //     job_status: "hired",
-      //     assigned_customer: assignedCustomers,
-      //   },
-      //   {
-      //     where: {
-      //       job_posting_id: body.job_posting_id,
-      //     },
-      //   }
-      // );
+      await JobPostings.update(
+        {
+          //job_status: "interviewing",
+          assigned_customer: assignedCustomers,
+        },
+        {
+          where: {
+            job_posting_id: body.job_posting_id,
+          },
+        }
+      );
 
       await Customer.update(
         {

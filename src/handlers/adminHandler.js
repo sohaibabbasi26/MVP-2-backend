@@ -102,7 +102,7 @@ async function getcustomerwithclientid(req, res) {
     if (data) {
       res.send(data);
     } else {
-      res.status(404).send({ message: "Customer not found" });
+      res.status(404).send({ message: "Client not found" });
     }
   } catch (error) {
     console.log(
