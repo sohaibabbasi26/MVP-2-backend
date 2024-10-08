@@ -100,6 +100,10 @@ async function verificationOfAnswers(dataArray) {
 }
 
 function countWords(str) {
+    // Check if str is a valid string, otherwise return 0
+    if (typeof str !== 'string') {
+        return 0;
+    }
     const words = str.trim().split(/\s+/);
     return words.length;
 }
