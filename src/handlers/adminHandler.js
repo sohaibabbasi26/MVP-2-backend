@@ -65,29 +65,9 @@ async function assigningCustomerHandler(req, res) {
 async function scheduleinterviewhandler(req, res) {
   try {
     const data = req.body;
-    if (!data.customer_id) {
-      return res.status(400).send({
-        message: "customer_id must not be empty",
-      });
-    }
-    if (!data.customer_email) {
-      return res.status(400).send({
-        message: "customer_email must not be empty",
-      });
-    }
-    if (!data.interview_time) {
-      return res.status(400).send({
-        message: "interview_time must not be empty",
-      });
-    }
-    if (!data.interview_date) {
-      return res.status(400).send({
-        message: "interview_date must not be empty",
-      });
-    } else {
       const result = await admin_interview_scheduling_service(data);
-      res.send(result);
-    }
+      res.status(result.status).send({...result});
+    
   } catch (error) {
     console.log(`Error while posting ${error}`);
     res.status(500).send({ message: "Internal Server Error" });

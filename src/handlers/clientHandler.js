@@ -14,6 +14,7 @@ const {
   getCandidatesOfClientService,
   getAllCandidatesOfClientJobService,
   getClientByEmail,
+  getNotificationClientService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -217,6 +218,11 @@ const getStripeAccount= async(req,res)=>{
   res.status(result.status).send({...result})
 }
 
+const getNotificationClient= async(req,res)=>{
+  const result= await getNotificationClientService(req.query?.client_id);
+  res.status(result.status).send({...result})
+}
+
 module.exports = {
   clients,
   client_updateprofile,
@@ -230,5 +236,6 @@ module.exports = {
   getJobviaclientIdAndJobIdHandler,
   getCandidatesOfClient,
   getAllCandidatesOfClientJob,
-  getClientByEmailHandler
+  getClientByEmailHandler,
+  getNotificationClient
 };

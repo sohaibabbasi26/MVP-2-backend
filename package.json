@@ -27,6 +27,7 @@
     "@sequelize/core": "^7.0.0-alpha.37",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
+    "bull": "^4.16.3",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "install": "^0.13.0",

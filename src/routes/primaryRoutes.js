@@ -63,7 +63,7 @@ const routes = [
   },
   {
     method: "POST",
-    url: "/scheduling-interview",
+    url: "/schedule-interview",
     handler: adminHandler.scheduleinterviewhandler,
     prehandler: adminValidation.validate_InterviewScheduleSchema,
   },
@@ -327,6 +327,11 @@ const routes = [
     handler: primaryHandlers.logout,
     //preHandler: authValidation.validateTakeTestBody,
   },
+  {
+    method: "GET",
+    url: "/get-client-notification",
+    handler: clientHandlers.getNotificationClient,
+  }
 ];
 
 module.exports = { routes };

@@ -7,6 +7,17 @@ const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const { Sequelize } = require("sequelize");
 const JobPostings = require("../models/jobPostings");
+const { NotificationClient } = require("../models/notification_client");
+
+const scheduleInterview = async (body, interviewDate) => {
+  const notificationDate = new Date(interviewDate);
+  notificationDate.setDate(notificationDate.getDate() + 1); // Schedule for one day later
+
+  const notification = await NotificationClient.create(body);
+
+  console.log('Notification scheduled:', notification);
+  return notification
+};
 
 //Interview scheduling
 async function admin_interview_scheduling_service(body) {
@@ -16,40 +27,81 @@ async function admin_interview_scheduling_service(body) {
         customer_id: body.customer_id,
       },
     });
+
+    const job = await JobPostings.findOne({
+      where: {
+        job_posting_id: body.job_posting_id,
+      },
+    });
     if (data) {
       const schedule = await AdminInterview.create(body);
-      if (schedule) {
-        const emailData = {
-          to: body.customer_email,
-          subject: "Interview Scheduled",
-          text: `Dear Candidate,
-                      
-Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
-              
-Thank you,
-Co-VenTech`,
 
-          user_role: `customer`,
-        };
+      if(schedule){
+        const notification= scheduleInterview({
+          job_posting_id: body?.job_posting_id,
+          message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
+          client_id: body?.client_id,
+          customer_id: body?.customer_id,
+          notification_type: 'trial'
+        }, body?.interview_date)
+        // const notification= NotificationClient.create({
+        //   job_posting_id: body?.job_posting_id,
+        //   message: `Your interview with candidate ${data?.name} for the job ${job?.job_posting_id} has been completed. Do you want to accept that candidate for TRIAL?`,
+        //   client_id: body?.client_id,
+        //   customer_id: body?.customer_id,
+        //   notification_type: 'trial'
+        // })
 
-        // Send the email
-        await sendMail(
-          { body: emailData },
-          {
-            send: (result) => console.log(result),
-            status: (code) => ({ send: (message) => console.log(message) }),
+        if(!notification){
+          return {
+            status: 401,
+            message: 'notification not created'
           }
-        );
-
-        return { message: "Successfully Scheduled an Interview" };
-      } else {
-        return { message: "Table not created" };
+        }
       }
-    } else {
-      return { message: "customer not existed in database" };
+      return {
+        status: 200,
+        message: 'interview is scheduled successfully'
+      }
+      //       if (schedule) {
+      //         const emailData = {
+      //           to: body.customer_email,
+      //           subject: "Interview Scheduled",
+      //           text: `Dear Candidate,
+
+      // Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
+
+      // Thank you,
+      // Co-VenTech`,
+
+      //           user_role: `customer`,
+      //         };
+
+      //         // Send the email
+      //         await sendMail(
+      //           { body: emailData },
+      //           {
+      //             send: (result) => console.log(result),
+      //             status: (code) => ({ send: (message) => console.log(message) }),
+      //           }
+      //         );
+
+      //         return { message: "Successfully Scheduled an Interview" };
+      //       } else {
+      //         return { message: "Table not created" };
+      //       }
     }
+    return {
+      status: 404,
+      message: "customer not existed in database"
+    };
+
   } catch (error) {
     console.log(`Error while inserting data ${error}`);
+    return {
+      status: 500,
+      message: error.message
+    }
   }
 }
 
@@ -188,7 +240,7 @@ async function getcustomerwithid(client_id) {
           model: Customer,
           Client,
           as: "customer",
-          attributes: ["customer_id", "name", "email","experience","hourly_rate","commitment","position"],
+          attributes: ["customer_id", "name", "email", "experience", "hourly_rate", "commitment", "position"],
         },
         {
           model: Client,

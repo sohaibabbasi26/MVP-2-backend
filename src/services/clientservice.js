@@ -7,6 +7,7 @@ const ClientInterview = require("../models/client_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
 const JobPostings = require("../models/jobPostings");
 const Payment_Client = require("../models/payment_client");
+const { NotificationClient } = require("../models/notification_client");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -651,6 +652,34 @@ const getClientByEmail = async (email) => {
   }
 };
 
+const getNotificationClientService= async(client_id)=>{
+  try{
+
+    const notification= await NotificationClient.findAll({
+      where:{
+        client_id
+      }
+    })
+
+    if(!notification){
+      return {
+        status: 400,
+        message: "no notifications yet"
+      }
+    }
+    return {
+      status: 200,
+      message: "notification fetched successfully",
+      data: notification
+    }
+  }catch(e){
+    return {
+      status: 500,
+      message: e.message
+    }
+  }
+}
+
 module.exports = {
   getClientByEmail,
   getClientByIdService,
@@ -667,4 +696,5 @@ module.exports = {
   getClientStripeAccountService,
   getCandidatesOfClientService,
   getAllCandidatesOfClientJobService,
+  getNotificationClientService
 };
