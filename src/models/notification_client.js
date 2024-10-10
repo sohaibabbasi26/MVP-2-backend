@@ -46,6 +46,10 @@ const NotificationClient = sequelize.define('notification_client', {
             key: 'customer_id'
         }
     },
+    is_accepted:{
+        type: DataTypes.BOOLEAN,
+        allowNull: true
+    }
     // schedule_time: {
     //     type: DataTypes.DATE,
     // }

@@ -53,8 +53,9 @@ async function registerClientHandler(req, res) {
 async function assigningCustomerHandler(req, res) {
   try {
     const data = req.body;
+    console.log(data)
     const result = await assigningCustomerservice(data);
-    res.send(result);
+    res.status(result.status).send({...result});
   } catch (error) {
     console.error("Error in adminassignedhandler:", error.message);
     res.status(500).send({ error: error.message });
