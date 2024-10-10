@@ -19,13 +19,13 @@ const AdminInterview = sequelize.define("admin_interviews", {
     onDelete: "CASCADE",
   },
   interview_date: {
-    type: DataTypes.DATEONLY,
+    type: DataTypes.DATE,
     //interview_time
     defaultValue: DataTypes.NOW,
     allowNull: false,
   },
   interview_time: {
-    type: DataTypes.TIME,
+    type: DataTypes.STRING,
     allowNull: false,
   },
 });

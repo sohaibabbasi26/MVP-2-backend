@@ -2,9 +2,10 @@ const Joi = require("joi");
 //schedule interview
 const interviewScheduleschema = Joi.object({
   customer_id: Joi.string().min(2).max(50).required(),
-  customer_email: Joi.string().email().required(),
+  //customer_email: Joi.string().email().required(),
   interview_time: Joi.string().required(),
   interview_date: Joi.date().required(),
+  job_posting_id: Joi.string().required(),
 });
 
 //Admin will assign customer to client

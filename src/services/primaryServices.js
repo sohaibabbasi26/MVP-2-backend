@@ -34,6 +34,7 @@ const {
 const { generateCodeQues } = require("../utilities/generateCodeQues");
 const transporter = require("../../configurations/gmailConfig");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
+const { where } = require("sequelize");
 
 async function customerSignupGoogle(data) {
   try {
@@ -709,10 +710,10 @@ async function getCustomerResultService({ customer_id }) {
         ],
       });
 
-      if(!result){
+      if (!result) {
         return {
           status: 404,
-          message:'results not found'
+          message: 'results not found'
         };
       }
 
@@ -721,70 +722,70 @@ async function getCustomerResultService({ customer_id }) {
         data: result,
       };
     }
-      const check = await Customer.findOne({
-        where: {
-          customer_id: customer_id,
-        },
-      });
+    const check = await Customer.findOne({
+      where: {
+        customer_id: customer_id,
+      },
+    });
 
-      if (!check) {
-        console.log("No customer found with id:", customer_id);
-        return {
-          status: 404,
-          message: "No such customer available.",
-        };
-      } else {
-        try {
-          result = await Results.findOne({
-            where: {
-              customer_id: customer_id,
-            },
-            include: [
-              {
-                model: Customer,
-                on: {
-                  customer_id: customer_id,
-                },
-                attributes: [
-                  "customer_id",
-                  "name",
-                  "email",
-                  "specialization",
-                  "experience",
-                  "hourly_rate",
-                  "commitment",
-                  "expertise",
-                  "job_type",
-                  "experience",
-                  "position",
-                ],
+    if (!check) {
+      console.log("No customer found with id:", customer_id);
+      return {
+        status: 404,
+        message: "No such customer available.",
+      };
+    } else {
+      try {
+        result = await Results.findOne({
+          where: {
+            customer_id: customer_id,
+          },
+          include: [
+            {
+              model: Customer,
+              on: {
+                customer_id: customer_id,
               },
-            ],
-          });
+              attributes: [
+                "customer_id",
+                "name",
+                "email",
+                "specialization",
+                "experience",
+                "hourly_rate",
+                "commitment",
+                "expertise",
+                "job_type",
+                "experience",
+                "position",
+              ],
+            },
+          ],
+        });
 
-          if (result?.dataValues) {
-            console.log("the fetched results are:", result?.dataValues);
-            return {
-              status: 200,
-              data: result?.dataValues,
-            };
-          }
+        if (result?.dataValues) {
+          console.log("the fetched results are:", result?.dataValues);
           return {
-            status: 404,
-            message: "Customer has not given test"
-          }
-        } catch (err) {
-          console.log(
-            "Error while finding the client's result:",
-            err,
-            "\nError source: src -> services -> primaryServices.js -> getCustomerResultService"
-          );
-          return {
-            status: 500,
-            message: "Error while finding the client:",
-            err,
+            status: 200,
+            data: result?.dataValues,
           };
         }
+        return {
+          status: 404,
+          message: "Customer has not given test"
+        }
+      } catch (err) {
+        console.log(
+          "Error while finding the client's result:",
+          err,
+          "\nError source: src -> services -> primaryServices.js -> getCustomerResultService"
+        );
+        return {
+          status: 500,
+          message: "Error while finding the client:",
+          err,
+        };
+      }
 
     }
   } catch (err) {
@@ -942,19 +943,33 @@ async function setExperienceService({ experience, customer_id }) {
 }
 
 async function updatecustomer_service(body, customer_id) {
-  const data = await Customer.findOne({
-    where: {
-      customer_id: customer_id,
-    },
-  });
-  if (!data) {
-    console.log(
-      "customer not found => src->services->customer->updatecustomer_service"
-    );
-  }
 
-  await data.update(body);
-  return body;
+  const result = await Customer.update(
+    body,
+    {
+      where: {
+        customer_id: customer_id,
+      },
+    }
+  );
+
+  if(result){
+    return body
+  }
+  return null
+// const data = await Customer.findOne({
+//   where: {
+//     customer_id: customer_id,
+//   },
+// });
+// if (!data) {
+//   console.log(
+//     "customer not found => src->services->customer->updatecustomer_service"
+//   );
+// }
+
+// await data.update(body);
+return body;
 }
 
 module.exports = {
