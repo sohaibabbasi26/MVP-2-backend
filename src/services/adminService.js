@@ -5,9 +5,10 @@ const Customer = require("../models/customer");
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 const JobPostings = require("../models/jobPostings");
 const { NotificationClient } = require("../models/notification_client");
+const Result = require("../models/results");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -22,6 +23,7 @@ const scheduleInterview = async (body, interviewDate) => {
 //Interview scheduling
 async function admin_interview_scheduling_service(body) {
   try {
+    //console.log(body)
     const data = await Customer.findOne({
       where: {
         customer_id: body.customer_id,
@@ -36,8 +38,8 @@ async function admin_interview_scheduling_service(body) {
     if (data) {
       const schedule = await AdminInterview.create(body);
 
-      if(schedule){
-        const notification= scheduleInterview({
+      if (schedule) {
+        const notification = scheduleInterview({
           job_posting_id: body?.job_posting_id,
           message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
           client_id: body?.client_id,
@@ -52,7 +54,7 @@ async function admin_interview_scheduling_service(body) {
         //   notification_type: 'trial'
         // })
 
-        if(!notification){
+        if (!notification) {
           return {
             status: 401,
             message: 'notification not created'
@@ -111,13 +113,16 @@ async function assigningCustomerservice(body) {
   try {
     const existingAssignment = await Adminassigned.findOne({
       where: {
-        client_id: body.client_id,
-        customer_id: body.customer_id,
-        job_posting_id: body.job_posting_id,
+        [Op.and]: [
+          { client_id: body?.client_id },
+          { customer_id: body?.customer_id },
+          { job_posting_id: body?.job_posting_id },
+        ]
       },
     });
     if (existingAssignment) {
       return {
+        status: 409,
         message: `Customer is already assigned to this client for the given job posting.`,
       };
     }
@@ -150,78 +155,108 @@ async function assigningCustomerservice(body) {
     //   };
     // }
 
-    if (customer && client && jobPosting) {
-      let position = customer.position || [];
-      let assignedClients = customer.assigned_clients || [];
-      let assignedCustomers = client.assigned_customers || [];
+    console.log("/////////////////////", customer)
+    console.log("!!!!!!!!!!!!!!!!!!!!!", client)
+    console.log("@@@@@@@@@@@@@@@@@@", jobPosting)
 
-      // Check if the client_id already exists in assignedClients
-      const clientExists = assignedClients.some(
-        (assignedClient) => assignedClient.client_id === body.client_id
-      );
-      if (!clientExists) {
-        assignedClients.push({ client_id: body.client_id });
+    if (!customer) {
+      return {
+        status: 404,
+        message: "customer not found"
       }
-
-      // Check if the customer_id already exists in assignedCustomers
-      const customerExists = assignedCustomers.some(
-        (assignedCustomer) => assignedCustomer.customer_id === body.customer_id
-      );
-      if (!customerExists) {
-        assignedCustomers.push({ customer_id: body.customer_id });
-      }
-
-      // Check if the job_posting_id already exists in position
-      const jobPostingExists = position.some(
-        (pos) => pos.job_posting_id === body.job_posting_id
-      );
-      if (!jobPostingExists) {
-        position.push({ job_posting_id: body.job_posting_id });
-      }
-
-      await JobPostings.update(
-        {
-          //job_status: "interviewing",
-          assigned_customer: assignedCustomers,
-        },
-        {
-          where: {
-            job_posting_id: body.job_posting_id,
-          },
-        }
-      );
-
-      await Customer.update(
-        {
-          talent_status: "interviewing",
-          position: position,
-          assigned_clients: assignedClients,
-          hourly_rate: body.hourly_rate
-        },
-        {
-          where: {
-            customer_id: body.customer_id,
-          },
-        }
-      );
-
-      await Client.update(
-        {
-          assigned_customers: assignedCustomers,
-        },
-        {
-          where: {
-            client_id: body.client_id,
-          },
-        }
-      );
     }
 
+    if (!client && jobPosting) {
+      return {
+        status: 404,
+        message: "client not found"
+      }
+    }
+
+    if (!jobPosting) {
+      return {
+        status: 404,
+        message: "job post not found"
+      }
+    }
+    let position = customer.position || [];
+    let assignedClients = customer.assigned_clients || [];
+    let assignedCustomers = client.assigned_customers || [];
+
+    // Check if the client_id already exists in assignedClients
+    const clientExists = assignedClients.some(
+      (assignedClient) => assignedClient.client_id === body.client_id
+    );
+    if (!clientExists) {
+      assignedClients.push({ client_id: body.client_id });
+    }
+
+    // Check if the customer_id already exists in assignedCustomers
+    const customerExists = assignedCustomers.some(
+      (assignedCustomer) => assignedCustomer.customer_id === body.customer_id
+    );
+    if (!customerExists) {
+      assignedCustomers.push({ customer_id: body.customer_id });
+    }
+
+    // Check if the job_posting_id already exists in position
+    const jobPostingExists = position.some(
+      (pos) => pos.job_posting_id === body.job_posting_id
+    );
+    if (!jobPostingExists) {
+      position.push({ job_posting_id: body.job_posting_id });
+    }
+
+    console.log("////////////////////////////////////////////////////////", assignedCustomers)
+    await JobPostings.update(
+      {
+        //job_status: "interviewing",
+        assigned_customer: assignedCustomers,
+      },
+      {
+        where: {
+          job_posting_id: body.job_posting_id,
+        },
+      }
+    );
+
+    await Customer.update(
+      {
+        talent_status: "interviewing",
+        position: position,
+        assigned_clients: assignedClients,
+        hourly_rate: body.hourly_rate
+      },
+      {
+        where: {
+          customer_id: body.customer_id,
+        },
+      }
+    );
+
+    await Client.update(
+      {
+        assigned_customers: assignedCustomers,
+      },
+      {
+        where: {
+          client_id: body.client_id,
+        },
+      }
+    );
     const data = await Adminassigned.create(body);
-    return { data, message: `Customer is assigned to Client` };
+    return {
+      status: 200,
+      data, message: `Customer is assigned to Client`
+    };
+
+
   } catch (e) {
     console.error(`Error while creating data: ${e.message}`, e);
-    throw e;
+    return {
+      status: 500,
+      message: e.message
+    }
   }
 }
 
@@ -263,6 +298,14 @@ async function getcustomerwithid(client_id) {
         },
       ],
     });
+
+    const customer_id = result?.customer?.customer_id;
+    const customer_result = Result.findOne({
+      where: {
+        customer_id
+      }
+    })
+
     return result;
   } catch (error) {
     console.log(

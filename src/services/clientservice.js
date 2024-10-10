@@ -252,11 +252,34 @@ const declineCustomerService = async (
       }
     );
 
+    await NotificationClient.update(
+      {
+        is_accepted: false,
+      },
+      {
+        where: {
+          [Op.and]: [
+            { job_posting_id },
+            {customer_id: customer_id},
+            {
+              [Op.or]: [
+                { notification_type: 'trial' },
+                { notification_type: 'hire' }
+              ]
+            }
+          ]
+
+        }
+      }
+    )
+
+
     return {
       status: 200,
       message: "customer has been deleted",
     };
   } catch (error) {
+    console.log(error)
     return {
       status: 500,
       message: error.message,
@@ -291,7 +314,7 @@ const clientAcceptService = async (body) => {
       //association
       JobPostings.belongsTo(Client, { foreignKey: "client_id" });
       Client.hasMany(JobPostings, { foreignKey: "client_id" });
-      
+
       const jobPosting = await JobPostings.findOne({
         where: {
           job_posting_id: job_id,
@@ -361,6 +384,42 @@ const clientAcceptService = async (body) => {
           },
         }
       );
+
+      if (body?.job_status === 'trial') {
+        await NotificationClient.update(
+          {
+            is_accepted: true,
+          },
+          {
+            where: {
+              [Op.and]: [
+                { job_posting_id: job_id },
+                {customer_id: body?.customer_id},
+                { notification_type: 'trial' }
+              ]
+
+            }
+          }
+        )
+      }
+
+      if (body?.job_status === 'hired') {
+        await NotificationClient.update(
+          {
+            is_accepted: true,
+          },
+          {
+            where: {
+              [Op.and]: [
+                { job_posting_id: job_id },
+                {customer_id: body?.customer_id},
+                { notification_type: 'hire' }
+              ]
+
+            }
+          }
+        )
+      }
 
       console.log("Update successful");
       return {
@@ -652,16 +711,16 @@ const getClientByEmail = async (email) => {
   }
 };
 
-const getNotificationClientService= async(client_id)=>{
-  try{
+const getNotificationClientService = async (client_id) => {
+  try {
 
-    const notification= await NotificationClient.findAll({
-      where:{
+    const notification = await NotificationClient.findAll({
+      where: {
         client_id
       }
     })
 
-    if(!notification){
+    if (!notification) {
       return {
         status: 400,
         message: "no notifications yet"
@@ -672,7 +731,7 @@ const getNotificationClientService= async(client_id)=>{
       message: "notification fetched successfully",
       data: notification
     }
-  }catch(e){
+  } catch (e) {
     return {
       status: 500,
       message: e.message

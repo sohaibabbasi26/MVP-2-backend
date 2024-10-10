@@ -6,6 +6,7 @@ const interviewScheduleschema = Joi.object({
   interview_time: Joi.string().required(),
   interview_date: Joi.date().required(),
   job_posting_id: Joi.string().required(),
+  client_id: Joi.string().required(),
 });
 
 //Admin will assign customer to client
