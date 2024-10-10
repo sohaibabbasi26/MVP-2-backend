@@ -299,12 +299,12 @@ async function getcustomerwithid(client_id) {
       ],
     });
 
-    const customer_id = result?.customer?.customer_id;
-    const customer_result = Result.findOne({
-      where: {
-        customer_id
-      }
-    })
+    // const customer_id = result?.customer?.customer_id;
+    // const customer_result = Result.findOne({
+    //   where: {
+    //     customer_id
+    //   }
+    // })
 
     return result;
   } catch (error) {

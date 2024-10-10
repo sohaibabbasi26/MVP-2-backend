@@ -794,7 +794,10 @@ async function getCustomerResultService({ customer_id }) {
       err,
       "\nError source: src -> services -> primaryServices.js -> getCustomerResultService"
     );
-    return "Error while finding the requested client's info:", err;
+    return {
+      status: 500,
+      message: "Error while finding the requested client's info:"+ err
+    };
   }
 }
 
