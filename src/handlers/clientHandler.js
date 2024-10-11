@@ -219,7 +219,7 @@ const getStripeAccount= async(req,res)=>{
 }
 
 const getNotificationClient= async(req,res)=>{
-  const result= await getNotificationClientService(req.query?.client_id);
+  const result= await getNotificationClientService(req.query?.client_id, req.query?.today_date);
   res.status(result.status).send({...result})
 }
 
