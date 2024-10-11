@@ -27,9 +27,12 @@ const serverInit = () => {
     origin: process.env.ALLOWED_CLIENT || "*",
   });
 
-  routes.forEach((route) => {
-    fastify.route(route);
-  });
+  // Register routes with /v1 prefix
+  fastify.register(async function (fastifyInstance) {
+    routes.forEach((route) => {
+      fastifyInstance.route(route);
+    });
+  }, { prefix: "/v1" });  // Add the /v1 prefix here
 
   syncModels();
   const jwtSecret = generateJwtSecret();
