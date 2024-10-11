@@ -740,12 +740,16 @@ const getNotificationClientService = async (client_id, date) => {
     for (let n of notification) {
       const notificationData = n.dataValues;
       const sendDate = new Date(notificationData.send_date).toISOString(); //remove toISOString() for the logic of 1 day
-      const send_minute= sendDate.split(':')[1] //remove this code for 1 day
+      let send_minute= sendDate.split(':')[1] //remove this code for 1 day
       const date_minute= date.split(':')[1]  // remove this code for 1 day
       console.log(parseInt(send_minute)+4) // remove this code for 1 day
       console.log(date_minute)  // remove this code for 1 day
+      send_minute= parseInt(send_minute)+4;
+      if(send_minute>59){  // case: if the send minute passes 1 hour, so it would be 60, but date_minute would consider 0
+        send_minute=0;
+      }
 
-      if (!notificationData.is_sent && parseInt(send_minute)+4 <= parseInt(date_minute)) {
+      if (!notificationData.is_sent && send_minute <= parseInt(date_minute)) {
         // If send_date has passed, mark the notification as sent
         await n.update({ is_sent: true });
         console.log(`Notification sent for client ${client_id} on ${inputDate}`);
