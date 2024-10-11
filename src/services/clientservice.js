@@ -260,7 +260,7 @@ const declineCustomerService = async (
         where: {
           [Op.and]: [
             { job_posting_id },
-            {customer_id: customer_id},
+            { customer_id: customer_id },
             {
               [Op.or]: [
                 { notification_type: 'trial' },
@@ -394,7 +394,7 @@ const clientAcceptService = async (body) => {
             where: {
               [Op.and]: [
                 { job_posting_id: job_id },
-                {customer_id: body?.customer_id},
+                { customer_id: body?.customer_id },
                 { notification_type: 'trial' }
               ]
 
@@ -412,7 +412,7 @@ const clientAcceptService = async (body) => {
             where: {
               [Op.and]: [
                 { job_posting_id: job_id },
-                {customer_id: body?.customer_id},
+                { customer_id: body?.customer_id },
                 { notification_type: 'hire' }
               ]
 
@@ -711,33 +711,86 @@ const getClientByEmail = async (email) => {
   }
 };
 
-const getNotificationClientService = async (client_id) => {
+const getNotificationClientService = async (client_id, date) => {
   try {
 
-    const notification = await NotificationClient.findAll({
-      where: {
-        client_id
-      }
-    })
-
-    if (!notification) {
+    if (!date) {
       return {
         status: 400,
-        message: "no notifications yet"
-      }
+        message: "Invalid date"
+      };
     }
+
+    const notification = await NotificationClient.findAll({
+      where: { client_id }
+    });
+
+    if (!notification || notification.length === 0) {
+      return {
+        status: 400,
+        message: "No notifications yet"
+      };
+    }
+
+    const client_notifications = [];
+
+    // Parse input date to a Date object for comparison
+    const inputDate = new Date(date);
+
+    for (let n of notification) {
+      const notificationData = n.dataValues;
+      const sendDate = new Date(notificationData.send_date).toISOString(); //remove toISOString() for the logic of 1 day
+      const send_minute= sendDate.split(':')[1] //remove this code for 1 day
+      const date_minute= date.split(':')[1]  // remove this code for 1 day
+      console.log(parseInt(send_minute)+4) // remove this code for 1 day
+      console.log(date_minute)  // remove this code for 1 day
+
+      if (!notificationData.is_sent && parseInt(send_minute)+4 <= parseInt(date_minute)) {
+        // If send_date has passed, mark the notification as sent
+        await n.update({ is_sent: true });
+        console.log(`Notification sent for client ${client_id} on ${inputDate}`);
+      } 
+      
+      if(notificationData.is_sent){
+        client_notifications.push(notificationData);
+      }
+
+      // Check if the notification is not sent yet
+      //this is for code after 1 day
+      // if (!notificationData.is_sent) {
+      //   // Compare send_date using getTime() to avoid millisecond issues
+      //   const sendDate = new Date(notificationData.send_date);
+      //   const inputDateObj = new Date(date);
+
+
+      //   //this is for code after 1 day
+      //   if (sendDate.getFullYear() === inputDateObj.getFullYear() &&
+      //     sendDate.getMonth() === inputDateObj.getMonth() &&
+      //     sendDate.getDate() === inputDateObj.getDate()) {
+      //     await n.update({ is_sent: true });
+      //     console.log(`Notification sent for client ${client_id} on ${date}`);
+      //   }
+        
+      // } 
+      
+      // if(notificationData.is_sent){
+      //   client_notifications.push(notificationData);
+      // }
+    }
+
     return {
       status: 200,
-      message: "notification fetched successfully",
-      data: notification
-    }
+      message: "Notifications fetched successfully",
+      data: client_notifications
+    };
   } catch (e) {
     return {
       status: 500,
       message: e.message
-    }
+    };
   }
-}
+};
+
 
 module.exports = {
   getClientByEmail,

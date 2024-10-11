@@ -3,7 +3,6 @@ const { sequelize } = require("../../configurations/sequelizePgSQL");
 const Client = require("./client");
 const JobPostings = require("./jobPostings");
 const Customer = require("./customer");
-const cron= require('node-cron');
 
 const NotificationClient = sequelize.define('notification_client', {
     notification_id: {
@@ -46,32 +45,33 @@ const NotificationClient = sequelize.define('notification_client', {
             key: 'customer_id'
         }
     },
-    is_accepted:{
+    is_accepted: {
         type: DataTypes.BOOLEAN,
         allowNull: true
+    },
+    send_date: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    is_sent:{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
-    // schedule_time: {
-    //     type: DataTypes.DATE,
-    // }
 }, {
-    // hooks: {
-    //     afterCreate: async (notification, options) => {
-    //         // Schedule interview one day after insertion
-    //         //const oneDayLater = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-    //         const fiveMinutesLater= new Date(new Date().getTime() + 5 * 60 * 1000);
+    hooks: {
+        beforeCreate: (notification, options) => {
+            // // Set send_date to 1 day after the current date
+            // const oneDayLater = new Date();
+            // oneDayLater.setDate(oneDayLater.getDate() + 1);
+            // notification.send_date = oneDayLater;
 
-    //         cron.schedule(fiveMinutesLater, async () => {
-    //             // Trigger interview scheduling logic
-    //             console.log(`Scheduling interview for client ${notification.client_id} after 1 day.`);
-
-    //             // Example: Update status or send an interview invite
-    //             await NotificationClient.update(
-    //                 { notification_type: 'interview_scheduled' },
-    //                 { where: { notification_id: notification.notification_id } }
-    //             );
-    //         });
-    //     }
-    // }
+            // Set send_date to 1 minute after the current date
+            const oneMinuteLater = new Date();
+            oneMinuteLater.setMinutes(oneMinuteLater.getMinutes() + 1);
+            notification.send_date = oneMinuteLater;
+        }
+    }
 });
 
 NotificationClient.hasMany(Client, {
@@ -79,8 +79,8 @@ NotificationClient.hasMany(Client, {
 });
 Client.belongsTo(NotificationClient, {
     foreignKey: 'client_id'
-})
+});
 
-module.exports={
+module.exports = {
     NotificationClient
-}
+};
