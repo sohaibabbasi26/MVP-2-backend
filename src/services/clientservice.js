@@ -609,6 +609,7 @@ const getAllCandidatesOfClientJobService = async (
               "customer_id",
               "name",
               "email",
+              "talent_status",
               "experience",
               "hourly_rate",
               "commitment",

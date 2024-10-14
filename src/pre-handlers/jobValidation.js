@@ -4,7 +4,7 @@ const getHiredCandidatesSchema= Joi.object({
     job_posting_id: Joi.string().optional(),
     client_id: Joi.string().optional(),
     candidate_id: Joi.string().optional(),
-    job_status: Joi.string().allow('hired','trial','qualified','not-qualified','hired-and-trial','all'),
+    job_status: Joi.string().allow('hired','trial','qualified','not-qualified','hired-and-trial','all').required(),
 })
 
 const getHiredCandidatesValidation= (req,res,next)=>{
