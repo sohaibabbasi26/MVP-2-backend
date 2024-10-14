@@ -599,6 +599,10 @@ const getAllCandidatesOfClientJobService = async (
       clientJobsWithCandidates = await Adminassigned.findAll({
         where: {
           client_id,
+          [Op.or]:[
+            {client_response:'accept'},
+            {client_response:'pending'}
+          ]
         },
         include: [
           {
