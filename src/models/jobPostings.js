@@ -80,6 +80,10 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  hourly_rate:{
+    type: DataTypes.INTEGER,
+    defaultValue:0
+  },
   workday_overlap: {
     type: DataTypes.STRING,
     allowNull: false,

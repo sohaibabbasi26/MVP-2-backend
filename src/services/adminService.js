@@ -213,6 +213,7 @@ async function assigningCustomerservice(body) {
       {
         //job_status: "interviewing",
         assigned_customer: assignedCustomers,
+        hourly_rate: body?.hourly_rate
       },
       {
         where: {
