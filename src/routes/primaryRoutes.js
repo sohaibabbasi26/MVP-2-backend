@@ -312,8 +312,8 @@ const routes = [
   },
   {
     method: 'GET',
-    url:'/get-candidate-jobs',
-    handler: customerHandler.getCustomerJobs
+    url:'/get-jobs',
+    handler: customerHandler.getJobs
   },
   {
     method:'GET',
