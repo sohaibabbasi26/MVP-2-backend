@@ -117,7 +117,6 @@ async function assigningCustomerservice(body) {
           { client_id: body?.client_id },
           { customer_id: body?.customer_id },
           { job_posting_id: body?.job_posting_id },
-          { hourly_rate: body?.hourly_rate }
         ]
       },
     });
