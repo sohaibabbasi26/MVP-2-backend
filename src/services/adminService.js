@@ -267,9 +267,7 @@ async function getcustomerwithid(client_id) {
     const result = await Adminassigned.findOne({
       where: {
         client_id,
-        client_response: {
-          [Sequelize.Op.or]: ["accept", "pending"],
-        },
+        client_response:'pending'
       },
       include: [
         {
