@@ -697,6 +697,7 @@ async function getCustomerResultService({ customer_id }) {
               "customer_id",
               "name",
               "email",
+              "talent_status",
               "specialization",
               "experience",
               "hourly_rate",

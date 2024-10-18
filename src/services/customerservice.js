@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const Customer = require("../models/customer");
 const Test = require("../models/test");
 const CodingResults = require("../models/codingResults");
+const Adminassigned = require("../models/admin_assigned_client_customer");
 //get coding_test result of a customer
 const getcodingresultService = async (customer_id) => {
   try {
@@ -121,6 +122,8 @@ async function getallcustomers(customer_id) {
   }
 }
 
+
+
 const getCustomerByEmail = async (email) => {
   try {
     const customer = await Customer.findOne({
@@ -197,13 +200,32 @@ const getCustomerExpertiseService = async (customer_id) => {
   };
 };
 
-const getCustomerJobsService=(job_posting_id,candidate_id)=>{
-  try{
+const getJobsService = async (job_posting_id, talent_status) => {
+
+  try {
+    const customer = await Adminassigned.findOne({
+      where: {
+        [Op.and]: [
+          //{ customer_id: candidate_id },
+          { job_posting_id }
+        ]
+      },
+      include:[
+        {
+          model: Customer,
+          as:'customer',
+          on:{
+            talent_status
+          }
+        }
+      ]
+    })
     return {
       status: 200,
-      message: "customer jobs fetched successfully"
+      message: "customer jobs fetched successfully",
+      data: customer
     }
-  }catch(err){
+  } catch (err) {
     return {
       status: 500,
       message: err.message
@@ -220,5 +242,5 @@ module.exports = {
   getcodingresultService,
   getCustomerExpertiseService,
   getCustomerByEmail,
-  getCustomerJobsService
+  getJobsService
 };

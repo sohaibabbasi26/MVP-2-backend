@@ -1,5 +1,6 @@
 const fastify = require("fastify")({
   logger: true,
+  bodyLimit: 1048576 * 150, // resolve error 413
 });
 const { routes } = require("../src/routes/primaryRoutes");
 require("dotenv").config();
@@ -24,7 +25,9 @@ fastify.register(fastifySession, {
 
 const serverInit = () => {
   fastify.register(cors, {
-    origin: process.env.ALLOWED_CLIENT || "*",
+    origin: process.env.ALLOWED_CLIENT,
+    methods: ["GET", "POST", "PUT","DELETE"],
+    credentials: true,
   });
 
   // Register routes with /v1 prefix

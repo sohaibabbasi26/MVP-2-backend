@@ -44,6 +44,10 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
     defaultValue: "pending",
     allowNull: false,
   },
+  hourly_rate:{
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   comments: {
     type: DataTypes.STRING,
     allowNull: true,

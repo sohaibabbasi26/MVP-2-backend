@@ -7,6 +7,7 @@ const {
   getcodingresultService,
   getCustomerExpertiseService,
   getCustomerByEmail,
+  getJobsService,
 } = require("../services/customerservice");
 //get coding_result of customer
 const GetcodingresultHandler = async (req, res) => {
@@ -101,9 +102,9 @@ const getCustomerByEmailHandler=async (req,res)=>{
   res.status(result.status).send({...result})
 }
 
-const getCustomerJobs=async (req,res)=>{
-  const { job_posting_id,candidate_id } = req.query;
-  const result= await getCustomerByEmail(email);
+const getJobs=async (req,res)=>{
+  const { job_posting_id, talent_status } = req.query;
+  const result= await getJobsService(job_posting_id, talent_status);
   res.status(result.status).send({...result})
 }
 
@@ -117,5 +118,5 @@ module.exports = {
   CustomergettestsHandler,
   GetcodingresultHandler,
   getCustomerExpertise,
-  getCustomerJobs
+  getJobs
 };

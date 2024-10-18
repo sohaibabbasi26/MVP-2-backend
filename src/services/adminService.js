@@ -212,6 +212,7 @@ async function assigningCustomerservice(body) {
       {
         //job_status: "interviewing",
         assigned_customer: assignedCustomers,
+        hourly_rate: body?.hourly_rate
       },
       {
         where: {
@@ -225,7 +226,7 @@ async function assigningCustomerservice(body) {
         talent_status: "interviewing",
         position: position,
         assigned_clients: assignedClients,
-        hourly_rate: body.hourly_rate
+        //hourly_rate: body.hourly_rate
       },
       {
         where: {
@@ -266,9 +267,7 @@ async function getcustomerwithid(client_id) {
     const result = await Adminassigned.findOne({
       where: {
         client_id,
-        client_response: {
-          [Sequelize.Op.or]: ["accept", "pending"],
-        },
+        client_response:'pending'
       },
       include: [
         {
