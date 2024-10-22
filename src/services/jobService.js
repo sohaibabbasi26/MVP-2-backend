@@ -161,6 +161,7 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
             }
         });
     } else {
+        //for admin and candidate
         accepted_candidates = await JobPostings.findAll({
             where: {
                 [Op.or]: [
@@ -174,21 +175,31 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
         });
         console.log('else block executed')
     }
-    console.log(accepted_candidates)
     if (accepted_candidates && accepted_candidates.length > 0) {
         let result = []
         //get customer info
         let customer_info = null
         for (let j = 0; j < accepted_candidates?.length; j++) {
+            //check if there's assigned customer or not
             if (accepted_candidates[j].assigned_customer && accepted_candidates[j].assigned_customer?.length > 0) {
                 let job = accepted_candidates[j];
+                //extract array of assigned customer from column
                 const assigned_customer = job?.assigned_customer
-                for (let i = 0; i < assigned_customer?.length; i++) {
-                    if (candidate_id && assigned_customer[i].customer_id === candidate_id) {
-                        customer_info = await Customer.findByPk(candidate_id)
-                    } else {
+                console.log(assigned_customer)
+                let customer_info;
+                const candidateExists = assigned_customer?.some(
+                    customer => customer.customer_id === candidate_id?.toString()
+                );
 
-                        customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
+                if (candidateExists) {
+                    console.log("candidate_id found");
+                    customer_info = await Customer.findByPk(candidate_id);
+                } 
+                else {
+                    for (let i = 0; i < assigned_customer?.length; i++) {
+                        customer_info = await Customer.findByPk(assigned_customer[i].customer_id);
+                        // You might want to break the loop if you only need the first customer info.
+                        break;
                     }
                 }
                 const days_passed = calculateDays(job?.updatedAt)
@@ -201,7 +212,6 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
             }
         }
 
-        console.log(result)
 
         return {
             status: 200,
