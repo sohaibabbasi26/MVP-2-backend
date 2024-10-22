@@ -9,6 +9,7 @@ const { generateJwtSecret } = require("../src/utilities/jwtSecretGenerator");
 const cors = require("@fastify/cors");
 const fastifyCookie = require("@fastify/cookie");
 const fastifySession = require("@fastify/session");
+const fastifyMultipart = require('@fastify/multipart');
 
 fastify.register(fastifyCookie); // Register this first
 
@@ -26,9 +27,16 @@ fastify.register(fastifySession, {
 const serverInit = () => {
   fastify.register(cors, {
     origin: process.env.ALLOWED_CLIENT,
-    methods: ["GET", "POST", "PUT","DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   });
+
+  fastify.register(fastifyMultipart, {
+    limits: {
+      files: 7,
+      fileSize: 150 * 1024 * 1024, // Set file size limit to 150MB
+    }
+  })
 
   // Register routes with /v1 prefix
   fastify.register(async function (fastifyInstance) {
