@@ -52,10 +52,18 @@ async function customerSignupGoogle(data) {
           email,
         };
         const result = await Customer.create(newData);
-        jwtSignature(result?.dataValues);
+        const token = await jwtSignature({
+          name: result?.name,
+          email: result?.email,
+          id: result?.customer_id,
+          status: result?.status,
+          user_role: 'customer'
+        });
         return {
           status: 200,
-          message: '"User has been created successfully."',
+          message: "customer has been created successfully.",
+          customer_id: result.customer_id,
+          token
         };
       } catch (err) {
         console.log(
@@ -101,11 +109,18 @@ async function customerSignup(data) {
           //contact_no,
         };
         const result = await Customer.create(newData);
-        jwtSignature(result?.dataValues);
+        const token = await jwtSignature({
+          name: result?.name,
+          email: result?.email,
+          id: result?.customer_id,
+          status: result?.status,
+          user_role: 'customer'
+        });
         return {
           status: 200,
-          message: "User has been created successfully.",
-          customer_id: result?.customer_id
+          message: "customer has been created successfully.",
+          customer_id: result.customer_id,
+          token
         };
       } catch (err) {
         console.log(
@@ -142,11 +157,18 @@ async function clientSignupGoogle(data) {
           email,
         };
         const result = await Client.create(newData);
-        jwtSignature(result?.dataValues);
+        const token = await jwtSignature({
+          name: result?.name,
+          email: result?.email,
+          id: result?.client_id,
+          status: result?.status,
+          user_role: 'client'
+        });
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
           client_id: result.client_id,
+          token
         };
       } catch (err) {
         console.log(
@@ -197,11 +219,18 @@ async function clientSignup(data) {
           //contact_no,
         };
         const result = await Client.create(newData);
-        jwtSignature(result?.dataValues);
+        const token = await jwtSignature({
+          name: result?.name,
+          email: result?.email,
+          id: result?.client_id,
+          status: result?.status,
+          user_role: 'client'
+        });
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
           client_id: result.client_id,
+          token
         };
       } catch (err) {
         console.log(
