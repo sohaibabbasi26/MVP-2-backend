@@ -104,7 +104,8 @@ async function customerSignup(data) {
         jwtSignature(result?.dataValues);
         return {
           status: 200,
-          message: '"User has been created successfully."',
+          message: "User has been created successfully.",
+          customer_id: result?.customer_id
         };
       } catch (err) {
         console.log(
