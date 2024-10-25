@@ -380,6 +380,22 @@ const logout = (req, res) => {
   res.status(200).send({ message: "Logout successful" });
 };
 
+const checkInterviewStatus = async (req,res)=>{
+  try{
+    const {client_id, customer_id, job_posting_id}= req?.query;
+    const result= await services.isInterviewScheduledService(client_id,job_posting_id,customer_id);
+    res.status(200).send({
+      status: 200,
+      data:{
+        is_scheduled: result
+      }
+    })
+  }catch(e){
+    res.status(500).send({
+      message: e.message
+    })
+  }
+}
 module.exports = {
   serverCheck,
   signupGoogle,
@@ -398,4 +414,5 @@ module.exports = {
   customer_updateprofile,
   checkRole,
   logout,
+  checkInterviewStatus
 };
