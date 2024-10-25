@@ -34,7 +34,8 @@ const {
 const { generateCodeQues } = require("../utilities/generateCodeQues");
 const transporter = require("../../configurations/gmailConfig");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
+const { NotificationClient } = require("../models/notification_client");
 
 async function customerSignupGoogle(data) {
   try {
@@ -991,22 +992,26 @@ async function updatecustomer_service(body, customer_id) {
     return body
   }
   return null
-// const data = await Customer.findOne({
-//   where: {
-//     customer_id: customer_id,
-//   },
-// });
-// if (!data) {
-//   console.log(
-//     "customer not found => src->services->customer->updatecustomer_service"
-//   );
-// }
+}
 
-// await data.update(body);
-return body;
+const isInterviewScheduledService= async(client_id, job_posting_id, customer_id)=>{
+  const result= await NotificationClient.findOne({
+    where:{
+      [Op.and]:[
+        {job_posting_id},
+        {client_id},
+        {customer_id}
+      ]
+    }
+  });
+  if(result){
+    return true;
+  }
+  return false
 }
 
 module.exports = {
+  isInterviewScheduledService,
   customerSignupGoogle,
   customerSignup,
   clientSignupGoogle,

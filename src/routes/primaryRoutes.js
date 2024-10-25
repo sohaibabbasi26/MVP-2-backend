@@ -333,6 +333,11 @@ const routes = [
     method: "GET",
     url: "/get-client-notification",
     handler: clientHandlers.getNotificationClient,
+  },
+  {
+    method:'GET',
+    url:'/check-interview-status',
+    handler: primaryHandlers.checkInterviewStatus
   }
 ];
 
