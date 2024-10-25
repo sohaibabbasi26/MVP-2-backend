@@ -178,7 +178,7 @@ async function sendMail(req, res) {
   try {
     const { to, subject, text } = req.body;
     const mailOptions = {
-      from: "sobiabbasi22@gmail.com",
+      from: "co.ventech01@gmail.com",
       to,
       subject,
       text,
