@@ -383,7 +383,7 @@ const logout = (req, res) => {
 const checkInterviewStatus = async (req,res)=>{
   try{
     const {client_id, customer_id, job_posting_id}= req?.query;
-    const result= await services.isInterviewScheduledService(client_id,job_posting_id,customer_id);
+    const result= await services?.isInterviewScheduledService(client_id,job_posting_id,customer_id);
     res.status(200).send({
       status: 200,
       data:{
