@@ -6,7 +6,18 @@ const Client = require("../models/client");
 const { calculateDays } = require("../utilities/calculateDays");
 
 const getAllJobsService = async () => {
-    const result = await JobPostings.findAll();
+    Client.hasOne(JobPostings,{foreignKey:'client_id'});
+    JobPostings.belongsTo(Client,{foreignKey:'client_id'})
+    const result = await JobPostings.findAll({
+        include:[
+            {
+                model: Client,
+                attributes:{
+                    exclude:['password']
+                }
+            }
+        ]
+    });
     return {
         status: 200,
         result

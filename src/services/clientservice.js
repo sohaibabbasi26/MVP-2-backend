@@ -41,7 +41,19 @@ async function getJobviaclientIdAndJobIdService(client_id, job_posting_id) {
 //Client Api
 async function getallclients(req, res) {
   try {
-    const result = await Client.findAll();
+    Client.hasMany(JobPostings,{foreignKey:'client_id'});
+    JobPostings.belongsTo(Client,{foreignKey:'client_id'});
+
+    const result = await Client.findAll({
+      include:[
+        {
+          model: JobPostings
+        }
+      ],
+      attributes:{
+        exclude:['password']
+      }
+    });
     return result;
   } catch (error) {
     console.log(
