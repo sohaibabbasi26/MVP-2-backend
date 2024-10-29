@@ -4,16 +4,17 @@ const JobPostings = require("../models/jobPostings");
 const Customer = require("../models/customer");
 const Client = require("../models/client");
 const { calculateDays } = require("../utilities/calculateDays");
+const { JobHistory } = require("../models/job_history");
 
 const getAllJobsService = async () => {
-    Client.hasOne(JobPostings,{foreignKey:'client_id'});
-    JobPostings.belongsTo(Client,{foreignKey:'client_id'})
+    Client.hasOne(JobPostings, { foreignKey: 'client_id' });
+    JobPostings.belongsTo(Client, { foreignKey: 'client_id' })
     const result = await JobPostings.findAll({
-        include:[
+        include: [
             {
                 model: Client,
-                attributes:{
-                    exclude:['password']
+                attributes: {
+                    exclude: ['password']
                 }
             }
         ]
@@ -205,7 +206,7 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
                 if (candidateExists) {
                     console.log("candidate_id found");
                     customer_info = await Customer.findByPk(candidate_id);
-                } 
+                }
                 else {
                     for (let i = 0; i < assigned_customer?.length; i++) {
                         customer_info = await Customer.findByPk(assigned_customer[i].customer_id);
@@ -238,7 +239,72 @@ const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
 
 }
 
+const closeJobService = async (body) => {
+    try {
+
+        await JobPostings.update({
+            job_status: 'closed'
+        }, {
+            where: {
+                job_posting_id: body?.job_posting_id
+            }
+        })
+
+        await JobHistory.update({
+            end_date: Date.now(),
+            job_status: 'closed'
+        }, {
+            where: {
+                job_posting_id: body?.job_posting_id
+            }
+        })
+        return {
+            status: 200,
+            message: "job has been closed"
+        }
+    } catch (e) {
+        return {
+            status: 500,
+            message: e.message
+        }
+    }
+}
+
+const getClosedJobService = async (query) => {
+    try {
+
+        JobPostings.hasMany(JobHistory, { foreignKey: 'job_posting_id' });
+        JobHistory.belongsTo(JobPostings, { foreignKey: 'job_posting_id' })
+        let job_histories = null;
+        if (query?.customer_id != null) {
+            job_histories = await JobHistory.findAll({
+                where: {
+                    customer_id: query?.customer_id
+                },
+                include: [
+                    {
+                        model: JobPostings,
+                    }
+                ]
+            });
+            console.log(job_histories)
+        }
+        return {
+            status: 200,
+            message: "job hiostories fetched",
+            data: job_histories
+        }
+    } catch (e) {
+        return {
+            status: 500,
+            message: e.message
+        }
+    }
+}
+
 module.exports = {
     getAllJobsService,
-    getJobCandidates
+    getJobCandidates,
+    closeJobService,
+    getClosedJobService
 }

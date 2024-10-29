@@ -9,6 +9,7 @@ const JobPostings = require("../models/jobPostings");
 const Payment_Client = require("../models/payment_client");
 const { NotificationClient } = require("../models/notification_client");
 const Result = require("../models/results");
+const { JobHistory } = require("../models/job_history");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -431,7 +432,14 @@ const clientAcceptService = async (body) => {
 
             }
           }
-        )
+        );
+        await JobHistory.create({
+          client_id,
+          customer_id,
+          start_date: Date.now(),
+          job_status: 'hired',
+          job_posting_id: job_id
+        });
       }
 
       console.log("Update successful");
