@@ -275,6 +275,8 @@ const getClosedJobService = async (query) => {
 
         JobPostings.hasMany(JobHistory, { foreignKey: 'job_posting_id' });
         JobHistory.belongsTo(JobPostings, { foreignKey: 'job_posting_id' })
+        Client.hasOne(JobHistory, { foreignKey: 'client_id' });
+        JobHistory.belongsTo(Client, { foreignKey: 'client_id' })
         let job_histories = null;
         if (query?.customer_id != null) {
             job_histories = await JobHistory.findAll({
@@ -284,6 +286,12 @@ const getClosedJobService = async (query) => {
                 include: [
                     {
                         model: JobPostings,
+                    },
+                    {
+                        model: Client,
+                        attributes:{
+                            exclude:['password']
+                        }
                     }
                 ]
             });
