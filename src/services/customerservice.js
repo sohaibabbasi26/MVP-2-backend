@@ -3,6 +3,7 @@ const Customer = require("../models/customer");
 const Test = require("../models/test");
 const CodingResults = require("../models/codingResults");
 const Adminassigned = require("../models/admin_assigned_client_customer");
+const JobPostings = require("../models/jobPostings");
 //get coding_test result of a customer
 const getcodingresultService = async (customer_id) => {
   try {
@@ -94,10 +95,10 @@ async function customerUpdateExpertise(body) {
   }
 }
 //customers Api
-async function getallcustomers(customer_id) {
+async function getallcustomers(query) {
   try {
     let result = null;
-    if (customer_id) result = await Customer.findByPk(customer_id);
+    if (query?.customer_id) result = await Customer.findByPk(query?.customer_id);
     else {
       result = await Customer.findAll();
     }
@@ -203,23 +204,30 @@ const getCustomerExpertiseService = async (customer_id) => {
 const getJobsService = async (job_posting_id, talent_status) => {
 
   try {
-    const customer = await Adminassigned.findOne({
+    const job = await JobPostings.findOne({
       where: {
-        [Op.and]: [
-          //{ customer_id: candidate_id },
-          { job_posting_id }
-        ]
+        job_posting_id
       },
-      include:[
-        {
-          model: Customer,
-          as:'customer',
-          on:{
-            talent_status
-          }
-        }
-      ]
+      // include:[
+      //   {
+      //     model: Customer,
+      //     as:'customer',
+      //     on:{
+      //       talent_status
+      //     }
+      //   }
+      // ]
+    });
+
+    const assigned_customer= job.assigned_customer[0].customer_id;
+  
+    const customer= await Customer.findOne({
+      where:{
+        customer_id: assigned_customer,
+        talent_status
+      }
     })
+
     return {
       status: 200,
       message: "customer jobs fetched successfully",

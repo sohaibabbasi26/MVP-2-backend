@@ -113,19 +113,45 @@ async function assigningCustomerservice(body) {
   try {
     const existingAssignment = await Adminassigned.findOne({
       where: {
-        [Op.and]: [
-          { client_id: body?.client_id },
-          { customer_id: body?.customer_id },
-          { job_posting_id: body?.job_posting_id },
-        ]
+        client_id: body?.client_id
+        // [Op.and]: [
+        //   { client_id: body?.client_id },
+        //   { customer_id: body?.customer_id },
+        //   { job_posting_id: body?.job_posting_id },
+        //   {
+        //     [Op.or]: [
+        //       { client_response: 'pending' },
+        //       { client_response: 'accept' },
+        //     ]
+        //   }
+        // ]
       },
     });
-    if (existingAssignment) {
-      return {
-        status: 409,
-        message: `Customer is already assigned to this client for the given job posting.`,
-      };
+
+    if (existingAssignment!==null) {
+      if (existingAssignment?.customer_id === body?.customer_id &&
+        existingAssignment?.job_posting_id === body?.job_posting_id &&
+        (existingAssignment?.client_response === 'pending' || existingAssignment?.client_response === 'accept')) {
+        return {
+          status: 409,
+          message: `Customer is already assigned to this client for the given job posting.`,
+        };
+      }
+
+      if (existingAssignment.customer_id !== body?.customer_id &&
+        existingAssignment.job_posting_id === body?.job_posting_id) {
+        existingAssignment.update({
+          customer_id: body?.customer_id,
+          client_response: 'pending'
+        })
+      } else {
+        await Adminassigned.create(body)
+      }
+    }else {
+      await Adminassigned.create(body)
     }
+
+
     const customer = await Customer.findOne({
       where: {
         customer_id: body.customer_id,
@@ -155,10 +181,6 @@ async function assigningCustomerservice(body) {
     //   };
     // }
 
-    console.log("/////////////////////", customer)
-    console.log("!!!!!!!!!!!!!!!!!!!!!", client)
-    console.log("@@@@@@@@@@@@@@@@@@", jobPosting)
-
     if (!customer) {
       return {
         status: 404,
@@ -177,6 +199,15 @@ async function assigningCustomerservice(body) {
       return {
         status: 404,
         message: "job post not found"
+      }
+    }
+
+    console.log(jobPosting)
+
+    if (jobPosting?.assigned_customer?.length > 0 || jobPosting?.assigned_customer !== null) {
+      return {
+        status: 400,
+        message: "you already assigned previous candidate"
       }
     }
     let position = customer.position || [];
@@ -210,7 +241,7 @@ async function assigningCustomerservice(body) {
     console.log("////////////////////////////////////////////////////////", assignedCustomers)
     await JobPostings.update(
       {
-        //job_status: "interviewing",
+        job_status: "interviewing",
         assigned_customer: assignedCustomers,
         hourly_rate: body?.hourly_rate
       },
@@ -245,10 +276,10 @@ async function assigningCustomerservice(body) {
         },
       }
     );
-    const data = await Adminassigned.create(body);
+    //const data = await Adminassigned.create(body);
     return {
       status: 200,
-      data, message: `Customer is assigned to Client`
+      message: `Customer is assigned to Client`
     };
 
 
@@ -267,7 +298,7 @@ async function getcustomerwithid(client_id) {
     const result = await Adminassigned.findOne({
       where: {
         client_id,
-        client_response:'pending'
+        client_response: 'pending'
       },
       include: [
         {

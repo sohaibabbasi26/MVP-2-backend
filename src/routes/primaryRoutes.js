@@ -338,6 +338,16 @@ const routes = [
     method:'GET',
     url:'/check-interview-status',
     handler: primaryHandlers.checkInterviewStatus
+  },
+  {
+    method: 'POST',
+    url:'/close-job',
+    handler: jobHandler.closeJob
+  },
+  {
+    method: 'GET',
+    url:'/get-job-history',
+    handler: jobHandler.getClosedJobs
   }
 ];
 
