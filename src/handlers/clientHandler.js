@@ -15,13 +15,14 @@ const {
   getAllCandidatesOfClientJobService,
   getClientByEmail,
   getNotificationClientService,
+  clientCloseJobService,
 } = require("../services/clientservice");
 
 //Client Api
 async function clients(req, res) {
   try {
-    const data = await getallclients();
-    res.send(data);
+    const data = await getallclients(req.query?.client_id);
+    res.status(data.status).send({...data});
   } catch (error) {
     console.log(`Error while getting clients data ${error}`);
     return;
@@ -186,6 +187,13 @@ const clientResponseHandler = (req, res) => {
           });
         });
         break;
+      case "close":
+        clientCloseJobService(req.body).then((result) => {
+          res.status(result.status).send({
+            message: result.message,
+            body: result.body,
+          });
+        });
       default:
         res.status(400).send({
           message: "invalid response status",

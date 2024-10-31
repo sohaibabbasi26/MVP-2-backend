@@ -40,22 +40,55 @@ async function getJobviaclientIdAndJobIdService(client_id, job_posting_id) {
   }
 }
 //Client Api
-async function getallclients(req, res) {
+async function getallclients(client_id) {
   try {
-    Client.hasMany(JobPostings,{foreignKey:'client_id'});
-    JobPostings.belongsTo(Client,{foreignKey:'client_id'});
 
-    const result = await Client.findAll({
-      include:[
-        {
-          model: JobPostings
+    Client.hasMany(JobPostings, { foreignKey: 'client_id' });
+    JobPostings.belongsTo(Client, { foreignKey: 'client_id' });
+
+    let result = null;
+    if(client_id){
+      result= await Client.findOne({
+        where:{
+          client_id
+        },
+        include: [
+          {
+            model: JobPostings,
+            on:{
+              client_id
+            }
+          }
+        ],
+        attributes: {
+          exclude: ['password']
         }
-      ],
-      attributes:{
-        exclude:['password']
+      });
+    }else{
+      result = await Client.findAll({
+        include: [
+          {
+            model: JobPostings
+          }
+        ],
+        attributes: {
+          exclude: ['password']
+        }
+      });
+    }
+
+    if(result===null){
+      return {
+        status: 404,
+        message: "no client found"
       }
-    });
-    return result;
+    }
+    
+    return {
+      status: 200,
+      message: "client found",
+      data: result
+    };
   } catch (error) {
     console.log(
       `Error while retrieving client data => src->services->clientservice${error}->getallclients`
@@ -530,6 +563,83 @@ const clientPendingService = async (body) => {
   }
 };
 
+const clientCloseJobService = async (body) => {
+  try {
+    const customer_id = body.customer_id;
+    const client_id = body.client_id;
+    const job_id = body.job_posting_id;
+
+    //Updating Customer_Table
+    const customer = await Customer.findOne({
+      where: {
+        customer_id: customer_id,
+      },
+    });
+    //Updating client_Table
+    const client = await Client.findOne({
+      where: {
+        client_id: client_id,
+      },
+    });
+    if (customer && client) {
+      await Adminassigned.update(
+        {
+          client_response: "closed",
+        },
+        {
+          where: {
+            job_posting_id: body.job_posting_id,
+          },
+        }
+      );
+      await JobPostings.update(
+        {
+          status: "closed",
+          job_status: "closed",
+        },
+        {
+          where: {
+            job_posting_id: job_id,
+          },
+        }
+      );
+      await Customer.update(
+        {
+          job_status: "open",
+        },
+        {
+          where: {
+            customer_id: customer_id,
+          },
+        }
+      );
+
+      await JobHistory.update({
+        end_date: Date.now(),
+        status: "closed"
+      }, {
+        where: {
+          client_id,
+          customer_id,
+          job_posting_id: job_id
+        }
+      })
+
+      console.log("Update successful");
+      return {
+        status: 200,
+        message: "Client has added customer in Pending",
+        body,
+      };
+    } else {
+      console.log("Customer not found");
+      return;
+    }
+  } catch (error) {
+    console.error("Error in clientAccept Service:", error.message);
+  }
+};
+
 const createClientStripeAccountService = async (body) => {
   const { client_id, stripe_id } = body;
   let msg = null;
@@ -776,9 +886,9 @@ const getNotificationClientService = async (client_id, date) => {
 
     await NotificationClient.update({
       is_sent: true,
-      
-    },{
-      where:{
+
+    }, {
+      where: {
         client_id
       }
     });
@@ -797,8 +907,8 @@ const getNotificationClientService = async (client_id, date) => {
     // }
 
     //const client_notifications = [];
-    const client_notifications= await NotificationClient.findAll({
-      where:{
+    const client_notifications = await NotificationClient.findAll({
+      where: {
         client_id
       }
     })
@@ -882,5 +992,6 @@ module.exports = {
   getClientStripeAccountService,
   getCandidatesOfClientService,
   getAllCandidatesOfClientJobService,
-  getNotificationClientService
+  getNotificationClientService,
+  clientCloseJobService
 };
