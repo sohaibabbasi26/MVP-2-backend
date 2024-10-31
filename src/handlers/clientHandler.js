@@ -15,6 +15,7 @@ const {
   getAllCandidatesOfClientJobService,
   getClientByEmail,
   getNotificationClientService,
+  clientCloseJobService,
 } = require("../services/clientservice");
 
 //Client Api
@@ -186,6 +187,13 @@ const clientResponseHandler = (req, res) => {
           });
         });
         break;
+      case "close":
+        clientCloseJobService(req.body).then((result) => {
+          res.status(result.status).send({
+            message: result.message,
+            body: result.body,
+          });
+        });
       default:
         res.status(400).send({
           message: "invalid response status",

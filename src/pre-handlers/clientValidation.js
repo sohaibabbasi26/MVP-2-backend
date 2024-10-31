@@ -31,7 +31,7 @@ const client_response_schema = Joi.object({
   }),
   response_status: Joi.string()
     .required()
-    .valid("accept", "decline", "pending")
+    .valid("accept", "decline", "pending","close")
     .messages({
       "any.required": "Response status is required.",
       "string.base": "response status must be a string.",
