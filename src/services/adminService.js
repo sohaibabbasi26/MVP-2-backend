@@ -111,6 +111,7 @@ async function admin_interview_scheduling_service(body) {
 
 async function assigningCustomerservice(body) {
   try {
+    let shouldCreateNewAdminAssigned= true;
     const existingAssignment = await Adminassigned.findOne({
       where: {
         client_id: body?.client_id
@@ -138,17 +139,13 @@ async function assigningCustomerservice(body) {
         };
       }
 
-      if (existingAssignment.customer_id !== body?.customer_id &&
-        existingAssignment.job_posting_id === body?.job_posting_id) {
+      if (existingAssignment.customer_id !== body?.customer_id && existingAssignment.job_posting_id === body?.job_posting_id) {
         existingAssignment.update({
           customer_id: body?.customer_id,
           client_response: 'pending'
         })
-      } else {
-        await Adminassigned.create(body)
-      }
-    }else {
-      await Adminassigned.create(body)
+        shouldCreateNewAdminAssigned= false;
+      } 
     }
 
 
@@ -205,11 +202,13 @@ async function assigningCustomerservice(body) {
     console.log(jobPosting)
 
     if (jobPosting?.assigned_customer?.length > 0 || jobPosting?.assigned_customer !== null) {
+      shouldCreateNewAdminAssigned=false;
       return {
         status: 400,
         message: "you already assigned previous candidate"
       }
     }
+
     let position = customer.position || [];
     let assignedClients = customer.assigned_clients || [];
     let assignedCustomers = client.assigned_customers || [];
@@ -237,7 +236,7 @@ async function assigningCustomerservice(body) {
     if (!jobPostingExists) {
       position.push({ job_posting_id: body.job_posting_id });
     }
-
+    
     console.log("////////////////////////////////////////////////////////", assignedCustomers)
     await JobPostings.update(
       {
@@ -265,7 +264,10 @@ async function assigningCustomerservice(body) {
         },
       }
     );
-
+    
+    if(shouldCreateNewAdminAssigned){
+      await Adminassigned.create(body);
+    }
     await Client.update(
       {
         assigned_customers: assignedCustomers,
