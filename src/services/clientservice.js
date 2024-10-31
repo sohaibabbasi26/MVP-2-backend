@@ -40,22 +40,55 @@ async function getJobviaclientIdAndJobIdService(client_id, job_posting_id) {
   }
 }
 //Client Api
-async function getallclients(req, res) {
+async function getallclients(client_id) {
   try {
+
     Client.hasMany(JobPostings, { foreignKey: 'client_id' });
     JobPostings.belongsTo(Client, { foreignKey: 'client_id' });
 
-    const result = await Client.findAll({
-      include: [
-        {
-          model: JobPostings
+    let result = null;
+    if(client_id){
+      result= await Client.findOne({
+        where:{
+          client_id
+        },
+        include: [
+          {
+            model: JobPostings,
+            on:{
+              client_id
+            }
+          }
+        ],
+        attributes: {
+          exclude: ['password']
         }
-      ],
-      attributes: {
-        exclude: ['password']
+      });
+    }else{
+      result = await Client.findAll({
+        include: [
+          {
+            model: JobPostings
+          }
+        ],
+        attributes: {
+          exclude: ['password']
+        }
+      });
+    }
+
+    if(result===null){
+      return {
+        status: 404,
+        message: "no client found"
       }
-    });
-    return result;
+    }
+    
+    return {
+      status: 200,
+      message: "client found",
+      data: result
+    };
   } catch (error) {
     console.log(
       `Error while retrieving client data => src->services->clientservice${error}->getallclients`

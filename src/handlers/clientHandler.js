@@ -21,8 +21,8 @@ const {
 //Client Api
 async function clients(req, res) {
   try {
-    const data = await getallclients();
-    res.send(data);
+    const data = await getallclients(req.query?.client_id);
+    res.status(data.status).send({...data});
   } catch (error) {
     console.log(`Error while getting clients data ${error}`);
     return;
