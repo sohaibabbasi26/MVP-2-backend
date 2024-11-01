@@ -28,9 +28,9 @@ const closeJob= async(req,res)=>{
     })
 }
 
-const getClosedJobs= async(req,res)=>{
+const getJobHistory= async(req,res)=>{
     
-    const result= await jobService.getClosedJobService(req?.query);
+    const result= await jobService.getJobHistoryService(req?.query);
     res.status(result.status).send({...result})
 }
 
@@ -38,5 +38,5 @@ module.exports={
     getAllJobs,
     getJobCandidates,
     closeJob,
-    getClosedJobs
+    getJobHistory
 }

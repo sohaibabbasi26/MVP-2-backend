@@ -270,7 +270,7 @@ const closeJobService = async (body) => {
     }
 }
 
-const getClosedJobService = async (query) => {
+const getJobHistoryService = async (query) => {
     try {
 
         JobPostings.hasMany(JobHistory, { foreignKey: 'job_posting_id' });
@@ -299,7 +299,7 @@ const getClosedJobService = async (query) => {
         }
         return {
             status: 200,
-            message: "job hiostories fetched",
+            message: "job histories fetched",
             data: job_histories
         }
     } catch (e) {
@@ -314,5 +314,5 @@ module.exports = {
     getAllJobsService,
     getJobCandidates,
     closeJobService,
-    getClosedJobService
+    getJobHistoryService
 }

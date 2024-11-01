@@ -603,16 +603,7 @@ const clientCloseJobService = async (body) => {
           },
         }
       );
-      await Customer.update(
-        {
-          job_status: "open",
-        },
-        {
-          where: {
-            customer_id: customer_id,
-          },
-        }
-      );
+      await customer.update({job_status: "open",});
 
       await JobHistory.update({
         end_date: Date.now(),
@@ -628,7 +619,7 @@ const clientCloseJobService = async (body) => {
       console.log("Update successful");
       return {
         status: 200,
-        message: "Client has added customer in Pending",
+        message: "Client has added customer in Close",
         body,
       };
     } else {
