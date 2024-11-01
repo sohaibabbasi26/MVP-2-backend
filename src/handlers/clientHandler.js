@@ -194,10 +194,10 @@ const clientResponseHandler = (req, res) => {
             body: result.body,
           });
         });
-      default:
-        res.status(400).send({
-          message: "invalid response status",
-        });
+      // default:
+      //   res.status(400).send({
+      //     message: "invalid response status",
+      //   });
     }
   } catch (err) {
     res.status(500).send({

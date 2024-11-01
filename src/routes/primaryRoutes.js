@@ -344,8 +344,8 @@ const routes = [
   },
   {
     method: 'GET',
-    url:'/get-job-history',
-    handler: jobHandler.getClosedJobs
+    url:'/get-job-history-of-candidate',
+    handler: jobHandler.getJobHistory
   }
 ];
 
