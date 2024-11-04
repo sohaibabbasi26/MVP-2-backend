@@ -7,312 +7,368 @@ const { calculateDays } = require("../utilities/calculateDays");
 const { JobHistory } = require("../models/job_history");
 
 const getAllJobsService = async () => {
-    Client.hasOne(JobPostings, { foreignKey: 'client_id' });
-    JobPostings.belongsTo(Client, { foreignKey: 'client_id' })
-    const result = await JobPostings.findAll({
-        include: [
-            {
-                model: Client,
-                attributes: {
-                    exclude: ['password']
-                }
-            }
-        ]
-    });
-    return {
-        status: 200,
-        result
-    }
-}
+  Client.hasOne(JobPostings, { foreignKey: "client_id" });
+  JobPostings.belongsTo(Client, { foreignKey: "client_id" });
+  const result = await JobPostings.findAll({
+    include: [
+      {
+        model: Client,
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    ],
+  });
+  return {
+    status: 200,
+    result,
+  };
+};
 
 const getJobCandidates = async (query) => {
+  //this will be used by admin
+  //association
+  JobPostings.belongsTo(Client, { foreignKey: "client_id" });
+  Client.hasMany(JobPostings, { foreignKey: "client_id" });
 
-    //this will be used by admin
-    //association
-    JobPostings.belongsTo(Client, { foreignKey: "client_id" });
-    Client.hasMany(JobPostings, { foreignKey: "client_id" });
+  let res = null;
+  if (query?.job_status === "hired-and-trial") {
+    res = getJobStatusHiredAndTrial(query.client_id, query?.candidate_id);
+  }
+  if (
+    query?.job_status === "hired-trial-interviewing" &&
+    query?.job_status !== "hired-and-trial"
+  ) {
+    res = getJobStatusHiredTrialInterviewing(
+      query.client_id,
+      query?.candidate_id
+    );
+  }
+  if (query?.job_status === "all") {
+    res = getJobStatusAll(query.client_id);
+  }
+  if (
+    query?.job_status !== "hired-and-trial" &&
+    query?.job_status != "all" &&
+    query?.job_status !== "hired-trial-interviewing"
+  ) {
+    res = getJobStatus(query?.job_status, query?.client_id);
+  }
 
-    let res = null
-    if (query?.job_status === 'hired-and-trial') {
-        res = getJobStatusHiredAndTrial(query.client_id, query?.candidate_id)
-    }
-    if (query?.job_status === 'all') {
-        res = getJobStatusAll(query.client_id)
-    }
-    if (query?.job_status !== 'hired-and-trial' && query?.job_status != 'all') {
-        res = getJobStatus(query?.job_status, query?.client_id)
-    }
+  if (res) {
+    return res;
+  }
+  return {
+    status: 500,
+    message: "Invalid request",
+  };
+};
 
-    if (res) {
-        return res
+const getJobStatusHiredTrialInterviewing = async (client_id) => {
+  const jobs = await JobPostings.findAll({
+    where: {
+      [Op.and]: {
+        client_id,
+        [Op.or]: [
+          { job_status: "hired" },
+          { job_status: "trial" },
+          { job_status: "interviewing" },
+        ],
+      },
+    },
+  });
+
+  const final_jobs = [];
+
+  if (jobs && jobs.length > 0) {
+    for (let job of jobs) {
+      const customer_info = await Customer.findByPk(
+        job?.assigned_customer[0].customer_id
+      );
+      final_jobs.push({
+        job,
+        customer_info,
+      });
     }
-    return {
-        status: 500,
-        message: 'Invalid request'
-    }
-}
+  }
+
+  return {
+    status: 200,
+    message: "hired, trial, and interviewing candidates",
+    data: final_jobs,
+  };
+};
 
 const getJobStatus = async (job_status, client_id) => {
+  let accepted_candidates = null;
+  if (client_id) {
+    accepted_candidates = await JobPostings.findAll({
+      where: {
+        client_id,
+        job_status,
+      },
+    });
+  } else {
+    accepted_candidates = await JobPostings.findAll({
+      where: {
+        job_status,
+      },
+      include: {
+        model: Client,
+      },
+    });
+  }
 
-    let accepted_candidates = null;
-    if (client_id) {
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                client_id,
-                job_status
-            }
-        });
-    } else {
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                job_status
-            },
-            include: {
-                model: Client,
-            }
-        });
-    }
-
-    if (accepted_candidates && accepted_candidates.length > 0 && accepted_candidates?.assigned_customer && accepted_candidates?.assigned_customer?.length > 0) {
-        let result = []
-        //get customer info
-        let customer_info = null;
-        for (let j = 0; j < accepted_candidates?.length; j++) {
-            let job = accepted_candidates[j];
-            const assigned_customer = job?.assigned_customer
-            for (let i = 0; i < assigned_customer?.length; i++) {
-                customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
-            }
-            let days_passed = 0;
-            if (job_status === "hired" || job_status === "trial") {
-                days_passed = calculateDays(job?.updatedAt)
-            }
-            result.push({
-                customer_info,
-                client: job?.client,
-                job,
-                days_passed
-            })
-        }
-
-        return {
-            status: 200,
-            message: 'hired-and-trial candidates',
-            data: result
-        }
+  if (
+    accepted_candidates &&
+    accepted_candidates.length > 0 &&
+    accepted_candidates?.assigned_customer &&
+    accepted_candidates?.assigned_customer?.length > 0
+  ) {
+    let result = [];
+    //get customer info
+    let customer_info = null;
+    for (let j = 0; j < accepted_candidates?.length; j++) {
+      let job = accepted_candidates[j];
+      const assigned_customer = job?.assigned_customer;
+      for (let i = 0; i < assigned_customer?.length; i++) {
+        customer_info = await Customer.findByPk(
+          assigned_customer[i].customer_id
+        );
+      }
+      let days_passed = 0;
+      if (job_status === "hired" || job_status === "trial") {
+        days_passed = calculateDays(job?.updatedAt);
+      }
+      result.push({
+        customer_info,
+        client: job?.client,
+        job,
+        days_passed,
+      });
     }
 
     return {
-        status: 404,
-        message: 'No candidates hired yet'
-    }
+      status: 200,
+      message: "hired-and-trial candidates",
+      data: result,
+    };
+  }
 
-}
+  return {
+    status: 404,
+    message: "No candidates hired yet",
+  };
+};
 
 const getJobStatusAll = async (client_id) => {
+  let accepted_candidates = null;
+  if (client_id) {
+    accepted_candidates = await JobPostings.findAll({
+      where: {
+        client_id,
+      },
+    });
+  } else {
+    accepted_candidates = await JobPostings.findAll({
+      include: {
+        model: Client,
+      },
+    });
+  }
 
-    let accepted_candidates = null;
-    if (client_id) {
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                client_id
-            }
-        });
-    } else {
-        accepted_candidates = await JobPostings.findAll({
-            include: {
-                model: Client,
-            }
-        });
-    }
-
-    if (accepted_candidates && accepted_candidates.length > 0 && accepted_candidates?.assigned_customer && accepted_candidates?.assigned_customer?.length > 0) {
-        let result = []
-        let customer_info = null
-        //get customer info
-        for (let j = 0; j < accepted_candidates?.length; j++) {
-            let job = accepted_candidates[j];
-            const assigned_customer = job?.assigned_customer
-            for (let i = 0; i < assigned_customer?.length; i++) {
-                customer_info = await Customer.findByPk(assigned_customer[i].customer_id)
-            }
-            result.push({
-                customer_info,
-                client: job?.client,
-                job,
-            })
-        }
-
-        return {
-            status: 200,
-            message: 'all job candidates',
-            data: result
-        }
+  if (
+    accepted_candidates &&
+    accepted_candidates.length > 0 &&
+    accepted_candidates?.assigned_customer &&
+    accepted_candidates?.assigned_customer?.length > 0
+  ) {
+    let result = [];
+    let customer_info = null;
+    //get customer info
+    for (let j = 0; j < accepted_candidates?.length; j++) {
+      let job = accepted_candidates[j];
+      const assigned_customer = job?.assigned_customer;
+      for (let i = 0; i < assigned_customer?.length; i++) {
+        customer_info = await Customer.findByPk(
+          assigned_customer[i].customer_id
+        );
+      }
+      result.push({
+        customer_info,
+        client: job?.client,
+        job,
+      });
     }
 
     return {
-        status: 404,
-        message: 'No candidates hired yet'
-    }
+      status: 200,
+      message: "all job candidates",
+      data: result,
+    };
+  }
 
-}
+  return {
+    status: 404,
+    message: "No candidates hired yet",
+  };
+};
 
 const getJobStatusHiredAndTrial = async (client_id, candidate_id) => {
+  let accepted_candidates = null;
+  if (client_id) {
+    accepted_candidates = await JobPostings.findAll({
+      where: {
+        [Op.and]: {
+          client_id,
+          [Op.or]: [{ job_status: "hired" }, { job_status: "trial" }],
+        },
+      },
+    });
+  } else {
+    //for admin and candidate
+    accepted_candidates = await JobPostings.findAll({
+      where: {
+        [Op.or]: [{ job_status: "hired" }, { job_status: "trial" }],
+      },
+      include: {
+        model: Client,
+      },
+    });
+    console.log("else block executed");
+  }
+  if (accepted_candidates && accepted_candidates.length > 0) {
+    let result = [];
+    //get customer info
+    let customer_info = null;
+    for (let j = 0; j < accepted_candidates?.length; j++) {
+      //check if there's assigned customer or not
+      if (
+        accepted_candidates[j].assigned_customer &&
+        accepted_candidates[j].assigned_customer?.length > 0
+      ) {
+        let job = accepted_candidates[j];
+        //extract array of assigned customer from column
+        const assigned_customer = job?.assigned_customer;
+        console.log(assigned_customer);
+        let customer_info;
+        const candidateExists = assigned_customer?.some(
+          (customer) => customer.customer_id === candidate_id?.toString()
+        );
 
-    let accepted_candidates = null;
-    if (client_id) {
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                [Op.and]: {
-                    client_id,
-                    [Op.or]: [
-                        { job_status: 'hired' },
-                        { job_status: 'trial' }
-                    ]
-                }
-            }
-        });
-    } else {
-        //for admin and candidate
-        accepted_candidates = await JobPostings.findAll({
-            where: {
-                [Op.or]: [
-                    { job_status: 'hired' },
-                    { job_status: 'trial' }
-                ]
-            },
-            include: {
-                model: Client,
-            }
-        });
-        console.log('else block executed')
-    }
-    if (accepted_candidates && accepted_candidates.length > 0) {
-        let result = []
-        //get customer info
-        let customer_info = null
-        for (let j = 0; j < accepted_candidates?.length; j++) {
-            //check if there's assigned customer or not
-            if (accepted_candidates[j].assigned_customer && accepted_candidates[j].assigned_customer?.length > 0) {
-                let job = accepted_candidates[j];
-                //extract array of assigned customer from column
-                const assigned_customer = job?.assigned_customer
-                console.log(assigned_customer)
-                let customer_info;
-                const candidateExists = assigned_customer?.some(
-                    customer => customer.customer_id === candidate_id?.toString()
-                );
-
-                if (candidateExists) {
-                    console.log("candidate_id found");
-                    customer_info = await Customer.findByPk(candidate_id);
-                }
-                else {
-                    for (let i = 0; i < assigned_customer?.length; i++) {
-                        customer_info = await Customer.findByPk(assigned_customer[i].customer_id);
-                        // You might want to break the loop if you only need the first customer info.
-                        break;
-                    }
-                }
-                const days_passed = calculateDays(job?.updatedAt)
-                result.push({
-                    customer_info,
-                    client: job?.client,
-                    job,
-                    days_passed
-                })
-            }
+        if (candidateExists) {
+          console.log("candidate_id found");
+          customer_info = await Customer.findByPk(candidate_id);
+        } else {
+          for (let i = 0; i < assigned_customer?.length; i++) {
+            customer_info = await Customer.findByPk(
+              assigned_customer[i].customer_id
+            );
+            // You might want to break the loop if you only need the first customer info.
+            break;
+          }
         }
-
-
-        return {
-            status: 200,
-            message: 'hired-and-trial candidates',
-            data: result
-        }
+        const days_passed = calculateDays(job?.updatedAt);
+        result.push({
+          customer_info,
+          client: job?.client,
+          job,
+          days_passed,
+        });
+      }
     }
 
     return {
-        status: 404,
-        message: 'No candidates hired yet'
-    }
+      status: 200,
+      message: "hired-and-trial candidates",
+      data: result,
+    };
+  }
 
-}
+  return {
+    status: 404,
+    message: "No candidates hired yet",
+  };
+};
 
 const closeJobService = async (body) => {
-    try {
+  try {
+    await JobPostings.update(
+      {
+        job_status: "closed",
+      },
+      {
+        where: {
+          job_posting_id: body?.job_posting_id,
+        },
+      }
+    );
 
-        await JobPostings.update({
-            job_status: 'closed'
-        }, {
-            where: {
-                job_posting_id: body?.job_posting_id
-            }
-        })
-
-        await JobHistory.update({
-            end_date: Date.now(),
-            job_status: 'closed'
-        }, {
-            where: {
-                job_posting_id: body?.job_posting_id
-            }
-        })
-        return {
-            status: 200,
-            message: "job has been closed"
-        }
-    } catch (e) {
-        return {
-            status: 500,
-            message: e.message
-        }
-    }
-}
+    await JobHistory.update(
+      {
+        end_date: Date.now(),
+        job_status: "closed",
+      },
+      {
+        where: {
+          job_posting_id: body?.job_posting_id,
+        },
+      }
+    );
+    return {
+      status: 200,
+      message: "job has been closed",
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      message: e.message,
+    };
+  }
+};
 
 const getJobHistoryService = async (query) => {
-    try {
-
-        JobPostings.hasMany(JobHistory, { foreignKey: 'job_posting_id' });
-        JobHistory.belongsTo(JobPostings, { foreignKey: 'job_posting_id' })
-        Client.hasOne(JobHistory, { foreignKey: 'client_id' });
-        JobHistory.belongsTo(Client, { foreignKey: 'client_id' })
-        let job_histories = null;
-        if (query?.customer_id != null) {
-            job_histories = await JobHistory.findAll({
-                where: {
-                    customer_id: query?.customer_id
-                },
-                include: [
-                    {
-                        model: JobPostings,
-                    },
-                    {
-                        model: Client,
-                        attributes:{
-                            exclude:['password']
-                        }
-                    }
-                ]
-            });
-            console.log(job_histories)
-        }
-        return {
-            status: 200,
-            message: "job histories fetched",
-            data: job_histories
-        }
-    } catch (e) {
-        return {
-            status: 500,
-            message: e.message
-        }
+  try {
+    JobPostings.hasMany(JobHistory, { foreignKey: "job_posting_id" });
+    JobHistory.belongsTo(JobPostings, { foreignKey: "job_posting_id" });
+    Client.hasOne(JobHistory, { foreignKey: "client_id" });
+    JobHistory.belongsTo(Client, { foreignKey: "client_id" });
+    let job_histories = null;
+    if (query?.customer_id != null) {
+      job_histories = await JobHistory.findAll({
+        where: {
+          customer_id: query?.customer_id,
+        },
+        include: [
+          {
+            model: JobPostings,
+          },
+          {
+            model: Client,
+            attributes: {
+              exclude: ["password"],
+            },
+          },
+        ],
+      });
+      console.log(job_histories);
     }
-}
+    return {
+      status: 200,
+      message: "job histories fetched",
+      data: job_histories,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      message: e.message,
+    };
+  }
+};
 
 module.exports = {
-    getAllJobsService,
-    getJobCandidates,
-    closeJobService,
-    getJobHistoryService
-}
+  getAllJobsService,
+  getJobCandidates,
+  closeJobService,
+  getJobHistoryService,
+};

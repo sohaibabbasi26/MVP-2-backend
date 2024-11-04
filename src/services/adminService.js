@@ -143,6 +143,7 @@ async function assigningCustomerservice(body) {
         (existingAssignment?.client_response === "pending" ||
           existingAssignment?.client_response === "accept")
       ) {
+        shouldCreateNewAdminAssigned= false;
         return {
           status: 409,
           message: `Customer is already assigned to this client for the given job posting.`,
@@ -211,7 +212,7 @@ async function assigningCustomerservice(body) {
       };
     }
 
-    console.log(jobPosting);
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%",jobPosting);
 
     if (
       jobPosting?.assigned_customer?.length > 0 ||
@@ -259,7 +260,7 @@ async function assigningCustomerservice(body) {
     await JobPostings.update(
       {
         job_status: "interviewing",
-        assigned_customer: assignedCustomers,
+        assigned_customer: [{"customer_id": body?.customer_id}],
         hourly_rate: body?.hourly_rate,
       },
       {

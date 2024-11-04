@@ -351,7 +351,7 @@ const routes = [
     method:'GET',
     url:'/get-stats',
     handler: adminHandler.getStats
-  }
+  },
 ];
 
 module.exports = { routes };
