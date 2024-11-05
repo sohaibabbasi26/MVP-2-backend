@@ -6,6 +6,7 @@ const {
   approveCustomerService,
   fetchClientRequestService,
   approveClientService,
+  getStatsService,
 } = require("../services/adminService");
 const { updateclient_service } = require("../services/clientservice");
 const { checkClientInDb } = require("../utilities/checkClientInDb");
@@ -146,6 +147,17 @@ const approveClientHandler = async (req, res) => {
   }
 };
 
+const getStats = async (req, res) => {
+  try{
+    const result= await getStatsService()
+    res.status(200).send({...result})
+  }catch(e){
+    res.status(500).send({
+      error: e.message
+    })
+  }
+}
+
 module.exports = {
   approveCustomerHandler,
   fetchClientRequestHandler,
@@ -154,4 +166,5 @@ module.exports = {
   scheduleinterviewhandler,
   registerClientHandler,
   approveClientHandler,
+  getStats
 };

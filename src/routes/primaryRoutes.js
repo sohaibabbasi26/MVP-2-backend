@@ -348,7 +348,12 @@ const routes = [
     method: 'GET',
     url:'/get-job-history-of-candidate',
     handler: jobHandler.getJobHistory
-  }
+  },
+  {
+    method:'GET',
+    url:'/get-stats',
+    handler: adminHandler.getStats
+  },
 ];
 
 module.exports = { routes };

@@ -9,6 +9,11 @@ const { Sequelize, Op } = require("sequelize");
 const JobPostings = require("../models/jobPostings");
 const { NotificationClient } = require("../models/notification_client");
 const Result = require("../models/results");
+const {
+  getCandidateStats,
+  getJobStats,
+  getClientStats,
+} = require("./statsService");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -16,8 +21,8 @@ const scheduleInterview = async (body, interviewDate) => {
 
   const notification = await NotificationClient.create(body);
 
-  console.log('Notification scheduled:', notification);
-  return notification
+  console.log("Notification scheduled:", notification);
+  return notification;
 };
 
 //Interview scheduling
@@ -39,13 +44,16 @@ async function admin_interview_scheduling_service(body) {
       const schedule = await AdminInterview.create(body);
 
       if (schedule) {
-        const notification = scheduleInterview({
-          job_posting_id: body?.job_posting_id,
-          message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
-          client_id: body?.client_id,
-          customer_id: body?.customer_id,
-          notification_type: 'trial'
-        }, body?.interview_date)
+        const notification = scheduleInterview(
+          {
+            job_posting_id: body?.job_posting_id,
+            message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
+            client_id: body?.client_id,
+            customer_id: body?.customer_id,
+            notification_type: "trial",
+          },
+          body?.interview_date
+        );
         // const notification= NotificationClient.create({
         //   job_posting_id: body?.job_posting_id,
         //   message: `Your interview with candidate ${data?.name} for the job ${job?.job_posting_id} has been completed. Do you want to accept that candidate for TRIAL?`,
@@ -57,14 +65,14 @@ async function admin_interview_scheduling_service(body) {
         if (!notification) {
           return {
             status: 401,
-            message: 'notification not created'
-          }
+            message: "notification not created",
+          };
         }
       }
       return {
         status: 200,
-        message: 'interview is scheduled successfully'
-      }
+        message: "interview is scheduled successfully",
+      };
       //       if (schedule) {
       //         const emailData = {
       //           to: body.customer_email,
@@ -95,15 +103,14 @@ async function admin_interview_scheduling_service(body) {
     }
     return {
       status: 404,
-      message: "customer not existed in database"
+      message: "customer not existed in database",
     };
-
   } catch (error) {
     console.log(`Error while inserting data ${error}`);
     return {
       status: 500,
-      message: error.message
-    }
+      message: error.message,
+    };
   }
 }
 
@@ -111,10 +118,10 @@ async function admin_interview_scheduling_service(body) {
 
 async function assigningCustomerservice(body) {
   try {
-    let shouldCreateNewAdminAssigned= true;
+    let shouldCreateNewAdminAssigned = true;
     const existingAssignment = await Adminassigned.findOne({
       where: {
-        client_id: body?.client_id
+        client_id: body?.client_id,
         // [Op.and]: [
         //   { client_id: body?.client_id },
         //   { customer_id: body?.customer_id },
@@ -129,25 +136,31 @@ async function assigningCustomerservice(body) {
       },
     });
 
-    if (existingAssignment!==null) {
-      if (existingAssignment?.customer_id === body?.customer_id &&
+    if (existingAssignment !== null) {
+      if (
+        existingAssignment?.customer_id === body?.customer_id &&
         existingAssignment?.job_posting_id === body?.job_posting_id &&
-        (existingAssignment?.client_response === 'pending' || existingAssignment?.client_response === 'accept')) {
+        (existingAssignment?.client_response === "pending" ||
+          existingAssignment?.client_response === "accept")
+      ) {
+        shouldCreateNewAdminAssigned= false;
         return {
           status: 409,
           message: `Customer is already assigned to this client for the given job posting.`,
         };
       }
 
-      if (existingAssignment.customer_id !== body?.customer_id && existingAssignment.job_posting_id === body?.job_posting_id) {
+      if (
+        existingAssignment.customer_id !== body?.customer_id &&
+        existingAssignment.job_posting_id === body?.job_posting_id
+      ) {
         existingAssignment.update({
           customer_id: body?.customer_id,
-          client_response: 'pending'
-        })
-        shouldCreateNewAdminAssigned= false;
-      } 
+          client_response: "pending",
+        });
+        shouldCreateNewAdminAssigned = false;
+      }
     }
-
 
     const customer = await Customer.findOne({
       where: {
@@ -181,32 +194,35 @@ async function assigningCustomerservice(body) {
     if (!customer) {
       return {
         status: 404,
-        message: "customer not found"
-      }
+        message: "customer not found",
+      };
     }
 
     if (!client && jobPosting) {
       return {
         status: 404,
-        message: "client not found"
-      }
+        message: "client not found",
+      };
     }
 
     if (!jobPosting) {
       return {
         status: 404,
-        message: "job post not found"
-      }
+        message: "job post not found",
+      };
     }
 
-    console.log(jobPosting)
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%",jobPosting);
 
-    if (jobPosting?.assigned_customer?.length > 0 || jobPosting?.assigned_customer !== null) {
-      shouldCreateNewAdminAssigned=false;
+    if (
+      jobPosting?.assigned_customer?.length > 0 ||
+      jobPosting?.assigned_customer !== null
+    ) {
+      shouldCreateNewAdminAssigned = false;
       return {
         status: 400,
-        message: "you already assigned previous candidate"
-      }
+        message: "you already assigned previous candidate",
+      };
     }
 
     let position = customer.position || [];
@@ -236,13 +252,16 @@ async function assigningCustomerservice(body) {
     if (!jobPostingExists) {
       position.push({ job_posting_id: body.job_posting_id });
     }
-    
-    console.log("////////////////////////////////////////////////////////", assignedCustomers)
+
+    console.log(
+      "////////////////////////////////////////////////////////",
+      assignedCustomers
+    );
     await JobPostings.update(
       {
         job_status: "interviewing",
-        assigned_customer: assignedCustomers,
-        hourly_rate: body?.hourly_rate
+        assigned_customer: [{"customer_id": body?.customer_id}],
+        hourly_rate: body?.hourly_rate,
       },
       {
         where: {
@@ -264,8 +283,8 @@ async function assigningCustomerservice(body) {
         },
       }
     );
-    
-    if(shouldCreateNewAdminAssigned){
+
+    if (shouldCreateNewAdminAssigned) {
       await Adminassigned.create(body);
     }
     await Client.update(
@@ -281,16 +300,14 @@ async function assigningCustomerservice(body) {
     //const data = await Adminassigned.create(body);
     return {
       status: 200,
-      message: `Customer is assigned to Client`
+      message: `Customer is assigned to Client`,
     };
-
-
   } catch (e) {
     console.error(`Error while creating data: ${e.message}`, e);
     return {
       status: 500,
-      message: e.message
-    }
+      message: e.message,
+    };
   }
 }
 
@@ -300,14 +317,22 @@ async function getcustomerwithid(client_id) {
     const result = await Adminassigned.findOne({
       where: {
         client_id,
-        client_response: 'pending'
+        client_response: "pending",
       },
       include: [
         {
           model: Customer,
           Client,
           as: "customer",
-          attributes: ["customer_id", "name", "email", "experience", "hourly_rate", "commitment", "position"],
+          attributes: [
+            "customer_id",
+            "name",
+            "email",
+            "experience",
+            "hourly_rate",
+            "commitment",
+            "position",
+          ],
         },
         {
           model: Client,
@@ -434,6 +459,31 @@ const fetchClientRequestService = async () => {
   }
 };
 
+const getStatsService = async () => {
+  return {
+    status: 200,
+    data: {
+      candidates: {
+        interviewing: (await getCandidateStats("interviewing")) || 0,
+        open: (await getCandidateStats("open")) || 0,
+        hired: (await getCandidateStats("hired")) || 0,
+        trial: (await getCandidateStats("trial")) || 0,
+      },
+      jobs: {
+        interviewing: (await getJobStats("interviewing")) || 0,
+        open: (await getJobStats("open")) || 0,
+        hired: (await getJobStats("hired")) || 0,
+        trial: (await getJobStats("trial")) || 0,
+        closed: (await getJobStats("closed")) || 0,
+      },
+      clients: {
+        no_jobs: await getClientStats(false),
+        jobs: await getClientStats(true),
+      },
+    },
+  };
+};
+
 module.exports = {
   approveCustomerService,
   fetchClientRequestService,
@@ -441,4 +491,5 @@ module.exports = {
   assigningCustomerservice,
   getcustomerwithid,
   approveClientService,
+  getStatsService,
 };
