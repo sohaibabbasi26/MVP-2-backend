@@ -42,52 +42,51 @@ async function getJobviaclientIdAndJobIdService(client_id, job_posting_id) {
 //Client Api
 async function getallclients(client_id) {
   try {
-
-    Client.hasMany(JobPostings, { foreignKey: 'client_id' });
-    JobPostings.belongsTo(Client, { foreignKey: 'client_id' });
+    Client.hasMany(JobPostings, { foreignKey: "client_id" });
+    JobPostings.belongsTo(Client, { foreignKey: "client_id" });
 
     let result = null;
-    if(client_id){
-      result= await Client.findOne({
-        where:{
-          client_id
+    if (client_id) {
+      result = await Client.findOne({
+        where: {
+          client_id,
         },
         include: [
           {
             model: JobPostings,
-            on:{
-              client_id
-            }
-          }
+            on: {
+              client_id,
+            },
+          },
         ],
         attributes: {
-          exclude: ['password']
-        }
+          exclude: ["password"],
+        },
       });
-    }else{
+    } else {
       result = await Client.findAll({
         include: [
           {
-            model: JobPostings
-          }
+            model: JobPostings,
+          },
         ],
         attributes: {
-          exclude: ['password']
-        }
+          exclude: ["password"],
+        },
       });
     }
 
-    if(result===null){
+    if (result === null) {
       return {
         status: 404,
-        message: "no client found"
-      }
+        message: "no client found",
+      };
     }
-    
+
     return {
       status: 200,
       message: "client found",
-      data: result
+      data: result,
     };
   } catch (error) {
     console.log(
@@ -258,7 +257,7 @@ const declineCustomerService = async (
 
     const assigned_clients = customer.assigned_clients || [];
     const position = customer.position || [];
-    const job_assigned_customers = job_postings.assigned_customer;
+    const job_assigned_customers = job_postings.assigned_customer || [];
 
     const updated_clients = assigned_clients.filter(
       (cli) => cli.client_id !== client_id
@@ -267,6 +266,8 @@ const declineCustomerService = async (
     const updated_job_assigned_customers = job_assigned_customers.filter(
       (cus) => cus.customer_id !== customer_id
     );
+    console.log(job_assigned_customers)
+    console.log(updated_job_assigned_customers);
 
     const updated_position = position.filter(
       (cus) => cus.job_posting_id !== job_posting_id
@@ -275,7 +276,7 @@ const declineCustomerService = async (
     customer.update({
       assigned_clients: updated_clients.length > 0 ? updated_clients : null,
       position: updated_position.length > 0 ? updated_position : null,
-      talent_status
+      talent_status,
     });
 
     job_postings.update({
@@ -299,6 +300,35 @@ const declineCustomerService = async (
       }
     );
 
+    // await JobHistory.update(
+    //   {
+    //     end_date: Date.now(),
+    //     status: "closed",
+    //   },
+    //   {
+    //     where: {
+    //       client_id,
+    //       customer_id,
+    //       job_posting_id: job_id,
+    //     },
+    //   }
+    // );
+
+    const jobHistory = await JobHistory.findOne({
+      where: {
+        client_id,
+        customer_id,
+        job_posting_id,
+      },
+    });
+
+    if (jobHistory) {
+      await jobHistory.update({
+        end_date: Date.now(),
+        status: "closed",
+      });
+    }
+
     await NotificationClient.update(
       {
         is_accepted: false,
@@ -310,23 +340,21 @@ const declineCustomerService = async (
             { customer_id: customer_id },
             {
               [Op.or]: [
-                { notification_type: 'trial' },
-                { notification_type: 'hire' }
-              ]
-            }
-          ]
-
-        }
+                { notification_type: "trial" },
+                { notification_type: "hire" },
+              ],
+            },
+          ],
+        },
       }
-    )
-
+    );
 
     return {
       status: 200,
       message: "customer has been deleted",
     };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return {
       status: 500,
       message: error.message,
@@ -340,8 +368,8 @@ const clientAcceptService = async (body) => {
     const customer_id = body.customer_id;
     const client_id = body.client_id;
     const job_id = body.job_posting_id;
-    const job_status = body?.job_status  //hired or trial
-    const talent_status = body?.talent_status
+    const job_status = body?.job_status; //hired or trial
+    const talent_status = body?.talent_status;
 
     // Fetch the customer and client records
     const customer = await Customer.findOne({
@@ -379,7 +407,7 @@ const clientAcceptService = async (body) => {
       // Update Adminassigned table
       await Adminassigned.update(
         {
-          client_response: 'accept'
+          client_response: "accept",
         },
         {
           where: {
@@ -391,14 +419,14 @@ const clientAcceptService = async (body) => {
       // Update Customer table
       await Customer.update(
         {
-          talent_status
+          talent_status,
         },
         {
           where: {
             customer_id: customer_id,
           },
-        });
-
+        }
+      );
 
       // Update Client table with assigned customer if not already assigned
       const assignedCustomers = client.assigned_customers || [];
@@ -423,7 +451,7 @@ const clientAcceptService = async (body) => {
       await JobPostings.update(
         {
           job_status,
-          assigned_customer: assignedCustomers
+          assigned_customer: assignedCustomers,
         },
         {
           where: {
@@ -432,7 +460,7 @@ const clientAcceptService = async (body) => {
         }
       );
 
-      if (body?.job_status === 'trial') {
+      if (body?.job_status === "trial") {
         await NotificationClient.update(
           {
             is_accepted: true,
@@ -442,37 +470,50 @@ const clientAcceptService = async (body) => {
               [Op.and]: [
                 { job_posting_id: job_id },
                 { customer_id: body?.customer_id },
-                { notification_type: 'trial' }
-              ]
-
-            }
-          }
-        )
-      }
-
-      if (body?.job_status === 'hired') {
-        await NotificationClient.update(
-          {
-            is_accepted: true,
-          },
-          {
-            where: {
-              [Op.and]: [
-                { job_posting_id: job_id },
-                { customer_id: body?.customer_id },
-                { notification_type: 'hire' }
-              ]
-
-            }
+                { notification_type: "trial" },
+              ],
+            },
           }
         );
-        await JobHistory.create({
-          client_id,
-          customer_id,
-          start_date: Date.now(),
-          job_status: 'hired',
-          job_posting_id: job_id
+      }
+
+      if (body?.job_status === "hired") {
+        await NotificationClient.update(
+          {
+            is_accepted: true,
+          },
+          {
+            where: {
+              [Op.and]: [
+                { job_posting_id: job_id },
+                { customer_id: body?.customer_id },
+                { notification_type: "hire" },
+              ],
+            },
+          }
+        );
+
+        const jobHistory = await JobHistory.findOne({
+          where: {
+            client_id,
+            customer_id,
+            job_posting_id: job_id,
+          },
         });
+
+        if (jobHistory) {
+          await jobHistory.update({
+            start_date: Date.now(),
+          });
+        } else {
+          await JobHistory.create({
+            client_id,
+            customer_id,
+            start_date: Date.now(),
+            job_status: "hired",
+            job_posting_id: job_id,
+          });
+        }
       }
 
       console.log("Update successful");
@@ -603,18 +644,21 @@ const clientCloseJobService = async (body) => {
           },
         }
       );
-      await customer.update({job_status: "open",});
+      await customer.update({ talent_status: "open" });
 
-      await JobHistory.update({
-        end_date: Date.now(),
-        status: "closed"
-      }, {
-        where: {
-          client_id,
-          customer_id,
-          job_posting_id: job_id
+      await JobHistory.update(
+        {
+          end_date: Date.now(),
+          status: "closed",
+        },
+        {
+          where: {
+            client_id,
+            customer_id,
+            job_posting_id: job_id,
+          },
         }
-      })
+      );
 
       console.log("Update successful");
       return {
@@ -723,9 +767,9 @@ const getAllCandidatesOfClientJobService = async (
         where: {
           client_id,
           [Op.or]: [
-            { client_response: 'accept' },
-            { client_response: 'pending' }
-          ]
+            { client_response: "accept" },
+            { client_response: "pending" },
+          ],
         },
         include: [
           {
@@ -749,7 +793,7 @@ const getAllCandidatesOfClientJobService = async (
               "customer_location",
               "province",
               "area_code",
-              "city"
+              "city",
             ],
           },
           {
@@ -796,7 +840,7 @@ const getAllCandidatesOfClientJobService = async (
               "customer_location",
               "province",
               "area_code",
-              "city"
+              "city",
             ],
           },
           {
@@ -819,15 +863,15 @@ const getAllCandidatesOfClientJobService = async (
 
       candidateResult = await Result.findOne({
         where: {
-          customer_id
-        }
-      })
+          customer_id,
+        },
+      });
     }
     if (clientJobsWithCandidates) {
       return {
         status: 200,
         data: clientJobsWithCandidates,
-        candidateResult
+        candidateResult,
       };
     }
   } catch (err) {
@@ -867,22 +911,23 @@ const getClientByEmail = async (email) => {
 
 const getNotificationClientService = async (client_id, date) => {
   try {
-
     if (!date) {
       return {
         status: 400,
-        message: "Invalid date"
+        message: "Invalid date",
       };
     }
 
-    await NotificationClient.update({
-      is_sent: true,
-
-    }, {
-      where: {
-        client_id
+    await NotificationClient.update(
+      {
+        is_sent: true,
+      },
+      {
+        where: {
+          client_id,
+        },
       }
-    });
+    );
 
     //console.log(notification)
 
@@ -900,13 +945,13 @@ const getNotificationClientService = async (client_id, date) => {
     //const client_notifications = [];
     const client_notifications = await NotificationClient.findAll({
       where: {
-        client_id
-      }
-    })
+        client_id,
+      },
+    });
 
     // Parse input date to a Date object for comparison
     const inputDate = new Date(date);
-    console.log(inputDate)
+    console.log(inputDate);
 
     // for (let n of notification) {
     //   const notificationData = n.dataValues;
@@ -924,7 +969,7 @@ const getNotificationClientService = async (client_id, date) => {
     //     // If send_date has passed, mark the notification as sent
     //     await n.update({ is_sent: true });
     //     console.log(`Notification sent for client ${client_id} on ${inputDate}`);
-    //   } 
+    //   }
 
     //   if(notificationData.is_sent){
     //     client_notifications.push(notificationData);
@@ -937,7 +982,6 @@ const getNotificationClientService = async (client_id, date) => {
     //   //   const sendDate = new Date(notificationData.send_date);
     //   //   const inputDateObj = new Date(date);
 
-
     //   //   //this is for code after 1 day
     //   //   if (sendDate.getFullYear() === inputDateObj.getFullYear() &&
     //   //     sendDate.getMonth() === inputDateObj.getMonth() &&
@@ -946,7 +990,7 @@ const getNotificationClientService = async (client_id, date) => {
     //   //     console.log(`Notification sent for client ${client_id} on ${date}`);
     //   //   }
 
-    //   // } 
+    //   // }
 
     //   // if(notificationData.is_sent){
     //   //   client_notifications.push(notificationData);
@@ -956,16 +1000,15 @@ const getNotificationClientService = async (client_id, date) => {
     return {
       status: 200,
       message: "Notifications fetched successfully",
-      data: client_notifications
+      data: client_notifications,
     };
   } catch (e) {
     return {
       status: 500,
-      message: e.message
+      message: e.message,
     };
   }
 };
-
 
 module.exports = {
   getClientByEmail,
@@ -984,5 +1027,5 @@ module.exports = {
   getCandidatesOfClientService,
   getAllCandidatesOfClientJobService,
   getNotificationClientService,
-  clientCloseJobService
+  clientCloseJobService,
 };

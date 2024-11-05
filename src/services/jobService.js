@@ -40,8 +40,8 @@ const getJobCandidates = async (query) => {
     query?.job_status !== "hired-and-trial"
   ) {
     res = getJobStatusHiredTrialInterviewing(
-      query.client_id,
-      query?.candidate_id
+      query?.client_id,
+      //query?.candidate_id
     );
   }
   if (query?.job_status === "all") {
@@ -65,29 +65,56 @@ const getJobCandidates = async (query) => {
 };
 
 const getJobStatusHiredTrialInterviewing = async (client_id) => {
-  const jobs = await JobPostings.findAll({
-    where: {
-      [Op.and]: {
-        client_id,
+  let jobs = null;
+
+  JobPostings.belongsTo(Client, { foreignKey: "client_id" });
+  Client.hasMany(JobPostings, { foreignKey: "client_id" });
+
+  if (client_id === null || client_id=== undefined) {
+    jobs = await JobPostings.findAll({
+      where: {
         [Op.or]: [
           { job_status: "hired" },
           { job_status: "trial" },
           { job_status: "interviewing" },
         ],
       },
-    },
-  });
+    });
+  } else {
+    jobs = await JobPostings.findAll({
+      where: {
+        [Op.and]: {
+          client_id: client_id,
+          [Op.or]: [
+            { job_status: "hired" },
+            { job_status: "trial" },
+            { job_status: "interviewing" },
+          ],
+        },
+      },
+    });
+  }
 
   const final_jobs = [];
 
   if (jobs && jobs.length > 0) {
     for (let job of jobs) {
+      const client= await Client.findByPk(job?.client_id)
       const customer_info = await Customer.findByPk(
         job?.assigned_customer[0].customer_id
       );
+      const days_passed = calculateDays(job?.updatedAt);
+      // result.push({
+      //   customer_info,
+      //   client: job?.client,
+      //   job,
+      //   days_passed,
+      // });
       final_jobs.push({
         job,
         customer_info,
+        days_passed,
+        client
       });
     }
   }
