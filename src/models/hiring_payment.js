@@ -46,6 +46,10 @@ const HiringPayment= sequelize.define('hiring_payment',{
         type: DataTypes.INTEGER,
         allowNull: true,
         //defaultValue:0
+    },
+    payment_method_id:{
+        type: DataTypes.STRING,
+        allowNull: true,
     }
 });
 

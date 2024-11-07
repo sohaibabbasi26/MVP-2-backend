@@ -358,6 +358,11 @@ const routes = [
     url:'/create-hiring',
     handler: hiringHandler.createHiringHandler
   },
+  {
+    method: 'GET',
+    url:'/get-hiring-payments',
+    handler: hiringHandler.getPaymentHiringHandler
+  }
 ];
 
 module.exports = { routes };
