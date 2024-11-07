@@ -12,6 +12,7 @@ const resetPasswordValidation = require("../pre-handlers/passwordResetValidation
 const jobValidation= require('../pre-handlers/jobValidation')
 const jobHandler = require("../handlers/jobHandler");
 const testHandler = require("../handlers/testHandler");
+const hiringHandler= require('../handlers/hiringHandler')
 
 const routes = [
   {
@@ -351,6 +352,11 @@ const routes = [
     method:'GET',
     url:'/get-stats',
     handler: adminHandler.getStats
+  },
+  {
+    method: 'POST',
+    url:'/create-hiring',
+    handler: hiringHandler.createHiringHandler
   },
 ];
 
