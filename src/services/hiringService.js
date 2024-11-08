@@ -36,7 +36,7 @@ const getHiringPaymentService = async (req) => {
   let hiringPaymtByJob = null;
 
   if (!job_posting_id && !stripe_client_id) {
-    hiringPaymtByJob = await HiringPayment.findOne({
+    hiringPaymtByJob = await HiringPayment.findAll({
       include: [
         {
           model: Client,
