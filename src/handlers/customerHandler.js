@@ -9,6 +9,7 @@ const {
   getCustomerByEmail,
   getJobsService,
   addCandidatePayment,
+  getCandidatePaymentService,
 } = require("../services/customerservice");
 //get coding_result of customer
 const GetcodingresultHandler = async (req, res) => {
@@ -119,6 +120,15 @@ const postPaymentDetails = async (req, res) => {
   }
 }
 
+const getPaymentDetails = async (req, res) => {
+  try{
+    const result = await getCandidatePaymentService(req.query.customer_id)
+     res.status(result.status).send({...result});
+  }catch(e){
+    console.log(e);
+    res.status(500).send(e.message);
+  }
+}
 
 module.exports = {
   getCustomerByEmailHandler,
@@ -130,5 +140,6 @@ module.exports = {
   GetcodingresultHandler,
   getCustomerExpertise,
   getJobs,
-  postPaymentDetails
+  postPaymentDetails,
+  getPaymentDetails
 };

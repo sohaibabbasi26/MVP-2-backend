@@ -368,6 +368,11 @@ const routes = [
     url:'/add-candidate-bank-account',
     handler: customerHandler.postPaymentDetails
   },
+  {
+    method: 'GET',
+    url:'/get-candidate-bank-account',
+    handler: customerHandler.getPaymentDetails
+  },
 ];
 
 module.exports = { routes };
