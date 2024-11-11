@@ -362,7 +362,12 @@ const routes = [
     method: 'GET',
     url:'/get-hiring-payments',
     handler: hiringHandler.getPaymentHiringHandler
-  }
+  },
+   {
+    method: 'POST',
+    url:'/add-candidate-bank-account',
+    handler: customerHandler.postPaymentDetails
+  },
 ];
 
 module.exports = { routes };

@@ -4,6 +4,7 @@ const Test = require("../models/test");
 const CodingResults = require("../models/codingResults");
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const JobPostings = require("../models/jobPostings");
+const CandidatePaymentDetails = require('../models/candidate_payment_details');
 //get coding_test result of a customer
 const getcodingresultService = async (customer_id) => {
   try {
@@ -67,6 +68,49 @@ const getCustomerViaExpertise = async (expertise) => {
     );
   }
 };
+
+async function addCandidatePayment(body){
+  const { customer_id, account_title, account_no, iban_no, bank_name, city, state, country } = body;
+
+    // Check if the customer exists
+    const customer = await Customer.findOne({ where: { customer_id } });
+    if (!customer) {
+      return{
+        status:404,
+        message:'Customer not found',
+      };
+    }
+
+    const payment_detail = await CandidatePaymentDetails.findOne({where:{customer_id}});
+
+    if(payment_detail){
+      return{
+        status:409,
+        message:'Only one entry allowed.',
+      };
+    }
+
+
+    // Create the candidate payment details
+    const candidatePaymentDetail = await CandidatePaymentDetails.create({
+      customer_id,
+      account_title,
+      account_no,
+      iban_no,
+      bank_name,
+      city,
+      state,
+      country
+    });
+
+    return {
+      status:200,
+      message: "Candidate payment details added successfully.",
+      data:candidatePaymentDetail,
+    };
+
+}
+
 //add expertise of customer
 async function customerUpdateExpertise(body) {
   try {
@@ -250,5 +294,6 @@ module.exports = {
   getcodingresultService,
   getCustomerExpertiseService,
   getCustomerByEmail,
-  getJobsService
+  getJobsService,
+  addCandidatePayment
 };
