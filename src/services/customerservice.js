@@ -116,8 +116,7 @@ async function addCandidatePayment(body){
         message:'Only one entry allowed.',
       };
     }
-
-
+    
     // Create the candidate payment details
     const candidatePaymentDetail = await CandidatePaymentDetails.create({
       customer_id,
