@@ -36,6 +36,7 @@ const transporter = require("../../configurations/gmailConfig");
 const { SimpleQueue } = require("../utilities/TemporaryQueue");
 const { where, Op } = require("sequelize");
 const { NotificationClient } = require("../models/notification_client");
+const Adminassigned = require("../models/admin_assigned_client_customer");
 
 async function customerSignupGoogle(data) {
   try {
@@ -995,16 +996,26 @@ async function updatecustomer_service(body, customer_id) {
 }
 
 const isInterviewScheduledService= async(client_id, job_posting_id, customer_id)=>{
-  const result= await NotificationClient.findOne({
+  // const result1= await NotificationClient.findOne({
+  //   where:{
+  //     [Op.and]:[
+  //       {job_posting_id},
+  //       {client_id},
+  //       {customer_id}
+  //     ]
+  //   }
+  // });
+  const result2= await Adminassigned.findOne({
     where:{
       [Op.and]:[
         {job_posting_id},
         {client_id},
-        {customer_id}
+        {customer_id},
+        {client_response:'scheduled'}
       ]
     }
   });
-  if(result){
+  if(result1&&result2){
     return true;
   }
   return false

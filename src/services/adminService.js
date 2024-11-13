@@ -42,6 +42,15 @@ async function admin_interview_scheduling_service(body) {
     });
     if (data) {
       const schedule = await AdminInterview.create(body);
+      await Adminassigned.update({
+        client_response:'scheduled'
+      },{
+        where:{
+          customer_id: body.customer_id,
+          job_posting_id: body.job_posting_id,
+          client_id: body.client_id
+        }
+      });
 
       if (schedule) {
         const notification = scheduleInterview(
@@ -147,6 +156,22 @@ async function assigningCustomerservice(body) {
         return {
           status: 409,
           message: `Customer is already assigned to this client for the given job posting.`,
+        };
+      }
+
+      if (
+        existingAssignment?.customer_id === body?.customer_id &&
+        existingAssignment?.job_posting_id === body?.job_posting_id &&
+        (existingAssignment?.client_response === "decline")
+      ) {
+        shouldCreateNewAdminAssigned= false;
+        existingAssignment.update({
+          customer_id: body?.customer_id,
+          client_response: "pending",
+        });
+        return {
+          status: 200,
+          message: `Customer reassigned.`,
         };
       }
 
