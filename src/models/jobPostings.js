@@ -35,7 +35,7 @@ const JobPostings = sequelize.define("job_postings", {
     allowNull: false,
   },
   job_type: {
-    type: DataTypes.ENUM("on-site", "remote"),
+    type: DataTypes.ENUM("on-site", "remote", "hybrid"),
     defaultValue: "on-site",
     allowNull: false,
   },
@@ -53,7 +53,7 @@ const JobPostings = sequelize.define("job_postings", {
   },
   location: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   is_test_required: {
     type: DataTypes.BOOLEAN,
