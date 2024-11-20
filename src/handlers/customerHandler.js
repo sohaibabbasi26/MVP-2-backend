@@ -10,6 +10,7 @@ const {
   getJobsService,
   addCandidatePayment,
   getCandidatePaymentService,
+  changeStatusService,
 } = require("../services/customerservice");
 //get coding_result of customer
 const GetcodingresultHandler = async (req, res) => {
@@ -130,6 +131,16 @@ const getPaymentDetails = async (req, res) => {
   }
 }
 
+const changeStatus = async(req, res) => {
+  try{
+     const result = await changeStatusService(req.body.status, req.body.customer_id)
+     res.status(result.status).send({...result});
+  }catch(e){
+    console.log(e)
+    res.status(500).send(e.message);
+  }
+}
+
 module.exports = {
   getCustomerByEmailHandler,
   getCustomerById,
@@ -141,5 +152,6 @@ module.exports = {
   getCustomerExpertise,
   getJobs,
   postPaymentDetails,
-  getPaymentDetails
+  getPaymentDetails,
+  changeStatus,
 };

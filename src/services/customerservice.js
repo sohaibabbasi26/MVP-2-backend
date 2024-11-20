@@ -311,6 +311,38 @@ const getJobsService = async (job_posting_id, talent_status) => {
   }
 }
 
+
+const changeStatusService = async (status, customer_id) => {
+  try{
+    const [updateCount] = await Customer.update({
+      status
+    }, {
+      where: {
+        customer_id
+      }
+    })
+
+    if(updateCount > 0){
+      return {
+        status: 200,
+        message: "Success"
+      }
+    }
+
+    return {
+        status: 404,
+        message: "Update failed",
+      }
+
+  }catch(e){
+    console.log(e);
+    return {
+      status: 500,
+      message: e.message
+    }
+  }
+}
+
 module.exports = {
   getCustomerByIdService,
   getCustomerViaExpertise,
@@ -322,5 +354,6 @@ module.exports = {
   getCustomerByEmail,
   getJobsService,
   addCandidatePayment,
-  getCandidatePaymentService
+  getCandidatePaymentService,
+  changeStatusService
 };
