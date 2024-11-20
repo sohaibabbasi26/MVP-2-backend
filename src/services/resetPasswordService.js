@@ -36,8 +36,15 @@ const resetPassword = async (body) => {
     }
 
     if (user) {
+      if (user.password === null) {
+        return {
+          status: 403,
+          message:
+            "Password can not be changed. This might be because you might have signed in with google",
+        };
+      }
       //check password of the user and compare it
-      if (!await comparePassword(body.new_password, user.password)) {
+      if (!(await comparePassword(body.new_password, user.password))) {
         //enable user to reset the password
         await user.update({
           password: await encryptPasword(body.new_password),
