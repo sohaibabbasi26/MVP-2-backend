@@ -379,6 +379,11 @@ const routes = [
     url:'/get-candidate-bank-account',
     handler: customerHandler.getPaymentDetails
   },
+  {
+    method: 'PUT',
+    url: '/status',
+    handler: customerHandler.changeStatus
+  }
 ];
 
 module.exports = { routes };
