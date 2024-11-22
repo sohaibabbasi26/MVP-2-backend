@@ -13,6 +13,7 @@ const jobValidation= require('../pre-handlers/jobValidation')
 const jobHandler = require("../handlers/jobHandler");
 const testHandler = require("../handlers/testHandler");
 const hiringHandler= require('../handlers/hiringHandler')
+const notificationHandler = require('../handlers/notificationHandler');
 
 const routes = [
   {
@@ -130,6 +131,11 @@ const routes = [
     handler: adminHandler.fetchClientRequestHandler,
     // preHandler: primaryHandlers.checkRole("admin"),
   },
+  {
+      method: "POST",
+      url: "/subscribe",
+      handler: notificationHandler.subscribe,
+    }, 
   {
     method: "POST",
     url: "/client/client-response",

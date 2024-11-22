@@ -1,7 +1,7 @@
 const Client = require("../models/client");
 const { Client_Requests } = require("../models/client_requests");
 const Customer = require("../models/customer");
-
+const webPush = require("../../configurations/webPush")
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
@@ -34,7 +34,6 @@ async function admin_interview_scheduling_service(body) {
         customer_id: body.customer_id,
       },
     });
-
     const job = await JobPostings.findOne({
       where: {
         job_posting_id: body.job_posting_id,
@@ -51,7 +50,6 @@ async function admin_interview_scheduling_service(body) {
           client_id: body.client_id
         }
       });
-
       if (schedule) {
         const notification = scheduleInterview(
           {
@@ -70,7 +68,6 @@ async function admin_interview_scheduling_service(body) {
         //   customer_id: body?.customer_id,
         //   notification_type: 'trial'
         // })
-
         if (!notification) {
           return {
             status: 401,
@@ -78,6 +75,19 @@ async function admin_interview_scheduling_service(body) {
           };
         }
       }
+      const {subscription} = body;
+      console.log("Subscription received:", subscription);
+      const payload = JSON.stringify({
+        title: "Meeting ended",
+        body: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
+      });
+      webPush
+        .sendNotification(subscription, payload)
+        .then(() => console.log("DONEEE"))
+        .catch((error) => {
+          console.error("Error sending notification:", error);
+          res.status(500).send(error);
+        });
       return {
         status: 200,
         message: "interview is scheduled successfully",
@@ -87,15 +97,11 @@ async function admin_interview_scheduling_service(body) {
       //           to: body.customer_email,
       //           subject: "Interview Scheduled",
       //           text: `Dear Candidate,
-
       // Your interview is scheduled on ${body.interview_date} at ${body.interview_time}.
-
       // Thank you,
       // Co-VenTech`,
-
       //           user_role: `customer`,
       //         };
-
       //         // Send the email
       //         await sendMail(
       //           { body: emailData },
@@ -104,7 +110,6 @@ async function admin_interview_scheduling_service(body) {
       //             status: (code) => ({ send: (message) => console.log(message) }),
       //           }
       //         );
-
       //         return { message: "Successfully Scheduled an Interview" };
       //       } else {
       //         return { message: "Table not created" };

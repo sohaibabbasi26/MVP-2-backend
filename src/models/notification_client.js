@@ -57,7 +57,11 @@ const NotificationClient = sequelize.define('notification_client', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
-    }
+    },
+    is_read: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
 }, {
     hooks: {
         beforeCreate: (notification, options) => {
