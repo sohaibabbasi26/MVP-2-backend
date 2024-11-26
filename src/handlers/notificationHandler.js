@@ -1,4 +1,5 @@
-const webPush = require('../../configurations/webPush')
+const webPush = require('../../configurations/webPush');
+const notificationService= require('../services/notificationService')
 
 const subscribe = (req, res) => {
   const subscription = req.body;
@@ -16,4 +17,11 @@ const subscribe = (req, res) => {
     });
 };
 
-module.exports= {subscribe}
+const notificationCountHandler= async(req,res)=>{
+  const count= await notificationService.countNotificationService(req.query?.client_id);
+  res.status(200).send({
+    count
+  })
+}
+
+module.exports= {subscribe, notificationCountHandler}

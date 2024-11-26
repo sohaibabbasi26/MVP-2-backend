@@ -1015,7 +1015,7 @@ const isInterviewScheduledService= async(client_id, job_posting_id, customer_id)
       ]
     }
   });
-  if(result1&&result2){
+  if(result2){
     return true;
   }
   return false
