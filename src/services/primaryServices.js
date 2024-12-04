@@ -729,6 +729,7 @@ async function getCustomerResultService({ customer_id }) {
               "customer_id",
               "name",
               "email",
+              "status",
               "talent_status",
               "specialization",
               "experience",
