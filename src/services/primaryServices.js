@@ -58,13 +58,13 @@ async function customerSignupGoogle(data) {
           email: result?.email,
           id: result?.customer_id,
           status: result?.status,
-          user_role: 'customer'
+          user_role: "customer",
         });
         return {
           status: 200,
           message: "customer has been created successfully.",
           customer_id: result.customer_id,
-          token
+          token,
         };
       } catch (err) {
         console.log(
@@ -87,13 +87,7 @@ async function customerSignupGoogle(data) {
 
 async function customerSignup(data) {
   try {
-    const {
-      name,
-      email,
-      password,
-      //contact_no,
-      method,
-    } = data;
+    const { name, email, password, contact_no, method } = data;
     const isCustomerInDb = await checkCustomerInDb(email, method);
     if (isCustomerInDb === true) {
       return {
@@ -107,7 +101,7 @@ async function customerSignup(data) {
           name,
           email,
           password: hashedPassword,
-          //contact_no,
+          contact_no,
         };
         const result = await Customer.create(newData);
         const token = await jwtSignature({
@@ -115,13 +109,13 @@ async function customerSignup(data) {
           email: result?.email,
           id: result?.customer_id,
           status: result?.status,
-          user_role: 'customer'
+          user_role: "customer",
         });
         return {
           status: 200,
           message: "customer has been created successfully.",
           customer_id: result.customer_id,
-          token
+          token,
         };
       } catch (err) {
         console.log(
@@ -163,13 +157,13 @@ async function clientSignupGoogle(data) {
           email: result?.email,
           id: result?.client_id,
           status: result?.status,
-          user_role: 'client'
+          user_role: "client",
         });
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
           client_id: result.client_id,
-          token
+          token,
         };
       } catch (err) {
         console.log(
@@ -200,7 +194,7 @@ async function clientSignup(data) {
       //client_location,
       email,
       password,
-      //contact_no,
+      contact_no,
       method,
     } = data;
     const isClientInDb = await checkClientInDb(email, method);
@@ -217,21 +211,22 @@ async function clientSignup(data) {
           //client_location,
           email,
           password: hashedPassword,
-          //contact_no,
+          contact_no,
         };
         const result = await Client.create(newData);
         const token = await jwtSignature({
           name: result?.name,
           email: result?.email,
           id: result?.client_id,
+
           status: result?.status,
-          user_role: 'client'
+          user_role: "client",
         });
         return {
           status: 200,
           message: "CLIENT has been created successfully.",
           client_id: result.client_id,
-          token
+          token,
         };
       } catch (err) {
         console.log(
@@ -308,7 +303,7 @@ async function customerLogin(data) {
             email: fetchedCustomer.dataValues?.email,
             id: fetchedCustomer?.customer_id,
             status: fetchedCustomer.dataValues?.status,
-            user_role: 'customer'
+            user_role: "customer",
           }); // Pass customer_id and email
           return {
             status: 200,
@@ -365,7 +360,7 @@ async function clientLogin(data) {
             email: fetchedClient.dataValues?.email,
             id: fetchedClient?.client_id,
             status: fetchedClient.dataValues?.status,
-            user_role: 'client'
+            user_role: "client",
           });
 
           return {
@@ -745,7 +740,7 @@ async function getCustomerResultService({ customer_id }) {
       if (!result) {
         return {
           status: 404,
-          message: 'results not found'
+          message: "results not found",
         };
       }
 
@@ -804,8 +799,8 @@ async function getCustomerResultService({ customer_id }) {
         }
         return {
           status: 404,
-          message: "Customer has not given test"
-        }
+          message: "Customer has not given test",
+        };
       } catch (err) {
         console.log(
           "Error while finding the client's result:",
@@ -818,7 +813,6 @@ async function getCustomerResultService({ customer_id }) {
           err,
         };
       }
-
     }
   } catch (err) {
     console.log(
@@ -828,7 +822,7 @@ async function getCustomerResultService({ customer_id }) {
     );
     return {
       status: 500,
-      message: "Error while finding the requested client's info:"+ err
+      message: "Error while finding the requested client's info:" + err,
     };
   }
 }
@@ -978,37 +972,33 @@ async function setExperienceService({ experience, customer_id }) {
 }
 
 async function updatecustomer_service(body, customer_id) {
+  const result = await Customer.update(body, {
+    where: {
+      customer_id: customer_id,
+    },
+  });
 
-  const result = await Customer.update(
-    body,
-    {
-      where: {
-        customer_id: customer_id,
-      },
-    }
-  );
-
-  if(result){
-    return body
+  if (result) {
+    return body;
   }
-  return null
+  return null;
 }
 
-const isInterviewScheduledService= async(client_id, job_posting_id, customer_id)=>{
-  const result= await NotificationClient.findOne({
-    where:{
-      [Op.and]:[
-        {job_posting_id},
-        {client_id},
-        {customer_id}
-      ]
-    }
+const isInterviewScheduledService = async (
+  client_id,
+  job_posting_id,
+  customer_id
+) => {
+  const result = await NotificationClient.findOne({
+    where: {
+      [Op.and]: [{ job_posting_id }, { client_id }, { customer_id }],
+    },
   });
-  if(result){
+  if (result) {
     return true;
   }
-  return false
-}
+  return false;
+};
 
 module.exports = {
   isInterviewScheduledService,

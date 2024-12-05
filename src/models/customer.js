@@ -37,9 +37,9 @@ const Customer = sequelize.define("customers", {
   position: {
     type: DataTypes.JSONB,
   },
-  specialization:{
+  specialization: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
   // job_status: {
   //   type: DataTypes.ENUM("Assigned", "On-Job", "Un-Assigned"),
@@ -48,7 +48,7 @@ const Customer = sequelize.define("customers", {
   // },
   talent_status: {
     type: DataTypes.ENUM("hired", "trial", "interviewing", "open", "fulfilled"),
-    defaultValue:'open'
+    defaultValue: "open",
   },
   status: {
     type: DataTypes.ENUM("active", "in-active"),
@@ -78,26 +78,26 @@ const Customer = sequelize.define("customers", {
   experience: {
     type: DataTypes.ENUM("beginner", "intermediate", "expert"),
   },
-  city:{
+  city: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  country:{
+  country: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  area_code:{
+  area_code: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
   },
-  province:{
+  province: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  customer_location:{
+  customer_location: {
     type: DataTypes.STRING,
-    allowNull: true
-  }
+    allowNull: true,
+  },
 });
 
 module.exports = Customer;

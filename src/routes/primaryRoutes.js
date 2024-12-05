@@ -9,10 +9,10 @@ const clientValidation = require("../pre-handlers/clientValidation");
 const customerValidation = require("../pre-handlers/customerValidation");
 const adminValidation = require("../pre-handlers/adminValidation");
 const resetPasswordValidation = require("../pre-handlers/passwordResetValidation");
-const jobValidation= require('../pre-handlers/jobValidation')
+const jobValidation = require("../pre-handlers/jobValidation");
 const jobHandler = require("../handlers/jobHandler");
 const testHandler = require("../handlers/testHandler");
-const hiringHandler= require('../handlers/hiringHandler')
+const hiringHandler = require("../handlers/hiringHandler");
 
 const routes = [
   {
@@ -314,15 +314,15 @@ const routes = [
     handler: clientHandlers.getAllCandidatesOfClientJob,
   },
   {
-    method: 'GET',
-    url:'/get-jobs',
-    handler: customerHandler.getJobs
+    method: "GET",
+    url: "/get-jobs",
+    handler: customerHandler.getJobs,
   },
   {
-    method:'GET',
-    url:'/get-job-candidates',
+    method: "GET",
+    url: "/get-job-candidates",
     handler: jobHandler.getJobCandidates,
-    preHandler: jobValidation.getHiredCandidatesValidation
+    preHandler: jobValidation.getHiredCandidatesValidation,
   },
   {
     method: "POST",
@@ -336,35 +336,35 @@ const routes = [
     handler: clientHandlers.getNotificationClient,
   },
   {
-    method:'GET',
-    url:'/check-interview-status',
-    handler: primaryHandlers.checkInterviewStatus
+    method: "GET",
+    url: "/check-interview-status",
+    handler: primaryHandlers.checkInterviewStatus,
   },
   {
-    method: 'POST',
-    url:'/close-job',
-    handler: jobHandler.closeJob
+    method: "POST",
+    url: "/close-job",
+    handler: jobHandler.closeJob,
   },
   {
-    method: 'GET',
-    url:'/get-job-history-of-candidate',
-    handler: jobHandler.getJobHistory
+    method: "GET",
+    url: "/get-job-history-of-candidate",
+    handler: jobHandler.getJobHistory,
   },
   {
-    method:'GET',
-    url:'/get-stats',
-    handler: adminHandler.getStats
+    method: "GET",
+    url: "/get-stats",
+    handler: adminHandler.getStats,
   },
   {
-    method: 'POST',
-    url:'/create-hiring',
-    handler: hiringHandler.createHiringHandler
+    method: "POST",
+    url: "/create-hiring",
+    handler: hiringHandler.createHiringHandler,
   },
   {
-    method: 'GET',
-    url:'/get-hiring-payments',
-    handler: hiringHandler.getPaymentHiringHandler
-  }
+    method: "GET",
+    url: "/get-hiring-payments",
+    handler: hiringHandler.getPaymentHiringHandler,
+  },
 ];
 
 module.exports = { routes };
