@@ -34,7 +34,7 @@ const jobPostSchema = Joi.object({
   commitment: Joi.string().min(2).max(50).required(),
   status: Joi.string().min(2).max(50).required(),
   applied_customers_count: Joi.number().required(),
-  location: Joi.string().min(2).max(50).required(),
+  location: Joi.string().allow(null),
   is_test_required: Joi.boolean().required(),
   application_questions: Joi.array().optional(),
   project_length: Joi.string().required(),

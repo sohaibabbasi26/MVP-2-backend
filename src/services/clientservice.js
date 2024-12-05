@@ -228,7 +228,8 @@ const declineCustomerService = async (
   customer_id,
   job_posting_id,
   talent_status,
-  job_status
+  job_status,
+  notification_id
 ) => {
   try {
     const client = await Client.findByPk(client_id);
@@ -332,6 +333,7 @@ const declineCustomerService = async (
     await NotificationClient.update(
       {
         is_accepted: false,
+        is_read: true
       },
       {
         where: {
@@ -464,6 +466,7 @@ const clientAcceptService = async (body) => {
         await NotificationClient.update(
           {
             is_accepted: true,
+            is_read: true
           },
           {
             where: {
@@ -481,6 +484,7 @@ const clientAcceptService = async (body) => {
         await NotificationClient.update(
           {
             is_accepted: true,
+            is_read: true
           },
           {
             where: {

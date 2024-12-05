@@ -40,7 +40,7 @@ const Adminassigned = sequelize.define("admin_assigned_customer", {
     onDelete: "CASCADE",
   },
   client_response: {
-    type: DataTypes.ENUM("accept", "pending", "decline","closed"),
+    type: DataTypes.ENUM("accept", "pending", "decline","closed","scheduled"),
     defaultValue: "pending",
     allowNull: false,
   },

@@ -42,6 +42,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "socket.io": "^4.7.5",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "web-push": "^3.6.7"
   }
 }

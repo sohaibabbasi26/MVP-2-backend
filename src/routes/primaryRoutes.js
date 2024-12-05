@@ -13,6 +13,7 @@ const jobValidation = require("../pre-handlers/jobValidation");
 const jobHandler = require("../handlers/jobHandler");
 const testHandler = require("../handlers/testHandler");
 const hiringHandler = require("../handlers/hiringHandler");
+const notificationHandler = require("../handlers/notificationHandler");
 
 const routes = [
   {
@@ -129,6 +130,11 @@ const routes = [
     url: "/admin/fetch-client-requests",
     handler: adminHandler.fetchClientRequestHandler,
     // preHandler: primaryHandlers.checkRole("admin"),
+  },
+  {
+    method: "POST",
+    url: "/subscribe",
+    handler: notificationHandler.subscribe,
   },
   {
     method: "POST",
@@ -364,6 +370,26 @@ const routes = [
     method: "GET",
     url: "/get-hiring-payments",
     handler: hiringHandler.getPaymentHiringHandler,
+  },
+  {
+    method: "GET",
+    url: "/count-notification",
+    handler: notificationHandler.notificationCountHandler,
+  },
+  {
+    method: "POST",
+    url: "/add-candidate-bank-account",
+    handler: customerHandler.postPaymentDetails,
+  },
+  {
+    method: "GET",
+    url: "/get-candidate-bank-account",
+    handler: customerHandler.getPaymentDetails,
+  },
+  {
+    method: "PUT",
+    url: "/status",
+    handler: customerHandler.changeStatus,
   },
 ];
 

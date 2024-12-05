@@ -22,7 +22,7 @@ const createHiringService = async (req) => {
 };
 
 const getHiringPaymentService = async (req) => {
-  const { job_posting_id, stripe_client_id } = req?.query;
+  const { job_posting_id, stripe_client_id, customer_id } = req?.query;
 
   JobPostings.hasOne(HiringPayment, { foreignKey: "job_posting_id" });
   HiringPayment.belongsTo(JobPostings, { foreignKey: "job_posting_id" });
@@ -35,7 +35,35 @@ const getHiringPaymentService = async (req) => {
 
   let hiringPaymtByJob = null;
 
-  if (!job_posting_id && !stripe_client_id) {
+  if (!job_posting_id && !stripe_client_id && customer_id) {
+    hiringPaymtByJob = await HiringPayment.findAll({
+      where:{
+        customer_id
+      },
+      include: [
+        {
+          model: Client,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+        {
+          model: Customer,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+        {
+          model: JobPostings,
+          // attributes:{
+          //     exclude:['password']
+          // }
+        },
+      ],
+    });
+  }
+
+  if (!job_posting_id && !stripe_client_id && !customer_id) {
     hiringPaymtByJob = await HiringPayment.findAll({
       include: [
         {
@@ -60,7 +88,7 @@ const getHiringPaymentService = async (req) => {
     });
   }
   
-  if(job_posting_id && !stripe_client_id){
+  if(job_posting_id && !stripe_client_id && !customer_id){
     hiringPaymtByJob = await HiringPayment.findOne({
         where:{
             job_posting_id
@@ -88,7 +116,7 @@ const getHiringPaymentService = async (req) => {
       });
   }
 
-  if(!job_posting_id && stripe_client_id){
+  if(!job_posting_id && stripe_client_id && !customer_id){
     hiringPaymtByJob = await HiringPayment.findAll({
         where:{
             stripe_client_id
