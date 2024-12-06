@@ -172,12 +172,13 @@ async function assigningCustomerservice(body) {
         shouldCreateNewAdminAssigned= false;
         existingAssignment.update({
           customer_id: body?.customer_id,
+          hourly_rate: body?.hourly_rate,
           client_response: "pending",
         });
-        return {
-          status: 200,
-          message: `Customer reassigned.`,
-        };
+        // return {
+        //   status: 200,
+        //   message: `Customer reassigned.`,
+        // };
       }
 
       if (
