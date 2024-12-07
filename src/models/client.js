@@ -47,22 +47,30 @@ const Client = sequelize.define("clients", {
     allowNull: true,
     defaultValue: null,
   },
-  city:{
+  city: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  country:{
+  country: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
-  area_code:{
+  area_code: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
   },
-  province:{
+  province: {
     type: DataTypes.STRING,
-    allowNull: true
-  }
+    allowNull: true,
+  },
+  company_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  company_size: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 module.exports = Client;

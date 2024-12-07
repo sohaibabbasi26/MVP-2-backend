@@ -190,6 +190,8 @@ const getClientByIdService = async (id) => {
       "area_code",
       "country",
       "province",
+      "company_name",
+      "company_size",
     ],
     where: {
       client_id: id,
@@ -267,7 +269,7 @@ const declineCustomerService = async (
     const updated_job_assigned_customers = job_assigned_customers.filter(
       (cus) => cus.customer_id !== customer_id
     );
-    console.log(job_assigned_customers)
+    console.log(job_assigned_customers);
     console.log(updated_job_assigned_customers);
 
     const updated_position = position.filter(
@@ -333,7 +335,7 @@ const declineCustomerService = async (
     await NotificationClient.update(
       {
         is_accepted: false,
-        is_read: true
+        is_read: true,
       },
       {
         where: {
@@ -466,7 +468,7 @@ const clientAcceptService = async (body) => {
         await NotificationClient.update(
           {
             is_accepted: true,
-            is_read: true
+            is_read: true,
           },
           {
             where: {
@@ -484,7 +486,7 @@ const clientAcceptService = async (body) => {
         await NotificationClient.update(
           {
             is_accepted: true,
-            is_read: true
+            is_read: true,
           },
           {
             where: {
