@@ -1,3 +1,4 @@
+const { getClientStripeAccountService } = require("../services/clientservice");
 const {
   getCustomerViaExpertise,
   customerUpdateExpertise,
@@ -11,6 +12,8 @@ const {
   addCandidatePayment,
   getCandidatePaymentService,
   changeStatusService,
+  createCustomerStripeAccountService,
+  getCustomerStripeAccountService,
 } = require("../services/customerservice");
 //get coding_result of customer
 const GetcodingresultHandler = async (req, res) => {
@@ -141,6 +144,17 @@ const changeStatus = async(req, res) => {
   }
 }
 
+const createStripeAccount = async (req, res) => {
+  const result = await createCustomerStripeAccountService(req.body);
+  res.status(result.status).send({ ...result });
+};
+
+const getStripeAccount = async (req, res) => {
+  const result = await getCustomerStripeAccountService(req.query);
+  res.status(result.status).send({ ...result });
+};
+
+
 module.exports = {
   getCustomerByEmailHandler,
   getCustomerById,
@@ -154,4 +168,6 @@ module.exports = {
   postPaymentDetails,
   getPaymentDetails,
   changeStatus,
+  createStripeAccount,
+  getStripeAccount,
 };
