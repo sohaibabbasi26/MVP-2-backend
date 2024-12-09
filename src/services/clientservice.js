@@ -57,6 +57,7 @@ async function getallclients(client_id) {
             on: {
               client_id,
             },
+            order:[['createdAt','DESC']],
           },
         ],
         attributes: {
@@ -68,8 +69,10 @@ async function getallclients(client_id) {
         include: [
           {
             model: JobPostings,
+            order:[['createdAt','DESC']],
           },
         ],
+        //order:[['createdAt','DESC']],
         attributes: {
           exclude: ["password"],
         },

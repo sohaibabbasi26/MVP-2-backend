@@ -10,6 +10,7 @@ const getAllJobsService = async () => {
   Client.hasOne(JobPostings, { foreignKey: "client_id" });
   JobPostings.belongsTo(Client, { foreignKey: "client_id" });
   const result = await JobPostings.findAll({
+    order:[['createdAt','DESC']],
     include: [
       {
         model: Client,
@@ -79,6 +80,7 @@ const getJobStatusHiredTrialInterviewing = async (client_id) => {
           { job_status: "interviewing" },
         ],
       },
+      order:[['createdAt','DESC']]
     });
   } else {
     jobs = await JobPostings.findAll({
@@ -92,6 +94,7 @@ const getJobStatusHiredTrialInterviewing = async (client_id) => {
           ],
         },
       },
+      order:[['createdAt','DESC']]
     });
   }
 

@@ -720,6 +720,7 @@ async function getCustomerResultService({ customer_id }) {
         include: [
           {
             model: Customer,
+            order:[['createdAt','DESC']],
             attributes: [
               "customer_id",
               "name",
