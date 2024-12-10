@@ -720,13 +720,13 @@ async function getCustomerResultService({ customer_id }) {
         include: [
           {
             model: Customer,
-            order:[['createdAt','DESC']],
             attributes: [
               "customer_id",
               "name",
               "email",
               "status",
               "talent_status",
+              "admin_hourly_rate",
               "specialization",
               "experience",
               "hourly_rate",

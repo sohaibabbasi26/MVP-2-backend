@@ -5,7 +5,7 @@ const webPush = require("../../configurations/webPush")
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
-const { Sequelize, Op } = require("sequelize");
+const { Sequelize, Op, where } = require("sequelize");
 const JobPostings = require("../models/jobPostings");
 const { NotificationClient } = require("../models/notification_client");
 const Result = require("../models/results");
@@ -210,7 +210,6 @@ async function assigningCustomerservice(body) {
         job_posting_id: body.job_posting_id,
       },
     });
-
     // if (!customer.is_approved) {
     //   return {
     //     message: `Customer is not approved.`,
@@ -306,6 +305,7 @@ async function assigningCustomerservice(body) {
         talent_status: "interviewing",
         position: position,
         assigned_clients: assignedClients,
+        admin_hourly_rate: body.hourly_rate
         //hourly_rate: body.hourly_rate
       },
       {

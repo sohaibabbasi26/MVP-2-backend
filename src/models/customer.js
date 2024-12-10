@@ -75,6 +75,10 @@ const Customer = sequelize.define("customers", {
   hourly_rate: {
     type: DataTypes.INTEGER,
   },
+  admin_hourly_rate: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   experience: {
     type: DataTypes.ENUM("beginner", "intermediate", "expert"),
   },
