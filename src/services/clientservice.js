@@ -658,7 +658,7 @@ const clientCloseJobService = async (body) => {
       await JobHistory.update(
         {
           end_date: Date.now(),
-          status: "closed",
+          job_status: "closed",
         },
         {
           where: {
