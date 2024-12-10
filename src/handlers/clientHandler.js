@@ -54,9 +54,9 @@ async function client_updateprofile(req, res) {
   const body = req.body;
   const client_id = req.params.client_id;
 
-  if (body.password) {
-    delete body.password;
-  }
+  // if (body.password) {
+  //   delete body.password;
+  // }
   if (body.email) {
     delete body.email;
   }

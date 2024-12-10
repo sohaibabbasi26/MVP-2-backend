@@ -10,6 +10,7 @@ const Payment_Client = require("../models/payment_client");
 const { NotificationClient } = require("../models/notification_client");
 const Result = require("../models/results");
 const { JobHistory } = require("../models/job_history");
+const { encryptPasword } = require("../utilities/encryptPassword");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -57,7 +58,7 @@ async function getallclients(client_id) {
             on: {
               client_id,
             },
-            order:[['createdAt','DESC']],
+            order: [["createdAt", "DESC"]],
           },
         ],
         attributes: {
@@ -69,7 +70,7 @@ async function getallclients(client_id) {
         include: [
           {
             model: JobPostings,
-            order:[['createdAt','DESC']],
+            order: [["createdAt", "DESC"]],
           },
         ],
         //order:[['createdAt','DESC']],
@@ -110,8 +111,13 @@ async function updateclient_service(body, client_id) {
       "client not found => src->services->clientservice->updateclient_service"
     );
   }
-
-  await data.update(body);
+  
+  const hashedPassword = await encryptPasword(body?.password);
+  const newData = {
+    ...body,
+    password: hashedPassword,
+  };
+  await data.update(newData);
   return body;
 }
 
