@@ -5,6 +5,8 @@ const CodingResults = require("../models/codingResults");
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const JobPostings = require("../models/jobPostings");
 const CandidatePaymentDetails = require('../models/candidate_payment_details');
+const Payment_Customer = require("../models/payment_customer");
+
 //get coding_test result of a customer
 const getcodingresultService = async (customer_id) => {
   try {
@@ -343,6 +345,67 @@ const changeStatusService = async (status, customer_id) => {
   }
 }
 
+const createCustomerStripeAccountService = async (body) => {
+  const { customer_id, stripe_id } = body;
+  let msg = null;
+  try {
+    const customerFind = await Customer.findOne({
+      where: {
+        customer_id,
+      },
+    });
+
+    if (!customerFind) {
+      return {
+        status: 404,
+        message: "customer not found",
+      };
+    }
+    await Payment_Customer.create({
+      customer_id,
+      stripe_id,
+    });
+    return {
+      status: 200,
+      message: "account created successfully",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
+
+const getCustomerStripeAccountService = async (query) => {
+  const { customer_id } = query;
+  try {
+    const payment = await Payment_Customer.findOne({
+      where: {
+        customer_id,
+      },
+    });
+
+    if (payment)
+      return {
+        status: 200,
+        message: "customer account fetched successfully",
+        data: payment,
+      };
+
+    return {
+      status: 404,
+      message: "Customer account not registered",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
+
+
 module.exports = {
   getCustomerByIdService,
   getCustomerViaExpertise,
@@ -355,5 +418,7 @@ module.exports = {
   getJobsService,
   addCandidatePayment,
   getCandidatePaymentService,
-  changeStatusService
+  changeStatusService,
+  createCustomerStripeAccountService,
+  getCustomerStripeAccountService,
 };

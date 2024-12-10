@@ -270,6 +270,12 @@ const routes = [
     preHandler: clientValidation.validateSetClientStripeAccount,
   },
   {
+    method: "POST",
+    url: "/create-customer-stripe-account",
+    handler: customerHandler.createStripeAccount,
+    preHandler: customerValidation.validateSetCustomerStripeAccount,
+  },
+  {
     method: "GET",
     url: "/get-candidate-test-questions",
     handler: testHandler.getCandidateTestQuestion,
@@ -279,6 +285,12 @@ const routes = [
     url: "/get-client-stripe-account",
     handler: clientHandlers.getStripeAccount,
     preHandler: clientValidation.validateGetClientStripeAccount,
+  },
+  {
+    method: "GET",
+    url: "/get-customer-stripe-account",
+    handler: customerHandlers.getStripeAccount,
+    preHandler: customerValidation.validateGetCustomerStripeAccount,
   },
   {
     method: "POST",
