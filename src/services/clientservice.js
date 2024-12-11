@@ -111,12 +111,20 @@ async function updateclient_service(body, client_id) {
       "client not found => src->services->clientservice->updateclient_service"
     );
   }
+
+  let newData=null;
   
-  const hashedPassword = await encryptPasword(body?.password);
-  const newData = {
-    ...body,
-    password: hashedPassword,
-  };
+  if(body?.password){
+    const hashedPassword = await encryptPasword(body?.password);
+    newData = {
+      ...body,
+      password: hashedPassword,
+    };
+  }else{
+    newData={
+      ...body
+    }
+  }
   await data.update(newData);
   return body;
 }
