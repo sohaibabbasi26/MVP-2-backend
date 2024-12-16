@@ -16,7 +16,10 @@ const {
 } = require("./statsService");
 const ClientNotificationSubscription = require("../models/client_notification_subscription");
 const CustomerNotificationSubscription = require("../models/candidate_notification_subscription");
-const { sendNotificationToClient, sendNotificationToCustomer } = require("./notificationService");
+const {
+  sendNotificationToClient,
+  sendNotificationToCustomer,
+} = require("./notificationService");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -124,7 +127,10 @@ async function admin_interview_scheduling_service(body) {
         title: "Interview!!",
         body: `You have been scheduled for the job ${job?.position} on ${body?.interview_date}`,
       });
-      sendNotificationToCustomer(body?.customer_id,notificationCustomerPayload)
+      sendNotificationToCustomer(
+        body?.customer_id,
+        notificationCustomerPayload
+      );
       return {
         status: 200,
         message: "interview is scheduled successfully",
@@ -378,7 +384,7 @@ async function assigningCustomerservice(body) {
       body: `You have been selected for the job ${jobPosting?.position} by the Admin`,
     });
     sendNotificationToClient(body?.client_id, notificationClientPayload);
-    sendNotificationToCustomer(body?.customer_id,notificationCustomerPayload)
+    sendNotificationToCustomer(body?.customer_id, notificationCustomerPayload);
     //const data = await Adminassigned.create(body);
     return {
       status: 200,
