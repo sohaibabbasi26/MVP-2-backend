@@ -14,6 +14,7 @@ const {
   getJobStats,
   getClientStats,
 } = require("./statsService");
+const ClientNotificationSubscription = require("../models/client_notification_subscription");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -75,7 +76,23 @@ async function admin_interview_scheduling_service(body) {
           };
         }
       }
-      const {subscription} = body;
+
+      const clientSubcription= await ClientNotificationSubscription.findOne({
+        where:{
+          client_id: body.client_id
+        }
+      });
+      console.log(clientSubcription)
+
+      const subscription = {
+        endpoint: clientSubcription.endpoint,
+        keys: {
+          p256dh: clientSubcription.p256dh,
+          auth: clientSubcription.auth,
+        },
+      };
+      
+      //const {subscription} = body;
       console.log("Subscription received:", subscription);
       const payload = JSON.stringify({
         title: "Meeting ended",
