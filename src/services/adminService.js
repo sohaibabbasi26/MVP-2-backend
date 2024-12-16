@@ -1,7 +1,7 @@
 const Client = require("../models/client");
 const { Client_Requests } = require("../models/client_requests");
 const Customer = require("../models/customer");
-const webPush = require("../../configurations/webPush")
+const webPush = require("../../configurations/webPush");
 const Adminassigned = require("../models/admin_assigned_client_customer");
 const AdminInterview = require("../models/admin_interview_scheduling");
 const { sendMail } = require("../handlers/primaryHandlers");
@@ -15,6 +15,8 @@ const {
   getClientStats,
 } = require("./statsService");
 const ClientNotificationSubscription = require("../models/client_notification_subscription");
+const CustomerNotificationSubscription = require("../models/candidate_notification_subscription");
+const { sendNotificationToClient, sendNotificationToCustomer } = require("./notificationService");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -42,15 +44,18 @@ async function admin_interview_scheduling_service(body) {
     });
     if (data) {
       const schedule = await AdminInterview.create(body);
-      await Adminassigned.update({
-        client_response:'scheduled'
-      },{
-        where:{
-          customer_id: body.customer_id,
-          job_posting_id: body.job_posting_id,
-          client_id: body.client_id
+      await Adminassigned.update(
+        {
+          client_response: "scheduled",
+        },
+        {
+          where: {
+            customer_id: body.customer_id,
+            job_posting_id: body.job_posting_id,
+            client_id: body.client_id,
+          },
         }
-      });
+      );
       if (schedule) {
         const notification = scheduleInterview(
           {
@@ -77,34 +82,49 @@ async function admin_interview_scheduling_service(body) {
         }
       }
 
-      const clientSubcription= await ClientNotificationSubscription.findOne({
-        where:{
-          client_id: body.client_id
-        }
+      const clientSubcription = await ClientNotificationSubscription.findOne({
+        where: {
+          client_id: body.client_id,
+        },
       });
-      console.log(clientSubcription)
 
-      const subscription = {
+      const customerSubcription =
+        await CustomerNotificationSubscription.findOne({
+          where: {
+            customer_id: body?.customer_id,
+          },
+        });
+      console.log(clientSubcription);
+      console.log(customerSubcription);
+
+      const fetchedClientSubscription = {
         endpoint: clientSubcription.endpoint,
         keys: {
           p256dh: clientSubcription.p256dh,
           auth: clientSubcription.auth,
         },
       };
-      
+
+      const fetchedCustomerSubscription = {
+        endpoint: customerSubcription.endpoint,
+        keys: {
+          p256dh: customerSubcription.p256dh,
+          auth: customerSubcription.auth,
+        },
+      };
+
       //const {subscription} = body;
-      console.log("Subscription received:", subscription);
-      const payload = JSON.stringify({
+      console.log("Subscription received:", fetchedClientSubscription);
+      const notificationClientPayload = JSON.stringify({
         title: "Meeting ended",
         body: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
       });
-      webPush
-        .sendNotification(subscription, payload)
-        .then(() => console.log("DONEEE"))
-        .catch((error) => {
-          console.error("Error sending notification:", error);
-          res.status(500).send(error);
-        });
+
+      const notificationCustomerPayload = JSON.stringify({
+        title: "Interview!!",
+        body: `You have been scheduled for the job ${job?.position} on ${body?.interview_date}`,
+      });
+      sendNotificationToCustomer(body?.customer_id,notificationCustomerPayload)
       return {
         status: 200,
         message: "interview is scheduled successfully",
@@ -174,7 +194,7 @@ async function assigningCustomerservice(body) {
         (existingAssignment?.client_response === "pending" ||
           existingAssignment?.client_response === "accept")
       ) {
-        shouldCreateNewAdminAssigned= false;
+        shouldCreateNewAdminAssigned = false;
         return {
           status: 409,
           message: `Customer is already assigned to this client for the given job posting.`,
@@ -184,9 +204,9 @@ async function assigningCustomerservice(body) {
       if (
         existingAssignment?.customer_id === body?.customer_id &&
         existingAssignment?.job_posting_id === body?.job_posting_id &&
-        (existingAssignment?.client_response === "decline")
+        existingAssignment?.client_response === "decline"
       ) {
-        shouldCreateNewAdminAssigned= false;
+        shouldCreateNewAdminAssigned = false;
         existingAssignment.update({
           customer_id: body?.customer_id,
           hourly_rate: body?.hourly_rate,
@@ -259,7 +279,7 @@ async function assigningCustomerservice(body) {
       };
     }
 
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%",jobPosting);
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%", jobPosting);
 
     if (
       jobPosting?.assigned_customer?.length > 0 ||
@@ -307,7 +327,7 @@ async function assigningCustomerservice(body) {
     await JobPostings.update(
       {
         job_status: "interviewing",
-        assigned_customer: [{"customer_id": body?.customer_id}],
+        assigned_customer: [{ customer_id: body?.customer_id }],
         hourly_rate: body?.hourly_rate,
       },
       {
@@ -322,7 +342,7 @@ async function assigningCustomerservice(body) {
         talent_status: "interviewing",
         position: position,
         assigned_clients: assignedClients,
-        admin_hourly_rate: body.hourly_rate
+        admin_hourly_rate: body.hourly_rate,
         //hourly_rate: body.hourly_rate
       },
       {
@@ -345,6 +365,20 @@ async function assigningCustomerservice(body) {
         },
       }
     );
+
+    //const {subscription} = body;
+    //console.log("Subscription received:", fetchedClientSubscription);
+    const notificationClientPayload = JSON.stringify({
+      title: "Congratulations!!",
+      body: `The job ${jobPosting?.position} has been added by the admin`,
+    });
+
+    const notificationCustomerPayload = JSON.stringify({
+      title: "Congratulations!!",
+      body: `You have been selected for the job ${jobPosting?.position} by the Admin`,
+    });
+    sendNotificationToClient(body?.client_id, notificationClientPayload);
+    sendNotificationToCustomer(body?.customer_id,notificationCustomerPayload)
     //const data = await Adminassigned.create(body);
     return {
       status: 200,

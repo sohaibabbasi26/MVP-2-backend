@@ -4,6 +4,8 @@ const notificationService = require("../services/notificationService");
 const subscribe = async (req, res) => {
   const { subscription, user_id, user_role } = req.body;
   console.log("Subscription received:", subscription);
+  console.log(user_id)
+  console.log(user_role)
   // const payload = JSON.stringify({
   //   title: "Welcome!",
   //   body: "You are subscribed to notifications.",
