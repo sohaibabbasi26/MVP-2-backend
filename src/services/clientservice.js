@@ -11,6 +11,8 @@ const { NotificationClient } = require("../models/notification_client");
 const Result = require("../models/results");
 const { JobHistory } = require("../models/job_history");
 const { encryptPasword } = require("../utilities/encryptPassword");
+const { NotificationCandidates } = require("../models/notification_candidates");
+const { formatDate } = require("../utilities/dateFormat");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -112,18 +114,18 @@ async function updateclient_service(body, client_id) {
     );
   }
 
-  let newData=null;
-  
-  if(body?.password){
+  let newData = null;
+
+  if (body?.password) {
     const hashedPassword = await encryptPasword(body?.password);
     newData = {
       ...body,
       password: hashedPassword,
     };
-  }else{
-    newData={
-      ...body
-    }
+  } else {
+    newData = {
+      ...body,
+    };
   }
   await data.update(newData);
   return body;
@@ -370,6 +372,12 @@ const declineCustomerService = async (
       }
     );
 
+    await NotificationCandidates.create({
+      customer_id,
+      title: "Sorry :(",
+      message: `You have been removed for the job ${job_postings?.position}`,
+    });
+
     return {
       status: 200,
       message: "customer has been deleted",
@@ -497,6 +505,14 @@ const clientAcceptService = async (body) => {
             },
           }
         );
+
+        await NotificationCandidates.create({
+          customer_id,
+          title: "Congratulations!!",
+          message: `You have been assigned in trial period for the job ${
+            jobPosting?.position
+          } on ${formatDate(new Date(Date.now()))} for 14 days`,
+        });
       }
 
       if (body?.job_status === "hired") {
@@ -515,6 +531,14 @@ const clientAcceptService = async (body) => {
             },
           }
         );
+
+        await NotificationCandidates.create({
+          customer_id,
+          title: "Congratulations!!",
+          message: `You have been hired for the job ${
+            jobPosting?.position
+          } on ${formatDate(new Date(Date.now()))}`,
+        });
 
         const jobHistory = await JobHistory.findOne({
           where: {
@@ -967,6 +991,7 @@ const getNotificationClientService = async (client_id, date) => {
 
     //const client_notifications = [];
     const client_notifications = await NotificationClient.findAll({
+      order: [["updatedAt", "DESC"]],
       where: {
         client_id,
       },

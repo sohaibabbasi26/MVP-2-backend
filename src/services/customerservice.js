@@ -6,6 +6,7 @@ const Adminassigned = require("../models/admin_assigned_client_customer");
 const JobPostings = require("../models/jobPostings");
 const CandidatePaymentDetails = require('../models/candidate_payment_details');
 const Payment_Customer = require("../models/payment_customer");
+const { NotificationCandidates } = require("../models/notification_candidates");
 
 //get coding_test result of a customer
 const getcodingresultService = async (customer_id) => {
@@ -345,6 +346,108 @@ const changeStatusService = async (status, customer_id) => {
   }
 }
 
+const getNotificationCandidateService = async (candidate_id, date) => {
+  try {
+    if (!date) {
+      return {
+        status: 400,
+        message: "Invalid date",
+      };
+    }
+
+    await NotificationCandidates.update(
+      {
+        is_sent: true,
+      },
+      {
+        where: {
+          customer_id: candidate_id,
+        },
+      }
+    );
+
+    //console.log(notification)
+
+    // const notification = await NotificationClient.findAll({
+    //   where: { client_id }
+    // });
+
+    // if (!notification || notification.length === 0) {
+    //   return {
+    //     status: 400,
+    //     message: "No notifications yet"
+    //   };
+    // }
+
+    //const client_notifications = [];
+    const client_notifications = await NotificationCandidates.findAll({
+      order:[['updatedAt','DESC']],
+      where: {
+        customer_id: candidate_id,
+      },
+    });
+
+    // Parse input date to a Date object for comparison
+    const inputDate = new Date(date);
+    console.log(inputDate);
+
+    // for (let n of notification) {
+    //   const notificationData = n.dataValues;
+    //   const sendDate = new Date(notificationData.send_date).toISOString(); //remove toISOString() for the logic of 1 day
+    //   let send_minute= sendDate.split(':')[1] //remove this code for 1 day
+    //   const date_minute= date.split(':')[1]  // remove this code for 1 day
+    //   console.log(parseInt(send_minute)+4) // remove this code for 1 day
+    //   console.log(date_minute)  // remove this code for 1 day
+    //   send_minute= parseInt(send_minute)+4;
+    //   if(send_minute>59){  // case: if the send minute passes 1 hour, so it would be 60, but date_minute would consider 0
+    //     send_minute=0;
+    //   }
+
+    //   if (!notificationData.is_sent && send_minute <= parseInt(date_minute)) {
+    //     // If send_date has passed, mark the notification as sent
+    //     await n.update({ is_sent: true });
+    //     console.log(`Notification sent for client ${client_id} on ${inputDate}`);
+    //   }
+
+    //   if(notificationData.is_sent){
+    //     client_notifications.push(notificationData);
+    //   }
+
+    //   // Check if the notification is not sent yet
+    //   //this is for code after 1 day
+    //   // if (!notificationData.is_sent) {
+    //   //   // Compare send_date using getTime() to avoid millisecond issues
+    //   //   const sendDate = new Date(notificationData.send_date);
+    //   //   const inputDateObj = new Date(date);
+
+    //   //   //this is for code after 1 day
+    //   //   if (sendDate.getFullYear() === inputDateObj.getFullYear() &&
+    //   //     sendDate.getMonth() === inputDateObj.getMonth() &&
+    //   //     sendDate.getDate() === inputDateObj.getDate()) {
+    //   //     await n.update({ is_sent: true });
+    //   //     console.log(`Notification sent for client ${client_id} on ${date}`);
+    //   //   }
+
+    //   // }
+
+    //   // if(notificationData.is_sent){
+    //   //   client_notifications.push(notificationData);
+    //   // }
+    // }
+
+    return {
+      status: 200,
+      message: "Notifications fetched successfully",
+      data: client_notifications,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      message: e.message,
+    };
+  }
+};
+
 const createCustomerStripeAccountService = async (body) => {
   const { customer_id, stripe_id } = body;
   let msg = null;
@@ -421,4 +524,5 @@ module.exports = {
   changeStatusService,
   createCustomerStripeAccountService,
   getCustomerStripeAccountService,
+  getNotificationCandidateService
 };

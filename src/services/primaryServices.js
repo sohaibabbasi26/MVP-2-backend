@@ -37,6 +37,7 @@ const { SimpleQueue } = require("../utilities/TemporaryQueue");
 const { where, Op } = require("sequelize");
 const { NotificationClient } = require("../models/notification_client");
 const Adminassigned = require("../models/admin_assigned_client_customer");
+const { sendNotificationToClient } = require("./notificationService");
 
 async function customerSignupGoogle(data) {
   try {
@@ -543,6 +544,12 @@ async function createPositionsService(data) {
       console.log("request body: ", requestBody);
       try {
         const result = await JobPostings.create(requestBody);
+        const notificationClientPayload = {
+          title: "Job created!!",
+          message: `Your job ${position} has been created`,
+          notification_type:"info"
+        };
+        sendNotificationToClient(client_id, notificationClientPayload);
         return { statusCode: 200, data: result?.dataValues };
       } catch (e) {
         console.log(

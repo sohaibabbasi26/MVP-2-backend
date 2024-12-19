@@ -20,6 +20,7 @@ const {
   sendNotificationToClient,
   sendNotificationToCustomer,
 } = require("./notificationService");
+const { formatDate } = require("../utilities/dateFormat");
 
 const scheduleInterview = async (body, interviewDate) => {
   const notificationDate = new Date(interviewDate);
@@ -63,7 +64,7 @@ async function admin_interview_scheduling_service(body) {
         const notification = scheduleInterview(
           {
             job_posting_id: body?.job_posting_id,
-            message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
+            message: `Your interview with candidate ${data?.name} for the job ${job?.position} is scheduled on ${formatDate(body?.interview_date)}`,
             client_id: body?.client_id,
             customer_id: body?.customer_id,
             notification_type: "trial",
@@ -85,48 +86,54 @@ async function admin_interview_scheduling_service(body) {
         }
       }
 
-      const clientSubcription = await ClientNotificationSubscription.findOne({
-        where: {
-          client_id: body.client_id,
-        },
-      });
+      // const clientSubcription = await ClientNotificationSubscription.findOne({
+      //   where: {
+      //     client_id: body.client_id,
+      //   },
+      // });
 
-      const customerSubcription =
-        await CustomerNotificationSubscription.findOne({
-          where: {
-            customer_id: body?.customer_id,
-          },
-        });
-      console.log(clientSubcription);
-      console.log(customerSubcription);
+      // const customerSubcription =
+      //   await CustomerNotificationSubscription.findOne({
+      //     where: {
+      //       customer_id: body?.customer_id,
+      //     },
+      //   });
+      // console.log(clientSubcription);
+      // console.log(customerSubcription);
 
-      const fetchedClientSubscription = {
-        endpoint: clientSubcription.endpoint,
-        keys: {
-          p256dh: clientSubcription.p256dh,
-          auth: clientSubcription.auth,
-        },
-      };
+      // const fetchedClientSubscription = {
+      //   endpoint: clientSubcription.endpoint,
+      //   keys: {
+      //     p256dh: clientSubcription.p256dh,
+      //     auth: clientSubcription.auth,
+      //   },
+      // };
 
-      const fetchedCustomerSubscription = {
-        endpoint: customerSubcription.endpoint,
-        keys: {
-          p256dh: customerSubcription.p256dh,
-          auth: customerSubcription.auth,
-        },
-      };
+      // const fetchedCustomerSubscription = {
+      //   endpoint: customerSubcription.endpoint,
+      //   keys: {
+      //     p256dh: customerSubcription.p256dh,
+      //     auth: customerSubcription.auth,
+      //   },
+      // };
 
       //const {subscription} = body;
-      console.log("Subscription received:", fetchedClientSubscription);
-      const notificationClientPayload = JSON.stringify({
-        title: "Meeting ended",
-        body: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
-      });
+      //console.log("Subscription received:", fetchedClientSubscription);
+      // const notificationClientPayload = {
+      //   title: "Meeting ended",
+      //   notification_type:"trial",
+      //   message: `Your interview with candidate ${data?.name} for the job ${job?.position} has been completed. Do you want to accept that candidate for TRIAL?`,
+      // };
 
-      const notificationCustomerPayload = JSON.stringify({
+      // console.log(notificationClientPayload)
+
+      // sendNotificationToClient(body?.client_id, notificationClientPayload)
+
+      const notificationCustomerPayload = {
         title: "Interview!!",
-        body: `You have been scheduled for the job ${job?.position} on ${body?.interview_date}`,
-      });
+        message: `You have been scheduled for the job ${job?.position} on ${formatDate(body?.interview_date)}`,
+        notification_type: "refer"
+      };
       sendNotificationToCustomer(
         body?.customer_id,
         notificationCustomerPayload
@@ -285,8 +292,6 @@ async function assigningCustomerservice(body) {
       };
     }
 
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%", jobPosting);
-
     if (
       jobPosting?.assigned_customer?.length > 0 ||
       jobPosting?.assigned_customer !== null
@@ -326,10 +331,7 @@ async function assigningCustomerservice(body) {
       position.push({ job_posting_id: body.job_posting_id });
     }
 
-    console.log(
-      "////////////////////////////////////////////////////////",
-      assignedCustomers
-    );
+    
     await JobPostings.update(
       {
         job_status: "interviewing",
@@ -374,15 +376,18 @@ async function assigningCustomerservice(body) {
 
     //const {subscription} = body;
     //console.log("Subscription received:", fetchedClientSubscription);
-    const notificationClientPayload = JSON.stringify({
+    const notificationClientPayload = {
       title: "Congratulations!!",
-      body: `The job ${jobPosting?.position} has been added by the admin`,
-    });
+      message: `You got a candidate for the job ${jobPosting?.position}`,
+      notification_type:"info"
+    };
+    //console.log(notificationClientPayload)
 
-    const notificationCustomerPayload = JSON.stringify({
+    const notificationCustomerPayload = {
       title: "Congratulations!!",
-      body: `You have been selected for the job ${jobPosting?.position} by the Admin`,
-    });
+      message: `You have been referred for the job ${jobPosting?.position} by the Admin`,
+      notification_type:"refer"
+    };
     sendNotificationToClient(body?.client_id, notificationClientPayload);
     sendNotificationToCustomer(body?.customer_id, notificationCustomerPayload);
     //const data = await Adminassigned.create(body);

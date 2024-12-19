@@ -1,5 +1,5 @@
 //const dateString = '2024-10-10T19:00:00.000000Z';
-const date = new Date(dateString);
+//const date = new Date(dateString);
 
 // Function to format the date and time in AM/PM
 function formatDate(date) {
@@ -11,8 +11,11 @@ function formatDate(date) {
         minute: 'numeric',
         hour12: true, // Use 12-hour format
     };
+
+    const d= new Date(date)
     
-    return date.toLocaleString('en-US', options); // Convert to a string based on locale
+    return d.toLocaleString('en-US', options); // Convert to a string based on locale
+    
 }
 
 module.exports= {formatDate};

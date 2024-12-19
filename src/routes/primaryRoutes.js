@@ -355,6 +355,11 @@ const routes = [
   },
   {
     method: "GET",
+    url: "/get-candidate-notification",
+    handler: customerHandler.getNotificationCustomer,
+  },
+  {
+    method: "GET",
     url: "/check-interview-status",
     handler: primaryHandlers.checkInterviewStatus,
   },

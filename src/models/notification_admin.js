@@ -5,7 +5,7 @@ const JobPostings = require("./jobPostings");
 const Customer = require("./customer");
 
 const NotificationCandidates = sequelize.define(
-  "notification_customer",
+  "notification_admin",
   {
     notification_id: {
       type: DataTypes.UUID,
@@ -28,7 +28,7 @@ const NotificationCandidates = sequelize.define(
       },
     },
     notification_type: {
-      type: DataTypes.ENUM("trial", "hire", "refer"),
+      type: DataTypes.ENUM("info"),
       allowNull: true,
     },
     job_posting_id: {

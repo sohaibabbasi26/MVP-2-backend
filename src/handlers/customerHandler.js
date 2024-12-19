@@ -14,6 +14,7 @@ const {
   changeStatusService,
   createCustomerStripeAccountService,
   getCustomerStripeAccountService,
+  getNotificationCandidateService,
 } = require("../services/customerservice");
 //get coding_result of customer
 const GetcodingresultHandler = async (req, res) => {
@@ -149,6 +150,11 @@ const createStripeAccount = async (req, res) => {
   res.status(result.status).send({ ...result });
 };
 
+const getNotificationCustomer= async(req,res)=>{
+  const result= await getNotificationCandidateService(req.query?.candidate_id, req.query?.today_date);
+  res.status(result.status).send({...result})
+}
+
 const getStripeAccount = async (req, res) => {
   const result = await getCustomerStripeAccountService(req.query);
   res.status(result.status).send({ ...result });
@@ -170,4 +176,5 @@ module.exports = {
   changeStatus,
   createStripeAccount,
   getStripeAccount,
+  getNotificationCustomer
 };
