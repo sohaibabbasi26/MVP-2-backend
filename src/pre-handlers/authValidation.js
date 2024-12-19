@@ -21,6 +21,7 @@ const registerSchema = Joi.object({
   contact_no: Joi.string().min(9).max(50),
   method: Joi.string().min(2).required(),
   user_role: Joi.string().min(2).required(),
+  country: Joi.optional(),
   //client_location: Joi.string().min(2)
 });
 
