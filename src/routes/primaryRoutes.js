@@ -395,12 +395,12 @@ const routes = [
   },
   {
     method: "POST",
-    url: "/add-candidate-bank-account",
+    url: "/add-candidate-account-details",
     handler: customerHandler.postPaymentDetails,
   },
   {
     method: "GET",
-    url: "/get-candidate-bank-account",
+    url: "/get-candidate-account-details",
     handler: customerHandler.getPaymentDetails,
   },
   {

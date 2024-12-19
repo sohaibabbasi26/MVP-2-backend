@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../configurations/sequelizePgSQL");
 const Customer = require("./customer"); // Ensure correct import
 
-const CandidatePaymentDetails = sequelize.define("candidate_payment_details", {
-  candidate_payment_id: {
+const CandidatePaymentDetails = sequelize.define("candidate_account_details", {
+  candidate_acct_id: {
     type: DataTypes.UUID,
     allowNull: false,
     defaultValue: DataTypes.UUIDV4,
@@ -18,32 +18,28 @@ const CandidatePaymentDetails = sequelize.define("candidate_payment_details", {
     },
     onDelete: "CASCADE",
   },
-  
-  account_title:{
+
+  account_holder_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  account_no: {
+  account_type: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-   iban_no: {
+  account_number: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-   bank_name: {
+  routing_number: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-   city: {
+  representative_first_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-   state: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-   country: {
+  representative_last_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
