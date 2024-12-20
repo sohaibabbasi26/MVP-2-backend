@@ -4,7 +4,7 @@ const Client = require("./client");
 const JobPostings = require("./jobPostings");
 const Customer = require("./customer");
 
-const NotificationCandidates = sequelize.define(
+const NotificationAdmin = sequelize.define(
   "notification_admin",
   {
     notification_id: {
@@ -90,5 +90,5 @@ const NotificationCandidates = sequelize.define(
 // });
 
 module.exports = {
-  NotificationCandidates,
+  NotificationAdmin,
 };

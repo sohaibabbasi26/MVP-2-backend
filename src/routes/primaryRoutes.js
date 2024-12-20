@@ -360,6 +360,11 @@ const routes = [
   },
   {
     method: "GET",
+    url: "/get-admin-notification",
+    handler: adminHandler.getNotificationAdmin,
+  },
+  {
+    method: "GET",
     url: "/check-interview-status",
     handler: primaryHandlers.checkInterviewStatus,
   },

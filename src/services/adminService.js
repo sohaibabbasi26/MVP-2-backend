@@ -8,6 +8,7 @@ const { sendMail } = require("../handlers/primaryHandlers");
 const { Sequelize, Op, where } = require("sequelize");
 const JobPostings = require("../models/jobPostings");
 const { NotificationClient } = require("../models/notification_client");
+const {NotificationAdmin} = require("../models/notification_admin");
 const Result = require("../models/results");
 const {
   getCandidateStats,
@@ -46,6 +47,8 @@ async function admin_interview_scheduling_service(body) {
         job_posting_id: body.job_posting_id,
       },
     });
+
+    const client= await Client.findByPk(body?.client_id);
     if (data) {
       await data?.update({
         talent_status: "interviewing",
@@ -66,6 +69,16 @@ async function admin_interview_scheduling_service(body) {
           },
         }
       );
+
+      await NotificationAdmin.create({
+        title: "Interview Scheduled",
+        message: `Interview with candidate ${data?.name} for the job ${job?.position} is scheduled on ${formatDate(body?.interview_date)} with the client ${client?.name}`,
+        client_id: body?.client_id,
+        customer_id: body?.customer_id,
+        notification_type: "info",
+        job_posting_id: body?.job_posting_id,
+      });
+
       if (schedule) {
         const notification = scheduleInterview(
           {
@@ -587,6 +600,14 @@ const getStatsService = async () => {
   };
 };
 
+const getNotificationAdminService = async () => {
+  const adminNotifications = await NotificationAdmin.findAll()
+  return {
+    status: 200,
+    data: adminNotifications
+  };
+}
+
 module.exports = {
   approveCustomerService,
   fetchClientRequestService,
@@ -595,4 +616,5 @@ module.exports = {
   getcustomerwithid,
   approveClientService,
   getStatsService,
+  getNotificationAdminService,
 };

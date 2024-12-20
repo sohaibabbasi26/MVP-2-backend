@@ -13,6 +13,7 @@ const { JobHistory } = require("../models/job_history");
 const { encryptPasword } = require("../utilities/encryptPassword");
 const { NotificationCandidates } = require("../models/notification_candidates");
 const { formatDate } = require("../utilities/dateFormat");
+const { NotificationAdmin } = require("../models/notification_admin");
 
 //job posting via client_Id
 //get job posting via client-Id
@@ -378,6 +379,15 @@ const declineCustomerService = async (
       message: `You have been removed for the job ${job_postings?.position}`,
     });
 
+    await NotificationAdmin.create({
+      title: "Referral Request",
+      message: `The client ${client?.name} for the job ${job_postings?.position} is requesting a new referral. Please assign a new candidate.`,
+      client_id,
+      customer_id,
+      notification_type: "info",
+      job_posting_id,
+    });
+
     return {
       status: 200,
       message: "customer has been deleted",
@@ -513,6 +523,15 @@ const clientAcceptService = async (body) => {
             jobPosting?.position
           } on ${formatDate(new Date(Date.now()))} for 14 days`,
         });
+
+        await NotificationAdmin.create({
+          title: "Trial Period",
+          message: `The client ${client?.name} has accepted the candidate ${customer?.name} in TRIAL period for the job ${jobPosting?.position}.`,
+          client_id: client?.client_id,
+          customer_id: customer?.customer_id,
+          notification_type: "info",
+          job_posting_id: job_id,
+        });
       }
 
       if (body?.job_status === "hired") {
@@ -538,6 +557,15 @@ const clientAcceptService = async (body) => {
           message: `You have been hired for the job ${
             jobPosting?.position
           } on ${formatDate(new Date(Date.now()))}`,
+        });
+
+        await NotificationAdmin.create({
+          title: "Hired",
+          message: `The client ${client?.name} has hired the candidate ${customer?.name} for the job ${jobPosting?.position}.`,
+          client_id: client?.client_id,
+          customer_id: customer?.customer_id,
+          notification_type: "info",
+          job_posting_id: job_id,
         });
 
         const jobHistory = await JobHistory.findOne({
@@ -991,7 +1019,7 @@ const getNotificationClientService = async (client_id, date) => {
 
     //const client_notifications = [];
     const client_notifications = await NotificationClient.findAll({
-      order: [["updatedAt", "DESC"]],
+      order: [["createdAt", "DESC"]],
       where: {
         client_id,
       },

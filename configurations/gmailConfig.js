@@ -1,31 +1,53 @@
 
+// const nodemailer = require("nodemailer");
+// const dotenv = require("dotenv");
+// const { OAuth2Client } = require("google-auth-library");
+// dotenv.config();
+
+// const oauth2Client= new OAuth2Client({
+//   clientId: process.env.GMAIL_CLIENT_ID,
+//   clientSecret: process.env.GMAIL_CLIENT_SECRET,
+// })
+
+// oauth2Client.setCredentials({
+//   refresh_token: process.env.GMAIL_REFRESH_TOKEN,
+// });
+
+// const accessToken= oauth2Client.getAccessToken();
+
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   //port: 587,
+//   auth: {
+//       type: 'OAuth2',
+//       user: process.env.GMAIL_EMAIL,
+//       // pass: process.env.GMAIL_PASS,
+//       clientId: process.env.GMAIL_CLIENT_ID,
+//       clientSecret: process.env.GMAIL_CLIENT_SECRET,
+//       refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+//       accessToken: accessToken
+//   }
+// });
+// module.exports = transporter;
+
 const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-const { OAuth2Client } = require("google-auth-library");
-dotenv.config();
-
-const oauth2Client= new OAuth2Client({
-  clientId: process.env.GMAIL_CLIENT_ID,
-  clientSecret: process.env.GMAIL_CLIENT_SECRET,
-})
-
-oauth2Client.setCredentials({
-  refresh_token: process.env.GMAIL_REFRESH_TOKEN,
-});
-
-const accessToken= oauth2Client.getAccessToken();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  //port: 587,
+  host: "smtp.hostinger.com", // Replace with your Hostinger SMTP server
+  port: 465, // Use 587 for TLS or 465 for SSL
+  secure: true, // true for SSL
   auth: {
-      type: 'OAuth2',
-      user: process.env.GMAIL_EMAIL,
-      // pass: process.env.GMAIL_PASS,
-      clientId: process.env.GMAIL_CLIENT_ID,
-      clientSecret: process.env.GMAIL_CLIENT_SECRET,
-      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-      accessToken: accessToken
-  }
+    user: process.env.GMAIL_EMAIL, // Your Hostinger email
+    pass: process.env.GMAIL_PASS, // Your email password
+  },
 });
+
+// transporter.sendMail(mailOptions, (error, info) => {
+//   if (error) {
+//     console.log("Error sending email:", error);
+//   } else {
+//     console.log("Email sent:", info.response);
+//   }
+// });
+
 module.exports = transporter;
