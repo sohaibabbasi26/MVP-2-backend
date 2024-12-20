@@ -12,6 +12,7 @@ const getHiredCandidatesSchema = Joi.object({
       "not-qualified",
       "hired-and-trial",
       "hired-trial-interviewing",
+      "hired-trial-referred-interviewing",
       "all"
     )
     .required(),

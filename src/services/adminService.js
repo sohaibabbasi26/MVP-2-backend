@@ -47,6 +47,12 @@ async function admin_interview_scheduling_service(body) {
       },
     });
     if (data) {
+      await data?.update({
+        talent_status: "interviewing",
+      });
+      await job?.update({
+        job_status: "interviewing",
+      });
       const schedule = await AdminInterview.create(body);
       await Adminassigned.update(
         {
@@ -334,7 +340,7 @@ async function assigningCustomerservice(body) {
     
     await JobPostings.update(
       {
-        job_status: "interviewing",
+        job_status: "referred",
         assigned_customer: [{ customer_id: body?.customer_id }],
         hourly_rate: body?.hourly_rate,
       },
@@ -347,7 +353,7 @@ async function assigningCustomerservice(body) {
 
     await Customer.update(
       {
-        talent_status: "interviewing",
+        talent_status: "referred",
         position: position,
         assigned_clients: assignedClients,
         admin_hourly_rate: body.hourly_rate,
@@ -410,7 +416,11 @@ async function getcustomerwithid(client_id) {
     const result = await Adminassigned.findOne({
       where: {
         client_id,
-        client_response: "pending",
+        [Op.or]: [
+          {client_response: "pending"},
+          {client_response: "scheduled"}
+        ]
+        //client_response: "pending"
       },
       include: [
         {
