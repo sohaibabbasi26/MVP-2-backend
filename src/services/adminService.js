@@ -83,7 +83,9 @@ async function admin_interview_scheduling_service(body) {
         const notification = scheduleInterview(
           {
             job_posting_id: body?.job_posting_id,
-            message: `Your interview with candidate ${data?.name} for the job ${job?.position} is scheduled on ${formatDate(body?.interview_date)}`,
+            message: `Your interview with candidate ${data?.name} for the job ${
+              job?.position
+            } is scheduled on ${formatDate(body?.interview_date)}`,
             client_id: body?.client_id,
             customer_id: body?.customer_id,
             notification_type: "trial",
@@ -150,8 +152,10 @@ async function admin_interview_scheduling_service(body) {
 
       const notificationCustomerPayload = {
         title: "Interview!!",
-        message: `You have been scheduled for the job ${job?.position} on ${formatDate(body?.interview_date)}`,
-        notification_type: "refer"
+        message: `You have been scheduled for the job ${
+          job?.position
+        } on ${formatDate(body?.interview_date)}`,
+        notification_type: "refer",
       };
       sendNotificationToCustomer(
         body?.customer_id,
@@ -350,7 +354,6 @@ async function assigningCustomerservice(body) {
       position.push({ job_posting_id: body.job_posting_id });
     }
 
-    
     await JobPostings.update(
       {
         job_status: "referred",
@@ -398,14 +401,14 @@ async function assigningCustomerservice(body) {
     const notificationClientPayload = {
       title: "Congratulations!!",
       message: `You got a candidate for the job ${jobPosting?.position}`,
-      notification_type:"info"
+      notification_type: "info",
     };
     //console.log(notificationClientPayload)
 
     const notificationCustomerPayload = {
       title: "Congratulations!!",
       message: `You have been referred for the job ${jobPosting?.position} by the Admin`,
-      notification_type:"refer"
+      notification_type: "refer",
     };
     sendNotificationToClient(body?.client_id, notificationClientPayload);
     sendNotificationToCustomer(body?.customer_id, notificationCustomerPayload);
