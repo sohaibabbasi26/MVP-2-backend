@@ -20,10 +20,10 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  experience:{
-    type: DataTypes.ENUM("beginner","intermediate","expert"),
+  experience: {
+    type: DataTypes.ENUM("beginner", "intermediate", "expert"),
     allowNull: false,
-    defaultValue:"beginner"
+    defaultValue: "beginner",
   },
   skills: {
     type: DataTypes.JSONB,
@@ -60,7 +60,15 @@ const JobPostings = sequelize.define("job_postings", {
   },
   //ADDED job_status because we dont wanna use multiple joins to get status
   job_status: {
-    type: DataTypes.ENUM("fulfilled", "hired", "open", "trial","closed", "interviewing"), //fulfilled, hired, open
+    type: DataTypes.ENUM(
+      "fulfilled",
+      "hired",
+      "open",
+      "trial",
+      "closed",
+      "interviewing",
+      "referred"
+    ), //fulfilled, hired, open
     defaultValue: "open",
     allowNull: false,
   },
@@ -80,9 +88,9 @@ const JobPostings = sequelize.define("job_postings", {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  hourly_rate:{
+  hourly_rate: {
     type: DataTypes.INTEGER,
-    defaultValue:0
+    defaultValue: 0,
   },
   workday_overlap: {
     type: DataTypes.STRING,

@@ -89,7 +89,7 @@ async function customerSignupGoogle(data) {
 
 async function customerSignup(data) {
   try {
-    const { name, email, password, contact_no, method } = data;
+    const { name, email, password, contact_no, country, method } = data;
     const isCustomerInDb = await checkCustomerInDb(email, method);
     if (isCustomerInDb === true) {
       return {
@@ -102,6 +102,7 @@ async function customerSignup(data) {
         const newData = {
           name,
           email,
+          country,
           password: hashedPassword,
           contact_no,
         };
@@ -193,6 +194,7 @@ async function clientSignup(data) {
   try {
     const {
       name,
+      country,
       //client_location,
       email,
       password,
@@ -212,6 +214,7 @@ async function clientSignup(data) {
           name,
           //client_location,
           email,
+          country,
           password: hashedPassword,
           contact_no,
         };

@@ -47,7 +47,7 @@ const Customer = sequelize.define("customers", {
   //   allowNull: false,
   // },
   talent_status: {
-    type: DataTypes.ENUM("hired", "trial", "interviewing", "open", "fulfilled"),
+    type: DataTypes.ENUM("hired", "trial", "interviewing", "open", "fulfilled","referred"),
     defaultValue: "open",
   },
   status: {
