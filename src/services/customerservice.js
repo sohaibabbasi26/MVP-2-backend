@@ -388,7 +388,7 @@ const getNotificationCandidateService = async (candidate_id, date) => {
 
     //const client_notifications = [];
     const client_notifications = await NotificationCandidates.findAll({
-      order:[['updatedAt','DESC']],
+      order: [["createdAt", "DESC"]],
       where: {
         customer_id: candidate_id,
       },

@@ -601,7 +601,9 @@ const getStatsService = async () => {
 };
 
 const getNotificationAdminService = async () => {
-  const adminNotifications = await NotificationAdmin.findAll()
+  const adminNotifications = await NotificationAdmin.findAll({
+    order:[['createdAt','DESC']]
+  })
   return {
     status: 200,
     data: adminNotifications
